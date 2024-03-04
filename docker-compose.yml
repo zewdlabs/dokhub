@@ -20,10 +20,38 @@ services:
     ports:
       - 3001:3001
     networks:
+      - database_network
       - app_network
-
+  database:
+    container_name: database
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_HOST: host
+      POSTGRES_PORT: port
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: dbname
+    ports:
+      - 5432:5432
+    networks:
+      - database_network
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_LISTEN_PORT: 5050
+    ports:
+      - "5050:5050"
+    networks:
+      - database_network
 # Define a network, which allows containers to communicate
 # with each other, by using their container name as a hostname
 networks:
   app_network:
     external: true
+  database_network:
+    driver: bridge
