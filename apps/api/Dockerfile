@@ -5,8 +5,8 @@ FROM node:20-alpine AS base
 
 FROM base AS builder
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
-RUN apk update
+RUN apk add --no-cache libc6-compat &&\
+    apk update
 
 # Install pnpm
 # RUN wget -qO- https://get.pnpm.io/install.sh | ENV="$HOME/.shrc" SHELL="$(which sh)" sh -
@@ -22,8 +22,8 @@ RUN turbo prune api --docker
 
 # Add lockfile and package.json's of isolated subworkspace
 FROM base AS installer
-RUN apk add --no-cache libc6-compat
-RUN apk update
+RUN apk add --no-cache libc6-compat &&\
+    apk update
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable pnpm
@@ -52,9 +52,9 @@ FROM base AS runner
 WORKDIR /app
 
 # Don't run production as root
-RUN addgroup --system --gid 1001 expressjs
-RUN adduser --system --uid 1001 expressjs
+RUN addgroup --system --gid 1001 expressjs &&\
+    adduser --system --uid 1001 expressjs
 USER expressjs
 COPY --from=installer /app .
 
-CMD node apps/api/dist/index.js
+CMD ["node", "apps/api/dist/index.js"]
