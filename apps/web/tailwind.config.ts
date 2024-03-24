@@ -1,20 +1,17 @@
+// tailwind config is required for editor support
 import type { Config } from "tailwindcss";
+import sharedConfig from "@turbocharger/tailwind-config/tailwind.config.ts";
 
-const config: Config = {
-  content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
-  theme: {
-    extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-      },
+const config: Pick<Config, "presets"> = {
+  presets: [
+    {
+      ...sharedConfig,
+      content: [
+        "./**/*.{js,ts,jsx,tsx}",
+        "../../packages/ui/src/**/*{.js,.ts,.jsx,.tsx}",
+      ],
     },
-  },
-  plugins: [],
+  ],
 };
+
 export default config;
