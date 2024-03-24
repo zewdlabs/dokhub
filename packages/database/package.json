@@ -9,12 +9,14 @@
     "db:migrate:dev": "prisma migrate dev",
     "db:push": "prisma db push",
     "db:seed": "tsx src/seed.ts",
+    "db:studio": "prisma studio",
     "generate": "prisma generate",
-    "studio": "prisma studio",
-    "format": "prisma format"
+    "format": "prisma format",
+    "lint": "eslint . --max-warnings 0",
+    "prebuild": "npm run generate",
+    "predev": "npm run generate"
   },
   "devDependencies": {
-    "@types/node": "^20.11.24",
     "@wisecare/eslint-config": "workspace:*",
     "@wisecare/typescript-config": "workspace:*",
     "eslint": "^8.57.0",
