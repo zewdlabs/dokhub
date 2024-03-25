@@ -1,17 +1,10 @@
 // tailwind config is required for editor support
 import type { Config } from "tailwindcss";
-import sharedConfig from "@turbocharger/tailwind-config/tailwind.config.ts";
+import sharedConfig from "@wisecare/tailwind-config";
 
-const config: Pick<Config, "presets"> = {
-  presets: [
-    {
-      ...sharedConfig,
-      content: [
-        "./**/*.{js,ts,jsx,tsx}",
-        "../../packages/ui/src/**/*{.js,.ts,.jsx,.tsx}",
-      ],
-    },
-  ],
+const config: Pick<Config, "content" | "presets"> = {
+  content: ["./src/app/**/*.tsx"],
+  presets: [sharedConfig],
 };
 
 export default config;
