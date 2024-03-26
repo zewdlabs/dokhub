@@ -8,7 +8,7 @@ const logger = pino(
       targets: [
         {
           target: "pino-pretty",
-          level: "debug",
+          level: "info",
           options: {
             destination: 1,
             colorize: true,
@@ -16,7 +16,7 @@ const logger = pino(
         },
       ],
     },
-    level: process.env.LOG_LEVEL || "warn",
+    level: process.env.LOG_LEVEL || "info",
     redact: {
       // add sensitive fields that should be redacted
       paths: [],
