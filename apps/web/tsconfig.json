@@ -1,5 +1,5 @@
 {
-  "extends": "@wisecare/typescript-config/nextjs.json",
+  "extends": "@dokhub/typescript-config/nextjs.json",
   "compilerOptions": {
     "plugins": [
       {

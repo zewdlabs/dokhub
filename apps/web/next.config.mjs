@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // transpilePackages: ["@wisecare/ui"],
+  // transpilePackages: ["@dokhub/ui"],
   output: "standalone",
 };
 
