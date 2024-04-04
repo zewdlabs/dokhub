@@ -1,5 +1,5 @@
 {
-  "extends": "@wisecare/typescript-config/base.json",
+  "extends": "@dokhub/typescript-config/base.json",
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"]

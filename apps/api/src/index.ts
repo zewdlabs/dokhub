@@ -2,8 +2,8 @@ import express, { Express } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import compression from "compression";
-import logger from "@wisecare/logging";
-import { pinoHttp } from "@wisecare/logging/middleware";
+import logger from "@dokhub/logging";
+import { pinoHttp } from "@dokhub/logging/middleware";
 
 const app: Express = express();
 
