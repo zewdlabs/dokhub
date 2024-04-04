@@ -1,1 +1,1 @@
-# `@wisecare/tailwind-config`
+# `@dokhub/tailwind-config`

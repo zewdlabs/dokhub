@@ -1,5 +1,5 @@
 {
-  "name": "@wisecare/eslint-config",
+  "name": "@dokhub/eslint-config",
   "version": "0.1.0",
   "private": true,
   "files": [

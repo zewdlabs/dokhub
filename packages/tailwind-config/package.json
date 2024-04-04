@@ -1,13 +1,13 @@
 {
-  "name": "@wisecare/tailwind-config",
+  "name": "@dokhub/tailwind-config",
   "version": "0.0.0",
   "private": true,
   "exports": {
     ".": "./tailwind.config.ts"
   },
   "devDependencies": {
-    "@wisecare/eslint-config": "workspace:^",
-    "@wisecare/typescript-config": "workspace:*",
-    "tailwindcss": "^3.3.0"
+    "@dokhub/eslint-config": "workspace:^",
+    "@dokhub/typescript-config": "workspace:*",
+    "tailwindcss": "^3.4.1"
   }
 }

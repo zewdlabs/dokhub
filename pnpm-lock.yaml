@@ -8,10 +8,10 @@ importers:
 
   .:
     devDependencies:
-      '@wisecare/eslint-config':
+      '@dokhub/eslint-config':
         specifier: workspace:*
         version: link:packages/eslint-config
-      '@wisecare/typescript-config':
+      '@dokhub/typescript-config':
         specifier: workspace:*
         version: link:packages/typescript-config
       prettier:
@@ -23,7 +23,7 @@ importers:
 
   apps/api:
     dependencies:
-      '@wisecare/logging':
+      '@dokhub/logging':
         specifier: workspace:^
         version: link:../../packages/logging
       compression:
@@ -42,6 +42,15 @@ importers:
         specifier: ^3.0.3
         version: 3.0.3
     devDependencies:
+      '@dokhub/database':
+        specifier: workspace:^
+        version: link:../../packages/database
+      '@dokhub/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
+      '@dokhub/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@types/compression':
         specifier: ^1.7.5
         version: 1.7.5
@@ -54,15 +63,6 @@ importers:
       '@types/jest':
         specifier: ^29.5.12
         version: 29.5.12
-      '@wisecare/database':
-        specifier: workspace:^
-        version: link:../../packages/database
-      '@wisecare/eslint-config':
-        specifier: workspace:*
-        version: link:../../packages/eslint-config
-      '@wisecare/typescript-config':
-        specifier: workspace:*
-        version: link:../../packages/typescript-config
       esbuild:
         specifier: ^0.20.1
         version: 0.20.1
@@ -81,12 +81,18 @@ importers:
 
   apps/web:
     dependencies:
+      '@hookform/resolvers':
+        specifier: ^3.3.4
+        version: 3.3.4(react-hook-form@7.51.2)
       '@radix-ui/react-label':
         specifier: ^2.0.2
         version: 2.0.2(@types/react-dom@18.2.18)(@types/react@18.2.46)(react-dom@18.2.0)(react@18.2.0)
       '@radix-ui/react-slot':
         specifier: ^1.0.2
         version: 1.0.2(@types/react@18.2.46)(react@18.2.0)
+      '@tailwindcss/typography':
+        specifier: ^0.5.12
+        version: 0.5.12(tailwindcss@3.4.1)
       class-variance-authority:
         specifier: ^0.7.0
         version: 0.7.0
@@ -108,13 +114,28 @@ importers:
       react-dom:
         specifier: ^18
         version: 18.2.0(react@18.2.0)
+      react-hook-form:
+        specifier: ^7.51.2
+        version: 7.51.2(react@18.2.0)
       tailwind-merge:
         specifier: ^2.2.2
         version: 2.2.2
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.1)
+      zod:
+        specifier: ^3.22.4
+        version: 3.22.4
     devDependencies:
+      '@dokhub/eslint-config':
+        specifier: workspace:*
+        version: link:../../packages/eslint-config
+      '@dokhub/tailwind-config':
+        specifier: workspace:^
+        version: link:../../packages/tailwind-config
+      '@dokhub/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       '@next/eslint-plugin-next':
         specifier: ^14.0.4
         version: 14.1.1
@@ -130,15 +151,6 @@ importers:
       '@types/react-dom':
         specifier: ^18
         version: 18.2.18
-      '@wisecare/eslint-config':
-        specifier: workspace:*
-        version: link:../../packages/eslint-config
-      '@wisecare/tailwind-config':
-        specifier: workspace:^
-        version: link:../../packages/tailwind-config
-      '@wisecare/typescript-config':
-        specifier: workspace:*
-        version: link:../../packages/typescript-config
       autoprefixer:
         specifier: ^10.0.1
         version: 10.4.18(postcss@8.4.31)
@@ -164,15 +176,15 @@ importers:
         specifier: ^5.10.2
         version: 5.10.2(prisma@5.10.2)
     devDependencies:
+      '@dokhub/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@dokhub/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
       '@types/node':
         specifier: ^20.11.30
         version: 20.11.30
-      '@wisecare/eslint-config':
-        specifier: workspace:*
-        version: link:../eslint-config
-      '@wisecare/typescript-config':
-        specifier: workspace:*
-        version: link:../typescript-config
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -222,23 +234,23 @@ importers:
         specifier: ^1.1.0
         version: 1.1.0
     devDependencies:
-      '@wisecare/eslint-config':
+      '@dokhub/eslint-config':
         specifier: workspace:*
         version: link:../eslint-config
-      '@wisecare/typescript-config':
+      '@dokhub/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
 
   packages/tailwind-config:
     devDependencies:
-      '@wisecare/eslint-config':
+      '@dokhub/eslint-config':
         specifier: workspace:^
         version: link:../eslint-config
-      '@wisecare/typescript-config':
+      '@dokhub/typescript-config':
         specifier: workspace:*
         version: link:../typescript-config
       tailwindcss:
-        specifier: ^3.3.0
+        specifier: ^3.4.1
         version: 3.4.1
 
   packages/typescript-config: {}
@@ -1022,6 +1034,14 @@ packages:
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
 
+  /@hookform/resolvers@3.3.4(react-hook-form@7.51.2):
+    resolution: {integrity: sha512-o5cgpGOuJYrd+iMKvkttOclgwRW86EsWJZZRC23prf0uU2i48Htq4PuT73AVb9ionFyZrwYEITuOFGF+BydEtQ==}
+    peerDependencies:
+      react-hook-form: ^7.0.0
+    dependencies:
+      react-hook-form: 7.51.2(react@18.2.0)
+    dev: false
+
   /@humanwhocodes/config-array@0.11.13:
     resolution: {integrity: sha512-JSBDMiDKSzQVngfRjOdFXgFfklaXI4K9nLF49Auh21lmBWRLIK3+xTErTWD4KU54pb6coM6ESE7Awz/FNU3zgQ==}
     engines: {node: '>=10.10.0'}
@@ -1604,6 +1624,18 @@ packages:
     resolution: {integrity: sha512-E4KcWTpoLHqwPHLxidpOqQbcrZVgi0rsmmZXUle1jXmJfuIf/UWpczUJ7MZZ5tlxytgJXyp0w4PGkkeLiuIdZw==}
     dependencies:
       tslib: 2.6.2
+    dev: false
+
+  /@tailwindcss/typography@0.5.12(tailwindcss@3.4.1):
+    resolution: {integrity: sha512-CNwpBpconcP7ppxmuq3qvaCxiRWnbhANpY/ruH4L5qs2GCiVDJXde/pjj2HWPV1+Q4G9+V/etrwUYopdcjAlyg==}
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || insiders'
+    dependencies:
+      lodash.castarray: 4.4.0
+      lodash.isplainobject: 4.0.6
+      lodash.merge: 4.6.2
+      postcss-selector-parser: 6.0.10
+      tailwindcss: 3.4.1
     dev: false
 
   /@types/babel__core@7.20.5:
@@ -5154,9 +5186,16 @@ packages:
       p-locate: 5.0.0
     dev: true
 
+  /lodash.castarray@4.4.0:
+    resolution: {integrity: sha512-aVx8ztPv7/2ULbArGJ2Y42bG1mEQ5mGjpdvrbJcJFU3TbYybe+QlLS4pst9zV52ymy2in1KpFPiZnAOATxD4+Q==}
+    dev: false
+
+  /lodash.isplainobject@4.0.6:
+    resolution: {integrity: sha512-oSXzaWypCMHkPC3NvBEaPHf0KsA5mvPrOPgQWDsbg8n7orZ290M0BmC/jgRZ4vcJ6DTAhjrsSYgdsW/F+MFOBA==}
+    dev: false
+
   /lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
-    dev: true
 
   /lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
@@ -5824,6 +5863,14 @@ packages:
       postcss: 8.4.31
       postcss-selector-parser: 6.0.15
 
+  /postcss-selector-parser@6.0.10:
+    resolution: {integrity: sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==}
+    engines: {node: '>=4'}
+    dependencies:
+      cssesc: 3.0.0
+      util-deprecate: 1.0.2
+    dev: false
+
   /postcss-selector-parser@6.0.15:
     resolution: {integrity: sha512-rEYkQOMUCEMhsKbK66tbEU9QVIxbhN18YiniAwA7XQYTVBqrBy+P2p5JcdqsHgKM2zWylp8d7J6eszocfds5Sw==}
     engines: {node: '>=4'}
@@ -5976,6 +6023,15 @@ packages:
       loose-envify: 1.4.0
       react: 18.2.0
       scheduler: 0.23.0
+    dev: false
+
+  /react-hook-form@7.51.2(react@18.2.0):
+    resolution: {integrity: sha512-y++lwaWjtzDt/XNnyGDQy6goHskFualmDlf+jzEZvjvz6KWDf7EboL7pUvRCzPTJd0EOPpdekYaQLEvvG6m6HA==}
+    engines: {node: '>=12.22.0'}
+    peerDependencies:
+      react: ^16.8.0 || ^17 || ^18
+    dependencies:
+      react: 18.2.0
     dev: false
 
   /react-is@16.13.1:
@@ -7125,3 +7181,7 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+  /zod@3.22.4:
+    resolution: {integrity: sha512-iC+8Io04lddc+mVqQ9AZ7OQ2MrUKGN+oIQyq1vemgt46jwCwLfhq7/pwnBnNXXXZb8VTVLKwp9EDkx+ryxIWmg==}
+    dev: false

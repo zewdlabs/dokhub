@@ -1,1 +1,1 @@
-# `@wisecare/logging`
+# `@dokhub/logging`
