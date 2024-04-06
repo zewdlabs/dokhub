@@ -28,25 +28,25 @@ model User {
 
   medicalLicenseNumber String?
 
-  socialLink SocialLink[]
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  role Role @default(USER)
+  socialLinks SocialLink[]
 
   organizations Organization[]
-  Invitation    Invitation[]
-  Session       Session[]
+  invitations   Invitation[]
+  session       Session[]
 
-  EmailVerification EmailVerification?
-  PasswordReset     PasswordReset?
-  Subscription      Subscription[]
-  Post              Post[]
-  PostLike          PostLike[]
+  emailVerification EmailVerification?
+  passwordReset     PasswordReset?
+  subscription      Subscription[]
+  post              Post[]
+  postLike          PostLike[]
 
   followedBy Follows[] @relation("followedBy")
   following  Follows[] @relation("following")
+
+  role Role @default(USER)
 
   @@index([email])
   @@map("users")
@@ -100,14 +100,13 @@ model EmailVerification {
 model PasswordReset {
   id String @id @default(cuid())
 
-  token String @unique
-
-  email String @unique
-
+  token  String @unique
+  email  String @unique
   userId String @unique
-  user   User   @relation(fields: [userId], references: [id])
 
   expiresAt DateTime @default(dbgenerated("now() + interval '1 day'"))
+
+  user User @relation(fields: [userId], references: [id])
 
   @@index([userId, token, email], name: "unique_password_reset")
   @@map("password_resets")
