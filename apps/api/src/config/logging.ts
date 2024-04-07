@@ -47,17 +47,12 @@ export const loggerConfig = (): LoggerOptions => {
     format: isProduction ? WINSTON_PROD_FORMAT : WINSTON_DEV_FORMAT,
     transports: [
       new transports.Console(),
-      // new SeqTransport({
-      //   serverUrl: isProduction ? process.env.SEQ_URL : 'http://localhost:5341',
-      //   apiKey: process.env.SEQ_API_KEY,
-      //   onError: (err) => {
-      //     console.error(err);
-      //   },
-      //   handleExceptions: true,
-      //   handleRejections: true,
-      // }),
+      new SeqTransport({
+        serverUrl: isProduction ? process.env.SEQ_URL : '',
+        onError: (err) => {
+          console.error('error sending log to seq', err);
+        },
+      }),
     ],
-    exceptionHandlers: [new transports.Console()],
-    rejectionHandlers: [new transports.Console()],
   };
 };

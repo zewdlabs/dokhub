@@ -14,8 +14,6 @@ import { loggerConfig } from '@/config/logging';
 import * as fs from 'fs';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
-import { ConfigService } from '@nestjs/config';
-import { AppConfig } from './config/app';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
