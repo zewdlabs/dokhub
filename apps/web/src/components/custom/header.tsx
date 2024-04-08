@@ -12,7 +12,7 @@ export function MarketingHeader() {
         <Link href="/">
           <Icons.logo className="w-28 h-20" />
         </Link>
-        <nav className="flex justify-between items-center">
+        <nav className="hidden md:flex justify-between items-center">
           <Button
             variant="link"
             className={cn(
@@ -67,7 +67,7 @@ export function MarketingHeader() {
           href="/auth/signin"
           className={cn(
             buttonVariants({ variant: "default" }),
-            "rounded-full bg-primary hover:bg-primary/90",
+            "rounded-full bg-primary hover:bg-primary/90 hidden md:flex items-center justify-center ease-in transition-colors",
           )}
         >
           Sign in
