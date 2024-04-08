@@ -3,7 +3,6 @@ import {
   HealthCheckService,
   HttpHealthIndicator,
   HealthCheck,
-  PrismaHealthIndicator,
 } from '@nestjs/terminus';
 
 @Controller('health')
@@ -11,18 +10,26 @@ export class HealthController {
   constructor(
     private health: HealthCheckService,
     private http: HttpHealthIndicator,
-    private db: PrismaHealthIndicator,
   ) {}
 
-  @Get()
+  @Get('api')
   @HealthCheck()
   checkapi() {
     return this.health.check([
-      () => this.http.pingCheck('dokhub api', 'http://localhost:4000'),
+      () =>
+        this.http.pingCheck(
+          'dokhub api',
+          'http://localhost:4231/api/auth/hello',
+        ),
     ]);
   }
 
-  @Get()
-  @HealthCheck()
-  check() {}
+  // TODO: Make this work later
+  // @Get('db')
+  // @HealthCheck()
+  // async checkdb() {
+  //   return this.db.pingCheck('dokhub db', {
+  //     $runCommandRaw: await this.prisma.$queryRaw`SELECT 1;`,
+  //   });
+  // }
 }

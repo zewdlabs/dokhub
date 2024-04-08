@@ -202,9 +202,10 @@ model SocialLink {
 }
 
 model Organization {
-  id       String @id @default(cuid())
+  id       String  @id @default(cuid())
   name     String
-  location String
+  slug     String  @unique
+  location String?
 
   institutionLicenseNumber String?
 
@@ -214,6 +215,7 @@ model Organization {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([slug])
   @@map("organizations")
 }
 

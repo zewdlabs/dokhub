@@ -15,7 +15,7 @@ describe('AppController (e2e)', () => {
   });
 
   it('/ (GET)', () => {
-    return request(app.getHttpServer()).get('/health').expect('OK');
+    return request(app.getHttpServer()).get('/health/api').expect('OK');
   });
 
   afterAll(async () => {

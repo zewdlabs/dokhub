@@ -6,7 +6,6 @@ import {
   Logger,
   RequestMethod,
   ValidationPipe,
-  VersioningType,
 } from '@nestjs/common';
 import type { INestApplication } from '@nestjs/common';
 import type { ValidationError } from '@nestjs/common';
@@ -26,13 +25,15 @@ async function bootstrap() {
 
   try {
     app.enableShutdownHooks();
-    app.enableVersioning({
-      type: VersioningType.URI,
-      prefix: 'v',
-      defaultVersion: '1',
-    });
+    // app.enableVersioning({
+    //   type: VersioningType.URI,
+    //   prefix: 'v',
+    //   defaultVersion: '1',
+    // });
 
-    app.use(helmet());
+    app.use(
+      helmet({ contentSecurityPolicy: process.env.NODE_ENV !== 'development' }),
+    );
 
     app.enableCors({
       origin: '*',
