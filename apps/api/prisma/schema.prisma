@@ -1,0 +1,260 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String  @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String  @unique
+  password  String
+  phone     String?
+  bio       String?
+
+  occupation        String?
+  specialty         String?
+  yearsOfExperience Int?
+
+  medicalLicenseNumber String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  socialLinks SocialLink[]
+
+  organizations Organization[]
+  invitations   Invitation[]
+  session       Session[]
+
+  emailVerification EmailVerification?
+  passwordReset     PasswordReset?
+  subscription      Subscription[]
+  post              Post[]
+  postLike          PostLike[]
+
+  followedBy Follows[] @relation("followedBy")
+  following  Follows[] @relation("following")
+
+  role Role @default(USER)
+
+  @@index([email])
+  @@map("users")
+}
+
+model Follows {
+  followedBy   User   @relation("followedBy", fields: [followedById], references: [id])
+  followedById String
+  following    User   @relation("following", fields: [followingId], references: [id])
+  followingId  String
+
+  createdAt DateTime @default(now())
+
+  @@id([followingId, followedById])
+  @@index([followedById, followingId], name: "unique_follows")
+  @@map("follows")
+}
+
+model Session {
+  id String @id @default(cuid())
+
+  token String @unique
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, token], name: "unique_session")
+  @@map("sessions")
+}
+
+model EmailVerification {
+  id String @id @default(cuid())
+
+  code String
+
+  email String @unique
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  expiresAt DateTime @default(dbgenerated("now() + interval '3 day'"))
+
+  @@index([userId])
+  @@map("email_verifications")
+}
+
+model PasswordReset {
+  id String @id @default(cuid())
+
+  token  String @unique
+  email  String @unique
+  userId String @unique
+
+  expiresAt DateTime @default(dbgenerated("now() + interval '1 day'"))
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, token, email], name: "unique_password_reset")
+  @@map("password_resets")
+}
+
+//TODO: Think about this after everything is done
+model Subscription {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  expiresAt DateTime @default(dbgenerated("now() + interval '1 month'"))
+
+  subscriptionType SubscriptionType @default(PRO)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("subscriptions")
+}
+
+//TODO: think about how to create a social network
+
+model Post {
+  id        String  @id @default(cuid())
+  title     String
+  content   String // Markdown content
+  metadata  String? // JSON metadata
+  published Boolean @default(false)
+
+  reportedAmount Int @default(0)
+
+  replyToPost   Post?   @relation("ReplyToPost", fields: [replyToPostId], references: [id])
+  replyToPostId String?
+
+  replies  Post[]     @relation("ReplyToPost")
+  postLike PostLike[]
+
+  tag Tag[]
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([authorId])
+  @@map("posts")
+}
+
+model PostLike {
+  id String @id @default(cuid())
+
+  postId String
+  post   Post   @relation(fields: [postId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([postId, userId], name: "unique_post_like")
+  @@map("post_likes")
+}
+
+model Tag {
+  id   String @id @default(cuid())
+  name String @unique
+
+  posts Post[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([name])
+  @@map("tags")
+}
+
+model SocialLink {
+  id       String @id @default(cuid())
+  username String @unique
+  userId   String
+  user     User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, username], name: "unique_social_link")
+  @@map("social_links")
+}
+
+model Organization {
+  id       String  @id @default(cuid())
+  name     String
+  slug     String  @unique
+  location String?
+
+  institutionLicenseNumber String?
+
+  members    User[]
+  Invitation Invitation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([slug])
+  @@map("organizations")
+}
+
+model Invitation {
+  id             String       @id @default(cuid())
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  organizationId String
+
+  expirationDate DateTime @default(dbgenerated("now() + interval '7 days'"))
+
+  email String
+  role  Role
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  status InvitationStatus @default(PENDING)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId, userId], name: "unique_invitation")
+  @@map("invitations")
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum SubscriptionType {
+  PRO
+  ENTERPRISE
+}
+
+enum Role {
+  SUADMIN
+  CREATOR
+  ADMIN
+  USER
+}
