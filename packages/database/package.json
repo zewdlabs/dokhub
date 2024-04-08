@@ -4,18 +4,6 @@
   "exports": {
     ".": "./src/client.ts"
   },
-  "scripts": {
-    "db:migrate:deploy": "prisma migrate deploy",
-    "db:migrate:dev": "prisma migrate dev",
-    "db:push": "prisma db push",
-    "db:seed": "tsx src/seed.ts",
-    "db:studio": "prisma studio",
-    "generate": "prisma generate",
-    "format": "prisma format",
-    "lint": "eslint . --max-warnings 0",
-    "prebuild": "npm run generate",
-    "predev": "npm run generate"
-  },
   "devDependencies": {
     "@types/node": "^20.11.30",
     "@dokhub/eslint-config": "workspace:*",
