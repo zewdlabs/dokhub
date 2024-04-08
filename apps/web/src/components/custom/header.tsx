@@ -46,15 +46,22 @@ export function MarketingHeader() {
           >
             Blog
           </Link>
-          <Link
-            href="#testimonials"
+          <Button
+            variant="link"
             className={cn(
               buttonVariants({ variant: "link", className: "no-underline" }),
               "text-base text-neutral-950 hover:text-primary ease-in transition-colors",
             )}
+            onClick={() => {
+              document.getElementById("testimonials")?.scrollIntoView({
+                behavior: "smooth",
+                inline: "center",
+                block: "center",
+              });
+            }}
           >
             Testimonials
-          </Link>
+          </Button>
         </nav>
         <Link
           href="/auth/signin"
