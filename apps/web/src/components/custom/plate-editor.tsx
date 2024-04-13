@@ -4,12 +4,12 @@ import React, { useRef } from "react";
 import { cn } from "@udecode/cn";
 import { CommentsProvider } from "@udecode/plate-comments";
 import { Plate } from "@udecode/plate-common";
-import { ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
 import { commentsUsers, myUserId } from "@/lib/plate/comments";
 import { MENTIONABLES } from "@/lib/plate/mentionables";
+import { ELEMENT_H1 } from "@udecode/plate-heading";
 import { plugins } from "@/lib/plate/plugins";
 import { CommentsPopover } from "@/components/plate-ui/comments-popover";
 import { CursorOverlay } from "@/components/plate-ui/cursor-overlay";
@@ -27,30 +27,30 @@ export default function PlateEditor() {
   const initialValue = [
     {
       id: "1",
-      type: ELEMENT_PARAGRAPH,
-      children: [{ text: "Hello, World!" }],
+      type: ELEMENT_H1,
+      children: [{ text: "Start with a title" }],
     },
   ];
 
   return (
-    <TooltipProvider>
+    <TooltipProvider delayDuration={200}>
       <DndProvider backend={HTML5Backend}>
         <CommentsProvider users={commentsUsers} myUserId={myUserId}>
           <Plate plugins={plugins} initialValue={initialValue}>
             <div
               ref={containerRef}
               className={cn(
-                "relative",
+                "relative md:container",
                 // Block selection
-                "[&_.slate-start-area-left]:!w-[64px] [&_.slate-start-area-right]:!w-[64px] [&_.slate-start-area-top]:!h-4",
+                "[&_.slate-start-area-left]:!w-16 [&_.slate-start-area-right]:!w-16 [&_.slate-start-area-top]:!h-6",
               )}
             >
-              <FixedToolbar>
+              <FixedToolbar className="border">
                 <FixedToolbarButtons />
               </FixedToolbar>
 
               <Editor
-                className="px-[96px] py-16"
+                className="px-8 md:px-24 py-12 min-h-[70vh] border border-t-0"
                 autoFocus
                 focusRing={false}
                 variant="ghost"

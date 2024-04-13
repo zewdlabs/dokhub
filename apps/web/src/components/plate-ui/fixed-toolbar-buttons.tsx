@@ -1,7 +1,6 @@
 import React from "react";
 import {
   MARK_BOLD,
-  MARK_CODE,
   MARK_ITALIC,
   MARK_STRIKETHROUGH,
   MARK_UNDERLINE,
@@ -19,7 +18,6 @@ import { MoreDropdownMenu } from "./more-dropdown-menu";
 
 import { AlignDropdownMenu } from "@/components/plate-ui/align-dropdown-menu";
 import { ColorDropdownMenu } from "@/components/plate-ui/color-dropdown-menu";
-import { CommentToolbarButton } from "@/components/plate-ui/comment-toolbar-button";
 import { EmojiDropdownMenu } from "@/components/plate-ui/emoji-dropdown-menu";
 import { IndentListToolbarButton } from "@/components/plate-ui/indent-list-toolbar-button";
 import { IndentToolbarButton } from "@/components/plate-ui/indent-toolbar-button";

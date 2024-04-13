@@ -61,21 +61,9 @@ import {
   WrapText,
   X,
   ActivityIcon,
-  AlertTriangle,
-  ArrowRight,
   ChevronLeft,
-  ClipboardCheck,
-  Copy,
-  CreditCard,
-  File,
-  FileText,
-  HelpCircle,
-  Laptop,
-  Loader2,
-  MoreVertical,
-  Pizza,
-  User,
-  XIcon,
+  PenTool,
+  Film,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -175,6 +163,9 @@ const borderTop = (props: LucideProps) => (
 );
 
 export const Icons = {
+  embed: Film,
+  excalidraw: PenTool,
+  hr: Minus,
   add: Plus,
   alignCenter: AlignCenter,
   alignJustify: AlignJustify,
@@ -192,6 +183,7 @@ export const Icons = {
   borderTop,
   check: Check,
   chevronRight: ChevronRight,
+  chevronLeft: ChevronLeft,
   chevronsUpDown: ChevronsUpDown,
   clear: X,
   close: X,
