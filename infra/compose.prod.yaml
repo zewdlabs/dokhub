@@ -1,0 +1,113 @@
+services:
+  # web:
+  #   container_name: web
+  #   build:
+  #     context: ../apps/web/
+  #     dockerfile: Dockerfile
+  #   restart: always
+  #   ports:
+  #     - 3000:3000
+  #   depends_on:
+  #     - api
+  # api:
+  #   container_name: api
+  #   build:
+  #     context: ../apps/api/
+  #     dockerfile: Dockerfile
+  #   restart: always
+  #   ports:
+  #     - 3001:3001
+  #   environment:
+  #     - NODE_ENV=production
+  #     - DATABASE_URL=${DATABASE_URL}
+  #   depends_on:
+  #     - database
+  #     - objstore
+  #     - log 
+  # log:
+  #   container_name: log
+  #   image: datalust/seq
+  #   restart: unless-stopped
+  #   ports:
+  #     - 10080:80
+  #     - 15341:5341
+  #   volumes:
+  #     - logstore:/var/lib/seq/data
+  #   environment:
+  #     ACCEPT_EULA: "Y"
+  # database:
+  #   container_name: database
+  #   image: postgres
+  #   restart: unless-stopped
+  #   volumes:
+  #     - dbstore:/var/lib/postgresql/data
+  #   environment:
+  #     - POSTGRES_HOST=${POSTGRES_HOST}
+  #     - POSTGRES_DB=${POSTGRES_DB}
+  #     - POSTGRES_USER=${POSTGRES_USER}
+  #     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+  #   ports:
+  #     - 15432:5432
+  #   healthcheck:
+  #     # specifying user and database is needed to avoid `FATAL:  role "root" does not exist`
+  #     # spam in the logs
+  #     test: ['CMD', 'pg_isready', '-U', 'prisma', '-d', 'tests']
+  #     interval: 5s
+  #     timeout: 2s
+  #     retries: 20
+  # pgadmin:
+  #   container_name: pgadmin
+  #   image: dpage/pgadmin4
+  #   restart: always
+  #   environment:
+  #     - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+  #     - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+  #     - PGADMIN_PORT=${PGADMIN_PORT}
+  #   ports:
+  #     - 15050:5050
+  # rediscache:
+  #   container_name: rediscache
+  #   image: redis
+  #   ports:
+  #     - 6379:6379
+  #   volumes:
+  #     - redisstore/data:/var/lib/redis/data
+  #     - redisstore/redis.conf:/var/lib/redis/redis.conf
+  #   environment:
+  #     - REDIS_PASSWORD=${REDIS_PASSWORD}
+  #     - REDIS_PORT=${REDIS_PORT}
+  #     - REDIS_DATABASES=${REDIS_DATABASES}
+  # objstore:
+  #   container_name: objstore
+  #   image: quay.io/minio/minio
+  #   ports:
+  #     - 19000:9000
+  #     - 19001:9001
+  #   volumes:
+  #     - objstore:/var/lib/minio/data
+  #   environment:
+  #     - MINIO_ROOT_USER=${MINIO_ROOT_USER}
+  #     - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
+  #   command: server --console-address ":19001" 
+  #   healthcheck:
+  #     # specifying user and database is needed to avoid `FATAL:  role "root" does not exist`
+  #     # spam in the logs
+  #     test: ['CMD', 'curl', '-f', 'http://localhost:19000/minio/health/live']
+  #     interval: 30s
+  #     timeout: 2s
+  #     retries: 3
+  vectorstore:
+    container_name: vectorstore
+    image: qdrant/qdrant
+    ports:
+      - 16333:6333
+      - 16334:6334
+    volumes:
+      - vectorstore:/var/lib/qdrant/data
+volumes:
+  vectorstore:
+  objstore:
+  # dbstore:
+  # logstore:
+  # redisstore/data:
+  # redisstore/redis.conf:
