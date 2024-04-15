@@ -5,12 +5,14 @@ import {
   Get,
   Param,
   Post,
-  Put,
+  Patch,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User as UserModel } from '@prisma/client';
-import CreatePlatformUserInput from './inputs/create-user-input';
-
+import CreatePlatformUserInput from './inputs/create-user-dto';
+// import { ApiBearerAuth, ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '@/auth/guards/jwt.guard';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -21,6 +23,7 @@ export class UserController {
   }
 
   @Get(':id')
+  @UseGuards(JwtAuthGuard)
   async getUser(@Param('id') id: string) {
     return this.userService.user({ id: id });
   }
@@ -32,7 +35,8 @@ export class UserController {
     return this.userService.createUser(userData);
   }
 
-  @Put(':id')
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   async updateUser(
     @Param('id') id: string,
     @Body() userData: { email: string; name: string },
