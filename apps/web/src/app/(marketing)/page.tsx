@@ -9,7 +9,7 @@ export default function Home() {
       <Hero />
       <GlobalCollaborationCard />
       <TextGenerateEffect
-        className="pt-28 pb-40 text-4xl	md:text-6xl max-w-[1370px] container md:leading-[85px] mb-12 font-cal"
+        className="p-12 md:px-28 md:py-40 text-4xl md:text-6xl max-w-7xl md:container md:leading-[85px] mb-12 font-cal"
         words="Our platform enables doctors and medical experts to collaborate effectively while leveraging state-of-the-art AI for diagnosis and other crucial tasks, ultimately enhancing patient care."
       />
       <Testimonials />
