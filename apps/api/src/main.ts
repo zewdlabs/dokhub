@@ -79,6 +79,7 @@ async function generateSwagger(app: INestApplication) {
     .setVersion('v1')
     .setDescription('Dokhub.co API')
     .setTermsOfService('https://dokhub.co/terms')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

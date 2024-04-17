@@ -11,15 +11,7 @@ import { UserModule } from '@/users/user.module';
 import { AccessTokenStrategy } from './strategies/accessToken.strategy';
 
 @Module({
-  imports: [
-    PrismaModule,
-    PassportModule,
-    JwtModule.register({
-      secret: 'abc123',
-      signOptions: { expiresIn: '1h' },
-    }),
-    UserModule,
-  ],
+  imports: [PrismaModule, PassportModule, JwtModule.register({}), UserModule],
   controllers: [AuthController],
   providers: [
     AuthService,

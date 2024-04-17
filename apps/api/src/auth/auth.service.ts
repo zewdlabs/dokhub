@@ -50,7 +50,10 @@ export class AuthService {
     return tokens;
   }
 
-  async login(email: string, password: string): Promise<AuthEntity> {
+  async login(
+    email: string,
+    password: string,
+  ): Promise<{ tokens: AuthEntity; user: User }> {
     // Step 1: Fetch a user with the given email
     const user = await this.prisma.user.findUnique({ where: { email: email } });
 
@@ -58,9 +61,10 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException(`No user found for email: ${email}`);
     }
-
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    // console.log(hashedPassword);
     // Step 2: Check if the password is correct
-    const isPasswordValid = user.password === password;
+    // const isPasswordValid = user.password === hashedPassword;
 
     // If password does not match, throw an error
     if (!isPasswordValid) {
@@ -70,7 +74,7 @@ export class AuthService {
     // Step 3: Generate a JWT containing the user's ID and return it
     const tokens = await this.getTokens(user.id, user.email);
     await this.updateRefreshToken(user, tokens.refreshToken);
-    return tokens;
+    return { tokens, user };
   }
 
   async updateRefreshToken(user: User, refreshToken: string) {
