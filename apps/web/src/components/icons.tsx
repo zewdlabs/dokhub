@@ -335,19 +335,22 @@ export const Icons = {
   ),
   twitterX: ({ className, ...otherProps }: LucideProps) => (
     <svg
+      className={cn("w-10 h-10", className)}
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
-      className={cn("w-8 h-8 hover:fill-primary/70 ease-in-out duration-100", className)}
       {...otherProps}
     >
-      <path d="M 2.3671875 3 L .4628906 13.140625 L 2.7402344 21 L 5.3808594 21 L 10.644531 14.830078 L 14.960938 21 L 21.871094 21 L 14.449219 10.375 L 20.740234 3 L 18.140625 3 L 13.271484 8.6875 L 9.2988281 3 L 2.3671875 3 z M 6.2070312 5 L 8.2558594 5 L 18.033203 19 L 16.001953 19 L 6.2070312 5 z" />
+      <path d="M 2.3671875 3 L 9.4628906 13.140625 L 2.7402344 21 L 5.3808594 21 L 10.644531 14.830078 L 14.960938 21 L 21.871094 21 L 14.449219 10.375 L 20.740234 3 L 18.140625 3 L 13.271484 8.6875 L 9.2988281 3 L 2.3671875 3 z M 6.2070312 5 L 8.2558594 5 L 18.033203 19 L 16.001953 19 L 6.2070312 5 z" />
     </svg>
   ),
   linkedIn: ({ className, ...otherProps }: LucideProps) => (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 30 30"
-      className={cn("w-8 h-8 hover:fill-primary/70 ease-in-out duration-100", className)}
+      className={cn(
+        "w-8 h-8 hover:fill-primary/70 ease-in-out duration-100",
+        className,
+      )}
       {...otherProps}
     >
       <path d="M9,25H4V10h5V25z M6.501,8C5.118,8,4,6.879,4,5.499S5.12,3,6.501,3C7.879,3,9,4.121,9,5.499C9,6.879,7.879,8,6.501,8z M27,25h-4.807v-7.3c0-1.741-0.033-3.98-2.499-3.98c-2.503,0-2.888,1.896-2.888,3.854V25H12V9.989h4.614v2.051h0.065 c0.642-1.18,2.211-2.424,4.551-2.424c4.87,0,5.77,3.109,5.77,7.151C27,16.767,27,25,27,25z" />
