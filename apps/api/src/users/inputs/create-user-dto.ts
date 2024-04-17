@@ -1,6 +1,6 @@
 import { IsString, MaxLength, MinLength } from 'class-validator';
 
-export default class CreatePlatformUserInput {
+export default class CreateUserDto {
   @IsString()
   email!: string;
 

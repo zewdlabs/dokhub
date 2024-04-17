@@ -5,22 +5,33 @@ import {
   Get,
   Param,
   Post,
-  Put,
+  Patch,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User as UserModel } from '@prisma/client';
-import CreatePlatformUserInput from './inputs/create-user-input';
-
+import CreatePlatformUserInput from './inputs/create-user-dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
+// import { JwtAuthGuard } from '@/auth/guards/jwt.guard';
+import { AccessTokenGuard } from '@/auth/guards/accessToken.guard';
+// import { Roles } from '@/auth/role.decorate';
+// import { RoleGuard } from '@/auth/guards/role.guard';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  async getAllUsers() {
+  // @Roles(Role.SUADMIN)
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  async getAllUsers(@Body() userData: { email: string; name: string }) {
+    console.log(userData);
     return this.userService.getAllUsers();
   }
 
   @Get(':id')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
   async getUser(@Param('id') id: string) {
     return this.userService.user({ id: id });
   }
@@ -32,7 +43,9 @@ export class UserController {
     return this.userService.createUser(userData);
   }
 
-  @Put(':id')
+  @Patch(':id')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
   async updateUser(
     @Param('id') id: string,
     @Body() userData: { email: string; name: string },
@@ -44,6 +57,8 @@ export class UserController {
   }
 
   @Delete(':id')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
   async deleteUser(@Param('id') id: string): Promise<UserModel> {
     return this.userService.deleteUser({ id: id });
   }

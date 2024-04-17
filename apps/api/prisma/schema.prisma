@@ -21,6 +21,7 @@ model User {
   password String
   phone    String?
   bio      String?
+  refreshToken String?
 
   occupation        String?
   specialty         String?

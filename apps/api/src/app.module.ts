@@ -6,6 +6,7 @@ import { UserModule } from './users/user.module';
 import { AppController } from './app.controller';
 import { AppLoggerMiddleware } from './applogger.middleware';
 import { OrganizationModule } from './organization/organization.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { OrganizationModule } from './organization/organization.module';
     AuthModule,
     UserModule,
     OrganizationModule,
+    ConfigModule.forRoot({ isGlobal: true }),
   ],
   controllers: [AppController],
 })
