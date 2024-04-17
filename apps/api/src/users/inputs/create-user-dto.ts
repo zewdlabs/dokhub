@@ -5,10 +5,7 @@ export default class CreateUserDto {
   email!: string;
 
   @IsString()
-  firstName!: string;
-
-  @IsString()
-  lastName!: string;
+  fullName!: string;
 
   @IsString()
   @MinLength(8)
