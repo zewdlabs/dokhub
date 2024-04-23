@@ -9,20 +9,21 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { User as UserModel } from '@prisma/client';
-import CreatePlatformUserInput from './inputs/create-user-dto';
+import { Role, User as UserModel } from '@prisma/client';
+// import CreatePlatformUserInput from './inputs/create-user-dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 // import { JwtAuthGuard } from '@/auth/guards/jwt.guard';
 import { AccessTokenGuard } from '@/auth/guards/accessToken.guard';
-// import { Roles } from '@/auth/role.decorate';
-// import { RoleGuard } from '@/auth/guards/role.guard';
+import { Roles } from '@/auth/role.decorate';
+import { RoleGuard } from '@/auth/guards/role.guard';
+import CreateUserDto from '@/auth/dto/create-user.dto';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  // @Roles(Role.SUADMIN)
-  @UseGuards(AccessTokenGuard)
+  @Roles(Role.ADMIN, Role.SUADMIN)
+  @UseGuards(AccessTokenGuard, RoleGuard)
   @ApiBearerAuth()
   async getAllUsers(@Body() userData: { email: string; name: string }) {
     console.log(userData);
@@ -37,9 +38,7 @@ export class UserController {
   }
 
   @Post()
-  async signupUser(
-    @Body() userData: CreatePlatformUserInput,
-  ): Promise<UserModel> {
+  async signupUser(@Body() userData: CreateUserDto): Promise<UserModel> {
     return this.userService.createUser(userData);
   }
 
