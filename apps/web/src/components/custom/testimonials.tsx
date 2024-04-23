@@ -76,7 +76,10 @@ export default function Testimonials() {
       </div>
       <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-5 col-span-6">
         {testimonials.map((testimonial) => (
-          <TestimonialCard key={testimonial.name+testimonial.company} testimonial={testimonial} />
+          <TestimonialCard
+            key={testimonial.testimonial}
+            testimonial={testimonial}
+          />
         ))}
       </div>
     </section>
