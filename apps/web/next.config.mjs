@@ -6,6 +6,9 @@ const nextConfig = {
   // transpilePackages: ["@dokhub/ui"],
   output: "standalone",
   pageExtensions: ["js", "jsx", "mdx", "ts", "tsx"],
+  images: {
+    domains: ["images.unsplash.com"],
+  },
 };
 
 const withMDXConfig = withMDX({
