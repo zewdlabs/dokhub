@@ -26,9 +26,27 @@ import {
   User,
   X,
   XIcon,
+  Bold,
+  Italic,
+  Strikethrough,
+  Heading1,
+  Heading2,
+  Heading3,
+  Heading4,
+  Heading5,
+  Heading6,
 } from "lucide-react";
 
 export const Icons = {
+  bold: Bold,
+  italic: Italic,
+  strikethrough: Strikethrough,
+  heading1: Heading1,
+  heading2: Heading2,
+  heading3: Heading3,
+  heading4: Heading4,
+  heading5: Heading5,
+  heading6: Heading6,
   quote: ({ className, ...otherProps }: LucideProps) => (
     <svg
       className={cn("w-6 h-6", className)}

@@ -14,13 +14,13 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(cuid())
-  prefix   String?
-  fullName String
-  email    String  @unique
-  password String
-  phone    String?
-  bio      String?
+  id           String  @id @default(cuid())
+  prefix       String?
+  fullName     String
+  email        String  @unique
+  password     String
+  phone        String?
+  bio          String?
   refreshToken String?
 
   occupation        String?

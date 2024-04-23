@@ -2,6 +2,7 @@ import Link from "next/link";
 import TestimonialCard from "./testimonial-card";
 import { buttonVariants } from "../ui/button";
 import { cn } from "@/lib/utils";
+import test from "node:test";
 
 export interface Testimonial {
   prefix?: string;
@@ -75,7 +76,7 @@ export default function Testimonials() {
       </div>
       <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-5 col-span-6">
         {testimonials.map((testimonial) => (
-          <TestimonialCard testimonial={testimonial} />
+          <TestimonialCard key={testimonial.name+testimonial.company} testimonial={testimonial} />
         ))}
       </div>
     </section>
