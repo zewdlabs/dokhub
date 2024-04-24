@@ -1,6 +1,5 @@
 "use client";
 
-import { Poppins } from "next/font/google";
 import {
   Card,
   CardDescription,
@@ -24,34 +23,34 @@ import {
   DropdownMenuSeparator,
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
-
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
-});
+import Link from "next/link";
 
 export default function PostCard({ post }: { post: Post }) {
   return (
     <Card className="w-full p-4 md:pt-6">
-      <div className="grid grid-cols-4 h-32">
-        <CardHeader className="p-2 pb-3 col-span-3 w-full">
-          <CardTitle className={poppins.className}>{post.title}</CardTitle>
-          <CardDescription className="max-w-lg leading-relaxed">
-            {post.description}
-          </CardDescription>
-        </CardHeader>
-        <div className="relative rounded-lg overflow-hidden">
-          <Image
-            src={post.imageUrl}
-            fill={true}
-            alt={post.title}
-            style={{
-              objectFit: "cover",
-            }}
-          />
+      <Link href={`home`}>
+        <div className="grid grid-cols-4">
+          <CardHeader className="p-2 pb-3 col-span-3 w-full space-y-3">
+            <CardTitle className="font-cal tracking-normal">
+              {post.title}
+            </CardTitle>
+            <CardDescription className="max-w-lg leading-relaxed">
+              {post.description}
+            </CardDescription>
+          </CardHeader>
+          <div className="relative mr-4 rounded-lg h-36 overflow-hidden">
+            <Image
+              src={post.imageUrl}
+              fill={true}
+              alt={post.title}
+              style={{
+                objectFit: "cover",
+              }}
+            />
+          </div>
         </div>
-      </div>
-      <CardFooter className="flex justify-between items-center pt-4">
+      </Link>
+      <CardFooter className="flex justify-between items-center pt-2 pb-0 px-2 w-full">
         <div className="flex items-center">
           <Avatar className="h-8 w-8">
             <AvatarImage
