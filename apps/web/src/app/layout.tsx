@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import LocalFont from "next/font/local";
 import QueryProvider from "@/lib/query-provider";
 import "./globals.css";
+import Providers from "@/components/Providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,7 +25,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className={`${inter.className} ${calSans.variable} antialiased`}>
+        <Providers>
         <QueryProvider>{children}</QueryProvider>
+        </Providers>
       </body>
     </html>
   );

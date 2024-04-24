@@ -4,15 +4,15 @@ import {
   IsOptional,
   IsEmail,
   IsNotEmpty,
-  IsInt,
+  // IsInt,
   IsAlphanumeric,
 } from 'class-validator';
 // import { Role } from '@prisma/client';
 
 class CreateUserDto {
-  @IsOptional()
-  @IsString()
-  prefix?: string;
+  // @IsOptional()
+  // @IsString()
+  // prefix?: string;
 
   @IsNotEmpty()
   @IsString()
@@ -26,33 +26,33 @@ class CreateUserDto {
   @IsString()
   password: string;
 
-  @IsOptional()
-  @IsString()
-  phone?: string;
+  // @IsOptional()
+  // @IsString()
+  // phone?: string;
 
-  @IsOptional()
-  @IsString()
-  bio?: string;
+  // @IsOptional()
+  // @IsString()
+  // bio?: string;
 
-  @IsOptional()
-  @IsString()
-  refreshToken?: string;
+  // @IsOptional()
+  // @IsString()
+  // refreshToken?: string;
 
-  @IsOptional()
-  @IsString()
-  occupation?: string;
+  // @IsOptional()
+  // @IsString()
+  // occupation?: string;
 
-  @IsOptional()
-  @IsString()
-  specialty?: string;
+  // @IsOptional()
+  // @IsString()
+  // specialty?: string;
 
-  @IsOptional()
-  @IsInt()
-  yearsOfExperience?: number;
+  // @IsOptional()
+  // @IsInt()
+  // yearsOfExperience?: number;
 
-  @IsOptional()
-  @IsString()
-  medicalLicenseNumber?: string;
+  // @IsOptional()
+  // @IsString()
+  // medicalLicenseNumber?: string;
 
   //   @IsOptional()
   //   @IsNotEmpty({ each: true })

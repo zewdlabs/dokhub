@@ -4,6 +4,7 @@ import { Icons } from "@/components/icons";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import SignInButton from "../SigninButton";
 
 export function MarketingHeader() {
   return (
@@ -63,7 +64,7 @@ export function MarketingHeader() {
             Testimonials
           </Button>
         </nav>
-        <Link
+        {/* <Link
           href="/auth/signin"
           className={cn(
             buttonVariants({ variant: "default" }),
@@ -71,7 +72,11 @@ export function MarketingHeader() {
           )}
         >
           Sign in
-        </Link>
+        </Link> */}
+        <div>
+
+        <SignInButton></SignInButton>
+        </div>
       </div>
     </header>
   );

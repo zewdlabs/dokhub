@@ -11,8 +11,9 @@ import { AuthEntity } from './auth.entity';
 import { LoginDto } from './dto/login.dto';
 import { AccessTokenGuard } from './guards/accessToken.guard';
 // import CreateUserDto from '@/users/inputs/create-user-dto';
-// import { Prisma } from '@prisma/client';
+import { User } from '@prisma/client';
 import CreateUserDto from './dto/create-user.dto';
+import { RefreshTokenGuard } from './guards/refreshToken.guards';
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
@@ -43,5 +44,13 @@ export class AuthController {
     console.log('Inside AuthController status method');
     console.log(req.user);
     return req.user;
+  }
+
+  @UseGuards(RefreshTokenGuard)
+  @Post('refresh')
+  async refreshToken(@Body() req: User) {
+    console.log('refreshed');
+
+    return await this.authService.getTokens(req.id, req.email, req.role);
   }
 }

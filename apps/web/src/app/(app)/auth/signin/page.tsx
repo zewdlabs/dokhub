@@ -1,5 +1,8 @@
 import SigninForm from "@/components/custom/signin";
-
-export default function SigninPage() {
-  return <SigninForm />;
+type Props = {
+  searchParams?: Record<"callbackUrl" | "error", string>;
+};
+export default function SigninPage(props: Props) {
+  return <SigninForm    error={props.searchParams?.error}
+  callbackUrl={props.searchParams?.callbackUrl} />;
 }

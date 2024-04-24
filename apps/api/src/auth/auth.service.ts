@@ -26,6 +26,7 @@ const fakeUsers = [
     password: 'password123',
   },
 ];
+const EXPIRE_TIME = 20 * 1000;
 
 @Injectable()
 export class AuthService {
@@ -90,6 +91,24 @@ export class AuthService {
       data: user,
     });
   }
+  async refreshToken(user: any) {
+    const payload = {
+      username: user.username,
+      sub: user.sub,
+    };
+
+    return {
+      accessToken: await this.jwtService.signAsync(payload, {
+        expiresIn: '20s',
+        secret: process.env.jwtSecretKey,
+      }),
+      refreshToken: await this.jwtService.signAsync(payload, {
+        expiresIn: '7d',
+        secret: process.env.jwtRefreshTokenKey,
+      }),
+      expiresIn: new Date().setTime(new Date().getTime() + EXPIRE_TIME),
+    };
+  }
   async getTokens(userId: string, email: string, role: string) {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
@@ -122,6 +141,7 @@ export class AuthService {
     return {
       accessToken,
       refreshToken,
+      expiresIn: new Date().setTime(new Date().getTime() + EXPIRE_TIME),
     };
   }
   validateUser({ email, password }: LoginDto) {
