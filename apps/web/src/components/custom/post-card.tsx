@@ -14,7 +14,16 @@ import { Icons } from "@/components/icons";
 import { format } from "date-fns";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import type { Post } from "../../app/(app)/[workspaceSlug]/(home)/page";
+import type { Post } from "../../app/(app)/app/[workspaceSlug]/(home)/page";
+import {
+  DropdownMenuLabel,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuGroup,
+} from "@/components/ui/dropdown-menu";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -67,12 +76,26 @@ export default function PostCard({ post }: { post: Post }) {
           >
             <Icons.bookmarkplus className="w-5 h-5 hover:fill-muted-foreground" />
           </Button>
-          <Button
-            variant="ghost"
-            className="px-3 hover:bg-transparent hover:text-muted-foreground"
-          >
-            <Icons.add className="w-5 h-5" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                aria-haspopup="true"
+                variant="ghost"
+                className="px-3 hover:bg-transparent hover:text-muted-foreground"
+              >
+                <Icons.option className="w-5 h-5" />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem>Add to library</DropdownMenuItem>
+                <DropdownMenuItem>Not interested</DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </CardFooter>
     </Card>

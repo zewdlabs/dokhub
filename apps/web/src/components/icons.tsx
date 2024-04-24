@@ -31,9 +31,11 @@ import {
   CreditCardIcon,
   LogOut,
   Dot,
+  MoreHorizontal,
 } from "lucide-react";
 
 export const Icons = {
+  option: MoreHorizontal,
   bookmarkplus: ({ className, ...otherProps }: LucideProps) => (
     <svg
       className={cn("w-6 h-6 fill-none", className)}
