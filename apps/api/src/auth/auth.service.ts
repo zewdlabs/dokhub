@@ -8,10 +8,11 @@ import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '@/prisma/prisma.service';
 import { AuthEntity } from './auth.entity';
-import { Prisma, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { UserService, roundsOfHashing } from '@/users/user.service';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
+import CreateUserDto from './dto/create-user.dto';
 
 const fakeUsers = [
   {
@@ -35,7 +36,7 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
-  async signUp(data: Prisma.UserCreateInput): Promise<any> {
+  async signUp(data: CreateUserDto): Promise<any> {
     // Check if user exists
     const userExists = await this.usersService.findByEmail(
       data.email as string,
@@ -45,7 +46,11 @@ export class AuthService {
     }
 
     const newUser = await this.usersService.createUser(data);
-    const tokens = await this.getTokens(newUser.id, newUser.email);
+    const tokens = await this.getTokens(
+      newUser.id,
+      newUser.email,
+      newUser.role,
+    );
     await this.updateRefreshToken(newUser, tokens.refreshToken);
     return tokens;
   }
@@ -72,7 +77,7 @@ export class AuthService {
     }
 
     // Step 3: Generate a JWT containing the user's ID and return it
-    const tokens = await this.getTokens(user.id, user.email);
+    const tokens = await this.getTokens(user.id, user.email, user.role);
     await this.updateRefreshToken(user, tokens.refreshToken);
     return { tokens, user };
   }
@@ -85,12 +90,13 @@ export class AuthService {
       data: user,
     });
   }
-  async getTokens(userId: string, email: string) {
+  async getTokens(userId: string, email: string, role: string) {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
           sub: userId,
           email,
+          role,
         },
         {
           secret:
@@ -102,6 +108,7 @@ export class AuthService {
         {
           sub: userId,
           email,
+          role,
         },
         {
           secret:

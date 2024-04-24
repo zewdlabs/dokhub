@@ -6,12 +6,13 @@ import { AuthService } from './auth.service';
 // import { LocalGuard } from './guards/local.guard';
 import { Request } from 'express';
 // import { JwtAuthGuard } from './guards/jwt.guard';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { AuthEntity } from './auth.entity';
 import { LoginDto } from './dto/login.dto';
 import { AccessTokenGuard } from './guards/accessToken.guard';
 // import CreateUserDto from '@/users/inputs/create-user-dto';
-import { Prisma } from '@prisma/client';
+// import { Prisma } from '@prisma/client';
+import CreateUserDto from './dto/create-user.dto';
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
@@ -24,7 +25,8 @@ export class AuthController {
   @Post('signup')
   @ApiOkResponse({ type: AuthEntity })
   // @ApiBody({ type: Prisma.UserCreateInput })
-  signup(@Body() user: Prisma.UserCreateInput) {
+  @ApiBody({ type: CreateUserDto })
+  signup(@Body() user: CreateUserDto) {
     return this.authService.signUp(user);
   }
 
