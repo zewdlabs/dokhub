@@ -14,22 +14,38 @@ import Link from "next/link";
 import { Icons } from "../icons";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 
 type FormInputs = {
   name: string;
   email: string;
   password: string;
+  confirmPassword: string;
 };
 
 export default function SignupForm() {
-
+const router= useRouter();
   const register = async () => {
-    console.log(data);
-    const res = await fetch("http://localhost:3000" + "/auth/register", {
+     console.log("hellooooo")
+    console.log({
+      fullName: data.current.name,
+      email: data.current.email,
+      password: data.current.password,
+    });
+    if(data.current.confirmPassword != data.current.password){
+      updateErrorMessages('confirmPassword', 'Passwords do not match');
+      // alert("passwords do not match");
+      return;
+    } else {
+      updateErrorMessages('confirmPassword', ''); // Clearing error message if validation passes
+      // data.current.confirmPassword = value;
+    }
+      
+    const res = await fetch("http://localhost:4231/api/auth/signup", {
       method: "POST",
       body: JSON.stringify({
-        name: data.current.name,
+        fullName: data.current.name,
         email: data.current.email,
         password: data.current.password,
       }),
@@ -43,14 +59,26 @@ export default function SignupForm() {
       return;
     }
     const response = await res.json();
-    alert("User Registered!");
+    router.push("http://localhost:3000/api/auth/signin");
     console.log({ response });
   };
   const data = useRef<FormInputs>({
     name: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
+  const [errorMessages, setErrorMessages] = useState({
+    confirmPassword: ''
+  });
+
+  // Function to update error messages
+  const updateErrorMessages = (fieldName: any, message: any) => {
+    setErrorMessages((prevState: any) => ({
+      ...prevState,
+      [fieldName]: message
+    }));
+  };
 
   return (
     <Card className="mx-auto max-w-2xl">
@@ -89,8 +117,13 @@ export default function SignupForm() {
             </div>
             <div className="grid gap-2">
               <Label htmlFor="confirm-password">Confirm Password</Label>
-              <Input id="confirm-password" type="password" />
+              <Input id="confirm-password" type="password" onChange={(e) => (data.current.confirmPassword = e.target.value)}/>
             </div>
+            <div className="w-full">
+              {errorMessages.confirmPassword && (
+        <span className="text-red-500">{errorMessages.confirmPassword}</span>
+      )}
+      </div>
           </div>
           <Button onClick={register} className="w-full">
             Create an account

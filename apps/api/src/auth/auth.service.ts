@@ -39,6 +39,7 @@ export class AuthService {
 
   async signUp(data: CreateUserDto): Promise<any> {
     // Check if user exists
+    console.log(data);
     const userExists = await this.usersService.findByEmail(
       data.email as string,
     );

@@ -60,7 +60,7 @@ class CreateUserDto {
 
   @IsOptional()
   @IsAlphanumeric()
-  role: Role;
+  role?: Role;
 }
 
 export default CreateUserDto;
