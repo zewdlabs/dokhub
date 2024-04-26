@@ -13,7 +13,7 @@ export function AppHeader() {
           href="#"
           className="flex items-center gap-2 text-lg font-semibold md:text-base"
         >
-          <Icons.logo className="w-24 h-24" />
+          <Icons.logo className="w-24 h-10" />
           <span className="sr-only"></span>
         </Link>
       </nav>

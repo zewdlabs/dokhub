@@ -94,6 +94,7 @@ export default function HomePage() {
 
 const posts: Post[] = [
   {
+    slug: "how-to-check-for-stress-in-pregnant-women",
     title: "How to check for stress in pregnant women",
     description:
       "Stress is a common problem for pregnant women. Here are some tips to help you check for stress in pregnant woman and how to manage it.",
@@ -108,6 +109,7 @@ const posts: Post[] = [
     },
   },
   {
+    slug: "how-to-break-postpartum-depression",
     title: "How to break postpartum depression",
     description:
       "Postpartum depression is a common problem for new mothers. Here are some tips to help you break postpartum depression and how to manage it.",
@@ -122,6 +124,7 @@ const posts: Post[] = [
     },
   },
   {
+    slug: "nutrition-for-women-in-pregnancy",
     title: "Nutrition for women in pregnancy",
     description:
       "Nutrition is important for women in pregnancy. Here are some tips to help you manage nutrition that is important for the baby.",
