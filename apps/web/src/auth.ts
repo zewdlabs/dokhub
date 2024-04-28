@@ -6,7 +6,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   session: {
     strategy: "jwt",
   },
-  secret: process.env.AUTH_SECRET,
   providers: [
     google,
     credentials({
@@ -37,7 +36,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user, account, profile, trigger }) {
       //:TODO: I think this is where we handle google sign in
       if (account) {
-        console.log(">>> Account", account);
+        token.auth_token = await signJwt({
+          sub: token.sub,
+          id_token: account.id_token,
+          access_token: account.access_token,
+          expires_at: account.expires_at,
+        });
       }
 
       if (profile) {

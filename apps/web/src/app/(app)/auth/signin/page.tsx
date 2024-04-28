@@ -1,5 +1,5 @@
 import SigninForm from "@/components/custom/signin";
 
-export default async function SigninPage() {
+export default function SigninPage() {
   return <SigninForm />;
 }
