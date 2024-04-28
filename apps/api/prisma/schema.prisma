@@ -14,13 +14,14 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(cuid())
-  prefix   String?
-  fullName String
-  email    String  @unique
-  password String
-  phone    String?
-  bio      String?
+  id           String  @id @default(cuid())
+  prefix       String?
+  username     String  @unique
+  fullName     String
+  email        String  @unique
+  password     String
+  phone        String?
+  bio          String?
   refreshToken String?
 
   occupation        String?
@@ -34,22 +35,21 @@ model User {
 
   socialLinks SocialLink[]
 
-  organizations Organization[]
-  invitations   Invitation[]
-  session       Session[]
+  workspaces  Workspace[]
+  invitations Invitation[]
 
   emailVerification EmailVerification?
   passwordReset     PasswordReset?
-  subscription      Subscription[]
   post              Post[]
   postLike          PostLike[]
 
-  followedBy Follows[] @relation("followedBy")
-  following  Follows[] @relation("following")
+  followedBy      Follows[] @relation("followedBy")
+  followedByCount Int       @default(0)
+  following       Follows[] @relation("following")
+  followingCount  Int       @default(0)
+  Roles           Roles[]
 
-  role Role @default(USER)
-
-  @@index([email])
+  @@index([email, username], name: "unique_user")
   @@map("users")
 }
 
@@ -66,22 +66,6 @@ model Follows {
   @@map("follows")
 }
 
-model Session {
-  id String @id @default(cuid())
-
-  token String @unique
-
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  expiresAt DateTime
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId, token], name: "unique_session")
-  @@map("sessions")
-}
-
 model EmailVerification {
   id String @id @default(cuid())
 
@@ -92,7 +76,7 @@ model EmailVerification {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
 
-  expiresAt DateTime @default(dbgenerated("now() + interval '3 day'"))
+  expiresAt DateTime @default(dbgenerated("now() + interval '1 day'"))
 
   @@index([userId])
   @@map("email_verifications")
@@ -117,21 +101,19 @@ model PasswordReset {
 model Subscription {
   id String @id @default(cuid())
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+  expiresAt DateTime
 
-  expiresAt DateTime @default(dbgenerated("now() + interval '1 month'"))
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
 
-  subscriptionType SubscriptionType @default(PRO)
+  subscriptionType SubscriptionPlan @default(PRO)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([userId])
+  @@index([workspaceId])
   @@map("subscriptions")
 }
-
-//TODO: think about how to create a social network
 
 model Post {
   id        String  @id @default(cuid())
@@ -145,13 +127,18 @@ model Post {
   replyToPost   Post?   @relation("ReplyToPost", fields: [replyToPostId], references: [id])
   replyToPostId String?
 
-  replies  Post[]     @relation("ReplyToPost")
-  postLike PostLike[]
+  replies      Post[] @relation("ReplyToPost")
+  repliesCount Int    @default(0)
 
-  tag Tag[]
+  tag           Tag[]
+  postLike      PostLike[]
+  postLikeCount Int        @default(0)
 
   authorId String
   author   User   @relation(fields: [authorId], references: [id])
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -190,45 +177,46 @@ model Tag {
 }
 
 model SocialLink {
-  id       String @id @default(cuid())
-  username String @unique
-  userId   String
-  user     User   @relation(fields: [userId], references: [id])
+  id             String @id @default(cuid())
+  socialUserName String
+  userId         String
+  user           User   @relation(fields: [userId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([userId, username], name: "unique_social_link")
+  @@index([userId])
   @@map("social_links")
 }
 
-model Organization {
-  id       String  @id @default(cuid())
-  name     String
-  slug     String  @unique
-  location String?
+model Workspace {
+  id   String @id @default(cuid())
+  slug String @unique
+  name String
 
-  institutionLicenseNumber String?
-
-  members    User[]
-  Invitation Invitation[]
+  members       User[]
+  roles         Roles[]
+  invitations   Invitation[]
+  subscriptions Subscription[]
+  posts         Post[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([slug])
-  @@map("organizations")
+  @@map("workspaces")
 }
 
 model Invitation {
-  id             String       @id @default(cuid())
-  organization   Organization @relation(fields: [organizationId], references: [id])
-  organizationId String
+  id String @id @default(cuid())
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId String
 
   expirationDate DateTime @default(dbgenerated("now() + interval '7 days'"))
 
   email String
-  role  Role
+  role  RoleType @default(MEMBER)
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
@@ -238,8 +226,21 @@ model Invitation {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([organizationId, userId], name: "unique_invitation")
+  @@index([workspaceId, userId], name: "unique_invitation")
   @@map("invitations")
+}
+
+model Roles {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+
+  role RoleType @default(MEMBER)
+
+  @@map("roles")
 }
 
 enum InvitationStatus {
@@ -248,14 +249,14 @@ enum InvitationStatus {
   REJECTED
 }
 
-enum SubscriptionType {
+enum SubscriptionPlan {
   PRO
   ENTERPRISE
 }
 
-enum Role {
+enum RoleType {
   SUADMIN
   CREATOR
   ADMIN
-  USER
+  MEMBER
 }
