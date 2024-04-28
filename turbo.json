@@ -19,7 +19,9 @@
     "db:migrate:deploy": {},
     "db:migrate:dev": {},
     "db:push": {},
-    "db:seed": {},
+    "db:seed": {
+      "dependsOn": ["^db:seed"]
+    },
     "generate": {
       "dependsOn": ["^generate"]
     },
