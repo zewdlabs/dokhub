@@ -1,18 +1,17 @@
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { WinstonModule } from 'nest-winston';
 import {
   BadRequestException,
   Logger,
   RequestMethod,
   ValidationPipe,
 } from '@nestjs/common';
-import type { INestApplication } from '@nestjs/common';
-import type { ValidationError } from '@nestjs/common';
-import { loggerConfig } from '@/config/logging';
-import * as fs from 'fs';
+import type { INestApplication, ValidationError } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { WinstonModule } from 'nest-winston';
 import helmet from 'helmet';
+import * as fs from 'fs';
+import { AppModule } from './app.module';
+import { loggerConfig } from '@/config/logging';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {

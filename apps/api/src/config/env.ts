@@ -1,4 +1,4 @@
-import { logLevels } from '@dokhub/logging/src';
+import { logLevels } from './logging';
 
 export type Environment = {
   NODE_ENV: 'development' | 'production';
