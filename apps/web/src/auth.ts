@@ -16,8 +16,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
 
       async authorize(credentials) {
-        console.log(">>> Authorizing credentials", credentials);
-
         if (!credentials.email || !credentials.password) return null;
 
         const res = await fetch(`${process.env.BACKEND_URL}/auth/signin`, {
@@ -33,41 +31,35 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
+    async signIn({ user, account, profile, credentials, email }) {
+      // console.log(">>> signIn callback called");
+      //
+      // console.log({ user });
+      // profile && console.log({ profile });
+      // account && console.log({ account });
+      // credentials && console.log({ credentials });
+      // email && console.log({ email });
+
+      return true;
+    },
     async jwt({ token, user, account, profile, trigger }) {
-      //:TODO: I think this is where we handle google sign in
-      if (account) {
-        token.auth_token = await signJwt({
-          sub: token.sub,
-          id_token: account.id_token,
-          access_token: account.access_token,
-          expires_at: account.expires_at,
-        });
-      }
+      // console.log("JWT callback called");
+      //
+      // console.log({ token });
+      // console.log({ user });
+      // console.log({ trigger });
+      // account && console.log({ account });
+      // profile && console.log({ profile });
 
-      if (profile) {
-        console.log(">>> Profile", profile);
-      }
-
-      console.log(">>> Trigger", trigger);
-
-      if (user) return { ...token, ...user };
-
-      if (new Date().getTime() < token.exp!) return token;
-
-      return await (
-        await fetch(`${process.env.BACKEND_URL}/auth/refresh`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Refresh ${token.backendTokens.refreshToken}`,
-          },
-        })
-      ).json();
+      return token;
     },
 
-    async session({ session, token, user }) {
-      session.user = { ...token.user, ...user };
-      session.backendTokens = token.backendTokens;
+    async session({ session, token, user, trigger }) {
+      // console.log(">>> Session callback called");
+      // console.log({ session });
+      // console.log({ token });
+      // console.log({ user });
+      // console.log({ trigger });
 
       return session;
     },
@@ -95,18 +87,12 @@ declare module "next-auth" {
   /**
    * Returned by `useSession`, `auth`, contains information about the active session.
    */
-  interface Session {
-    user: {} & DefaultSession["user"];
-    backendTokens: { accessToken: string; refreshToken: string };
-  }
+  interface Session {}
 }
 
 // The `JWT` interface can be found in the `next-auth/jwt` submodule
 
 declare module "next-auth/jwt" {
   /** Returned by the `jwt` callback and `auth`, when using JWT sessions */
-  interface JWT {
-    user: {} & DefaultSession["user"];
-    backendTokens: { accessToken: string; refreshToken: string };
-  }
+  interface JWT {}
 }
