@@ -1,15 +1,17 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { HealthModule } from './health/health.module';
-import { PrismaModule } from './prisma/prisma.module';
-import { AppController } from './app.controller';
-import { AppLoggerMiddleware } from './middlewares/applogger.middleware';
 import { ConfigModule } from '@nestjs/config';
+import { HealthModule } from '@/modules/health/health.module';
+import { PrismaModule } from '@/modules/prisma/prisma.module';
+import { UsersModule } from '@/modules/users/users.module';
+import { AppLoggerMiddleware } from '@/middlewares/applogger.middleware';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     HealthModule,
     PrismaModule,
-    ConfigModule.forRoot({ isGlobal: true }),
+    UsersModule,
   ],
   controllers: [AppController],
 })
