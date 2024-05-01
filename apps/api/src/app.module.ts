@@ -2,7 +2,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { HealthModule } from './health/health.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { AppController } from './app.controller';
-import { AppLoggerMiddleware } from './applogger.middleware';
+import { AppLoggerMiddleware } from './middlewares/applogger.middleware';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
