@@ -14,13 +14,13 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(cuid())
-  prefix   String?
-  fullName String
-  email    String  @unique
-  password String
-  phone    String?
-  bio      String?
+  id           String  @id @default(cuid())
+  prefix       String?
+  fullName     String
+  email        String  @unique
+  password     String
+  phone        String?
+  bio          String?
   refreshToken String?
 
   occupation        String?
@@ -41,8 +41,11 @@ model User {
   emailVerification EmailVerification?
   passwordReset     PasswordReset?
   subscription      Subscription[]
-  post              Post[]
-  postLike          PostLike[]
+
+  post     Post[]     @relation("author")
+  postLike PostLike[]
+
+  collaboratedOn Post[] @relation("collabrators")
 
   followedBy Follows[] @relation("followedBy")
   following  Follows[] @relation("following")
@@ -136,8 +139,8 @@ model Subscription {
 model Post {
   id        String  @id @default(cuid())
   title     String
-  content   String // Markdown content
-  metadata  String? // JSON metadata
+  content   String  @db.Text
+  metadata  Json    @default("{}")
   published Boolean @default(false)
 
   reportedAmount Int @default(0)
@@ -145,16 +148,22 @@ model Post {
   replyToPost   Post?   @relation("ReplyToPost", fields: [replyToPostId], references: [id])
   replyToPostId String?
 
-  replies  Post[]     @relation("ReplyToPost")
-  postLike PostLike[]
+  replies    Post[]     @relation("ReplyToPost")
+  postLike   PostLike[]
+  likesCount Int        @default(0)
 
   tag Tag[]
 
   authorId String
-  author   User   @relation(fields: [authorId], references: [id])
+  author   User   @relation(fields: [authorId], references: [id], name: "author")
+
+  collabrators User[] @relation("collabrators")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  Organization   Organization? @relation(fields: [organizationId], references: [id])
+  organizationId String?
 
   @@index([authorId])
   @@map("posts")
@@ -212,6 +221,8 @@ model Organization {
 
   members    User[]
   Invitation Invitation[]
+
+  post Post[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
