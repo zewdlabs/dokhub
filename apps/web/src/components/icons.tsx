@@ -35,11 +35,31 @@ import {
   Heading4,
   Heading5,
   Heading6,
+  Underline,
+  Pilcrow,
+  ListOrdered,
+  List,
+  AlignLeft,
+  AlignRight,
+  AlignCenter,
+  AlignJustify,
+  Undo2,
+  Redo2,
 } from "lucide-react";
 
 export const Icons = {
+  undo: Undo2,
+  redo: Redo2,
+  leftAlign: AlignLeft,
+  rightAlign: AlignRight,
+  centerAlign: AlignCenter,
+  justifyAlign: AlignJustify,
+  bulletedList: List,
+  orderedList: ListOrdered,
+  paragraph: Pilcrow,
   bold: Bold,
   italic: Italic,
+  underline: Underline,
   strikethrough: Strikethrough,
   heading1: Heading1,
   heading2: Heading2,
@@ -47,6 +67,21 @@ export const Icons = {
   heading4: Heading4,
   heading5: Heading5,
   heading6: Heading6,
+  write: ({ className, ...otherProps }: LucideProps) => (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      className={cn("w-6 h-6 fill-none stroke-2", className)}
+      {...otherProps}
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"
+      />
+    </svg>
+  ),
   quote: ({ className, ...otherProps }: LucideProps) => (
     <svg
       className={cn("w-6 h-6", className)}

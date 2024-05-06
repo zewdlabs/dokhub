@@ -2,20 +2,70 @@
 
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
+import Image from "@tiptap/extension-image";
+import TextAlign from "@tiptap/extension-text-align";
+import Link from "@tiptap/extension-link";
+import { BubbleMenu as BubbleMenuConfig } from "@tiptap/extension-bubble-menu";
 import EditorToolbar from "./editor/toolbar";
 import { useMutation } from "@tanstack/react-query";
 import { useDebounce } from "@/hooks/use-debounce";
+import { buttonVariants } from "../ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Icons } from "@/components/icons";
 
 export default function Tiptap() {
-  const [editorState, setEditorState] = useState(`<h1>Hi there</h1>`);
+  const [newChangesMade, setNewChangesMade] = useState(false);
+  const [editorState, setEditorState] = useState(`<h1>Start with a title</h1>`);
+
+  // NOTE: I don't think we need this since we save the state automatically
+
+  // useEffect(() => {
+  //   if (!newChangesMade) return;
+  //   function beforeUnload(e: BeforeUnloadEvent) {
+  //     e.preventDefault();
+  //   }
+  //
+  //   window.addEventListener("beforeunload", beforeUnload, { capture: true });
+  //
+  //   return () => {
+  //     window.removeEventListener("beforeunload", beforeUnload);
+  //   };
+  // }, [newChangesMade]);
 
   const editor = useEditor({
-    extensions: [StarterKit.configure()],
-    autofocus: true,
-    onUpdate: ({ editor }) => setEditorState(editor.getHTML()),
+    extensions: [
+      StarterKit.configure({}),
+      TextAlign.configure({
+        defaultAlignment: "left",
+        alignments: ["left", "center", "right", "justify"],
+        types: ["heading", "paragraph"],
+      }),
+      Underline.configure(),
+      BubbleMenuConfig.configure({
+        tippyOptions: {
+          duration: 200,
+        },
+      }),
+      Image.configure(),
+      Link.configure({
+        protocols: ["http", "https", "mailto"],
+        openOnClick: "whenNotEditable",
+        HTMLAttributes: {
+          class: cn(
+            buttonVariants({ variant: "link", className: "px-0 py-0" }),
+          ),
+        },
+      }),
+    ],
+    onUpdate: ({ editor }) => {
+      setNewChangesMade((state) => !state && true);
+      setEditorState(editor.getHTML());
+    },
     content: editorState,
+    autofocus: true,
   });
 
   const saveNote = useMutation({
@@ -40,6 +90,7 @@ export default function Tiptap() {
     if (debouncedEditorState === "") return;
     saveNote.mutate(undefined, {
       onSuccess: (data) => {
+        setNewChangesMade(false);
         console.log("success update!", data);
       },
       onError: (err) => {
@@ -49,9 +100,48 @@ export default function Tiptap() {
   }, [debouncedEditorState]);
 
   return (
-    <div className={cn("relative md:container")}>
-      {editor && <EditorToolbar editor={editor} />}
-      <EditorContent editor={editor} />
+    <div className={cn("relative container")}>
+      {editor && (
+        <EditorToolbar
+          editor={editor}
+          newChangeOccured={newChangesMade}
+          setNewChangeOccured={setNewChangesMade}
+        />
+      )}
+      {editor && (
+        <BubbleMenu editor={editor}>
+          <ToggleGroup type="multiple">
+            <ToggleGroupItem
+              value="bold"
+              aria-label="Toggle bold"
+              onClick={() => editor.chain().focus().toggleBold().run()}
+              disabled={!editor.can().chain().focus().toggleBold().run()}
+            >
+              <Icons.bold className="h-5 w-5" />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="italic"
+              aria-label="Toggle italic"
+              onClick={() => editor.chain().focus().toggleItalic().run()}
+              disabled={!editor.can().chain().focus().toggleItalic().run()}
+            >
+              <Icons.italic className="h-5 w-5" />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="underline"
+              aria-label="Toggle underline"
+              onClick={() => editor.chain().focus().toggleUnderline().run()}
+              disabled={!editor.can().chain().focus().toggleStrike().run()}
+            >
+              <Icons.underline className="h-5 w-5" />
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </BubbleMenu>
+      )}
+      <EditorContent
+        editor={editor}
+        className="px-8 prose max-w-none md:px-24 py-12 min-h-[70vh] border border-t-0"
+      />
     </div>
   );
 }
