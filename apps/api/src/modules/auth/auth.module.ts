@@ -5,9 +5,9 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './strategies/local.strategy';
 import { RefreshTokenStrategy } from './strategies/refreshToken.strategy';
-import { PrismaService } from '@/prisma/prisma.service';
-import { PrismaModule } from '@/prisma/prisma.module';
-import { UserModule } from '@/users/user.module';
+import { PrismaService } from '@/modules/prisma/prisma.service';
+import { PrismaModule } from '@/modules/prisma/prisma.module';
+import { UserModule } from '@/modules/users/user.module';
 import { AccessTokenStrategy } from './strategies/accessToken.strategy';
 
 @Module({

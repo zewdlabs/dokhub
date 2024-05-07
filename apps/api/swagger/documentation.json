@@ -195,6 +195,16 @@
       "post": {
         "operationId": "AuthController_signup",
         "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "",
@@ -466,6 +476,140 @@
           }
         }
       }
+    },
+    "/api/posts": {
+      "post": {
+        "operationId": "PostsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePostDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Posts"
+        ]
+      },
+      "get": {
+        "operationId": "PostsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Posts"
+        ]
+      }
+    },
+    "/api/posts/user/{userId}": {
+      "get": {
+        "operationId": "PostsController_findUserPosts",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Posts"
+        ]
+      }
+    },
+    "/api/posts/{id}": {
+      "get": {
+        "operationId": "PostsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Posts"
+        ]
+      },
+      "patch": {
+        "operationId": "PostsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePostDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Posts"
+        ]
+      },
+      "delete": {
+        "operationId": "PostsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Posts"
+        ]
+      }
     }
   },
   "info": {
@@ -486,6 +630,10 @@
       }
     },
     "schemas": {
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {}
+      },
       "AuthEntity": {
         "type": "object",
         "properties": {
@@ -512,47 +660,56 @@
           "password"
         ]
       },
-      "CreateUserDto": {
+      "CreateOrganizationDto": {
         "type": "object",
         "properties": {}
       },
-      "CreateOrganizationDto": {
+      "UpdateOrganizationDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreatePostDto": {
         "type": "object",
         "properties": {
-          "name": {
+          "title": {
             "type": "string"
           },
-          "slug": {
+          "content": {
             "type": "string"
           },
-          "location": {
+          "authorId": {
             "type": "string"
           },
-          "institutionLicenseNumber": {
-            "type": "string"
+          "replyToPostId": {
+            "type": "object"
+          },
+          "metadata": {
+            "type": "object"
           }
         },
         "required": [
-          "name",
-          "slug",
-          "location",
-          "institutionLicenseNumber"
+          "title",
+          "content",
+          "authorId"
         ]
       },
-      "UpdateOrganizationDto": {
+      "UpdatePostDto": {
         "type": "object",
         "properties": {
-          "name": {
+          "title": {
             "type": "string"
           },
-          "slug": {
+          "content": {
             "type": "string"
           },
-          "location": {
+          "authorId": {
             "type": "string"
           },
-          "institutionLicenseNumber": {
-            "type": "string"
+          "replyToPostId": {
+            "type": "object"
+          },
+          "metadata": {
+            "type": "object"
           }
         }
       }

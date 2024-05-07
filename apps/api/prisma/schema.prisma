@@ -137,7 +137,7 @@ model Post {
   id        String  @id @default(cuid())
   title     String
   content   String // Markdown content
-  metadata  String? // JSON metadata
+  metadata  Json? // JSON metadata
   published Boolean @default(false)
 
   reportedAmount Int @default(0)

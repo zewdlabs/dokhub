@@ -16,9 +16,18 @@ import { buttonVariants } from "../ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Icons } from "@/components/icons";
 
-export default function Tiptap() {
+export default function Tiptap({
+  id,
+  title,
+  content,
+}: {
+  id: string;
+  title: string;
+  content: string;
+}) {
   const [newChangesMade, setNewChangesMade] = useState(false);
-  const [editorState, setEditorState] = useState(`<h1>Start with a title</h1>`);
+  const [editorState, setEditorState] = useState(content);
+  const [titleState, setTitleState] = useState(title);
 
   // NOTE: I don't think we need this since we save the state automatically
 
@@ -70,10 +79,24 @@ export default function Tiptap() {
 
   const saveNote = useMutation({
     mutationFn: async () => {
-      const response = await fetch("/api/notes", {
-        method: "POST",
+      console.log(
+        "saving note for id",
+        id,
+        "id matches",
+        id === "clvwfwrup0001102ke9cu02n9",
+        "content changed",
+        content !== editorState,
+      );
+
+      console.log("saving note", editorState);
+      const response = await fetch(`http://localhost:4231/api/posts/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          editorState,
+          title: titleState,
+          content: editorState,
         }),
       });
 
@@ -81,7 +104,9 @@ export default function Tiptap() {
         throw new Error("An error occurred while saving the note");
       }
 
-      return response.json();
+      const data = await response.json();
+      console.log("data after request", data);
+      return data;
     },
   });
 
