@@ -17,6 +17,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Icons } from "../icons";
+import { signIn } from "next-auth/react";
 
 const signInSchema = z.object({
   email: z.string().email(),
@@ -33,7 +34,11 @@ export default function SigninForm() {
   });
 
   const onSubmit = form.handleSubmit(
-    (values: z.infer<typeof signInSchema>) => {},
+    async (values: z.infer<typeof signInSchema>) => {
+      await signIn("credentials", {
+        ...values,
+      });
+    },
   );
 
   return (
@@ -70,7 +75,13 @@ export default function SigninForm() {
           <Button type="submit" className="w-full">
             Continue
           </Button>
-          <Button variant="outline" className="w-full">
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={async () => {
+              await signIn("google");
+            }}
+          >
             <Icons.google className="w-5 h-5 mr-2" />
             Continue with Google
           </Button>

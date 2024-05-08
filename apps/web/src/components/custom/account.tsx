@@ -7,18 +7,29 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { Session } from "next-auth";
+import { signOut } from "next-auth/react";
 
-export default function AccountButton() {
+function genFallback(name: string) {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("");
+}
+
+export default function AccountButton({ session }: { session: Session }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-10 w-10">
-            <AvatarImage src="/avatars/01.png" alt="@shadcn" />
-            <AvatarFallback>NM</AvatarFallback>
+            <AvatarImage
+              src={session?.user?.image!}
+              alt={session?.user?.name!}
+            />
+            <AvatarFallback>{genFallback(session?.user?.name!)}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
@@ -26,10 +37,10 @@ export default function AccountButton() {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">
-              Nathnael Mekonnen
+              {session?.user?.name!}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
-              nmktadesse@gmail.com
+              {session?.user?.email!}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -49,9 +60,8 @@ export default function AccountButton() {
           */}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
           Log out
-          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

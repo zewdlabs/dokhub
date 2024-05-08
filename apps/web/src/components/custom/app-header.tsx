@@ -30,6 +30,7 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useState } from "react";
 import { redirect } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 const publishFormSchema = z.object({
   publishPublic: z.boolean().default(false),
@@ -51,6 +52,8 @@ const publishFormSchema = z.object({
 });
 
 export function AppHeader({ id }: { id: string }) {
+  const { data: session, status } = useSession();
+
   const [publishModalOpen, setPublishModalOpen] = useState(false);
 
   const form = useForm<z.infer<typeof publishFormSchema>>({
@@ -117,7 +120,7 @@ export function AppHeader({ id }: { id: string }) {
             <Icons.logo className="w-28 h-20" />
           </Link>
           <Separator orientation="vertical" className="h-8" />
-          <span className="text-center">Drafts in Solomon Tesfaye</span>
+          <span className="text-center">Drafts in {session?.user?.name}</span>
         </div>
         <div className="flex items-center gap-4 ">
           <Dialog open={publishModalOpen} onOpenChange={setPublishModalOpen}>
@@ -174,7 +177,7 @@ export function AppHeader({ id }: { id: string }) {
               </Form>
             </DialogContent>
           </Dialog>
-          <AccountButton />
+          {status === "authenticated" && <AccountButton session={session!} />}
         </div>
       </div>
     </header>
