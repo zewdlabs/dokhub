@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Post } from '@prisma/client';
-import { IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class CreatePostDto
   implements
@@ -16,6 +16,11 @@ export class CreatePostDto
   @IsString()
   @ApiProperty()
   content: string;
+
+  @IsBoolean()
+  @IsOptional()
+  @ApiProperty()
+  published: boolean;
 
   @IsString()
   @ApiProperty()

@@ -677,6 +677,9 @@
           "content": {
             "type": "string"
           },
+          "published": {
+            "type": "boolean"
+          },
           "authorId": {
             "type": "string"
           },
@@ -690,6 +693,7 @@
         "required": [
           "title",
           "content",
+          "published",
           "authorId"
         ]
       },
@@ -701,6 +705,9 @@
           },
           "content": {
             "type": "string"
+          },
+          "published": {
+            "type": "boolean"
           },
           "authorId": {
             "type": "string"

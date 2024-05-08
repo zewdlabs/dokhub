@@ -29,21 +29,6 @@ export default function Tiptap({
   const [editorState, setEditorState] = useState(content);
   const [titleState, setTitleState] = useState(title);
 
-  // NOTE: I don't think we need this since we save the state automatically
-
-  // useEffect(() => {
-  //   if (!newChangesMade) return;
-  //   function beforeUnload(e: BeforeUnloadEvent) {
-  //     e.preventDefault();
-  //   }
-  //
-  //   window.addEventListener("beforeunload", beforeUnload, { capture: true });
-  //
-  //   return () => {
-  //     window.removeEventListener("beforeunload", beforeUnload);
-  //   };
-  // }, [newChangesMade]);
-
   const editor = useEditor({
     extensions: [
       StarterKit.configure({}),
@@ -79,16 +64,6 @@ export default function Tiptap({
 
   const saveNote = useMutation({
     mutationFn: async () => {
-      console.log(
-        "saving note for id",
-        id,
-        "id matches",
-        id === "clvwfwrup0001102ke9cu02n9",
-        "content changed",
-        content !== editorState,
-      );
-
-      console.log("saving note", editorState);
       const response = await fetch(`http://localhost:4231/api/posts/${id}`, {
         method: "PATCH",
         headers: {
@@ -125,7 +100,7 @@ export default function Tiptap({
   }, [debouncedEditorState]);
 
   return (
-    <div className={cn("relative container")}>
+    <div className={cn("relative container px-0")}>
       {editor && (
         <EditorToolbar
           editor={editor}
