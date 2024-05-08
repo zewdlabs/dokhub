@@ -43,7 +43,7 @@ export const loggerConfig = (): LoggerOptions => {
 
   return {
     levels: logLevels,
-    level: process.env.LOG_LEVEL ?? 'info',
+    level: process.env.LOG_LEVEL ?? 'warn',
     format: isProduction ? WINSTON_PROD_FORMAT : WINSTON_DEV_FORMAT,
     transports: [
       new transports.Console(),

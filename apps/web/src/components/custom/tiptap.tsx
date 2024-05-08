@@ -25,7 +25,6 @@ export default function Tiptap({
   title: string;
   content: string;
 }) {
-  const [newChangesMade, setNewChangesMade] = useState(false);
   const [editorState, setEditorState] = useState(content);
   const [titleState, setTitleState] = useState(title);
 
@@ -55,7 +54,6 @@ export default function Tiptap({
       }),
     ],
     onUpdate: ({ editor }) => {
-      setNewChangesMade((state) => !state && true);
       setEditorState(editor.getHTML());
     },
     content: editorState,
@@ -89,10 +87,6 @@ export default function Tiptap({
   useEffect(() => {
     if (debouncedEditorState === "") return;
     saveNote.mutate(undefined, {
-      onSuccess: (data) => {
-        setNewChangesMade(false);
-        console.log("success update!", data);
-      },
       onError: (err) => {
         console.error(err);
       },
@@ -101,13 +95,7 @@ export default function Tiptap({
 
   return (
     <div className={cn("relative container px-0")}>
-      {editor && (
-        <EditorToolbar
-          editor={editor}
-          newChangeOccured={newChangesMade}
-          setNewChangeOccured={setNewChangesMade}
-        />
-      )}
+      {editor && <EditorToolbar editor={editor} />}
       {editor && (
         <BubbleMenu editor={editor}>
           <ToggleGroup type="multiple">

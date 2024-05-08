@@ -32,9 +32,9 @@ export default function SigninForm() {
     },
   });
 
-  const onSubmit = form.handleSubmit((values: z.infer<typeof signInSchema>) => {
-    console.log(values);
-  });
+  const onSubmit = form.handleSubmit(
+    (values: z.infer<typeof signInSchema>) => {},
+  );
 
   return (
     <Card className="mx-auto max-w-sm">

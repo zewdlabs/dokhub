@@ -93,7 +93,7 @@ export function AppHeader({ id }: { id: string }) {
         },
         body: JSON.stringify({ published: true }),
       });
-      console.log("req made to" + `${process.env.BACKEND_URL}/api/posts`);
+
       if (!req.ok) throw new Error("Failed to publish post");
       return await req.json();
     },

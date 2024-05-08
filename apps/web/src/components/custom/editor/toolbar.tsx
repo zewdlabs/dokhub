@@ -5,15 +5,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
 import type { Editor } from "@tiptap/react";
 
-export default function EditorToolbar({
-  editor,
-  newChangeOccured,
-  setNewChangeOccured,
-}: {
-  editor: Editor;
-  newChangeOccured: boolean;
-  setNewChangeOccured: (value: boolean) => void;
-}) {
+export default function EditorToolbar({ editor }: { editor: Editor }) {
   return (
     <div
       className={cn(
