@@ -17,7 +17,6 @@ import { PostsModule } from '@/modules/posts/posts.module';
     AuthModule,
     UserModule,
     OrganizationModule,
-    ConfigModule.forRoot({ isGlobal: true }),
     PostsModule,
   ],
   controllers: [AppController],

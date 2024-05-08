@@ -46,35 +46,122 @@ async function main() {
   await prisma.user.createMany({
     data: [
       {
-        fullName: 'Myshkin Smith',
-        prefix: null,
-        email: 'testadmin@gmail.com',
-        password: await bcrypt.hash('admin123', 10),
-        phone: '123-456-7890',
-        bio: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        fullName: 'Aiden Johnson',
+        prefix: 'Dr.',
+        email: 'aiden.johnson@example.com',
+        password: await bcrypt.hash('aiden123', 10),
+        phone: '555-123-4567',
+        bio: 'Experienced surgeon specializing in orthopedics.',
         refreshToken: null,
-        occupation: 'Doctor',
+        occupation: 'Surgeon',
+        specialty: 'Orthopedics',
+        yearsOfExperience: 15,
+        medicalLicenseNumber: 'GHI789JKL',
+        role: Role.USER,
+      },
+      {
+        fullName: 'Sophia Patel',
+        prefix: null,
+        email: 'sophia.patel@example.com',
+        password: await bcrypt.hash('sophia123', 10),
+        phone: '555-987-6543',
+        bio: "Passionate pediatrician dedicated to children's health.",
+        refreshToken: null,
+        occupation: 'Pediatrician',
+        specialty: 'Pediatrics',
+        yearsOfExperience: 8,
+        medicalLicenseNumber: 'MNO012PQR',
+        role: Role.ADMIN,
+      },
+      {
+        fullName: 'Elijah Chang',
+        prefix: 'Dr.',
+        email: 'elijah.chang@example.com',
+        password: await bcrypt.hash('elijah123', 10),
+        phone: '555-789-0123',
+        bio: 'Skilled cardiologist with a focus on preventive care.',
+        refreshToken: null,
+        occupation: 'Cardiologist',
         specialty: 'Cardiology',
-        yearsOfExperience: 10,
-        medicalLicenseNumber: 'ABC123XYZ',
+        yearsOfExperience: 12,
+        medicalLicenseNumber: 'STU345VWX',
         role: Role.SUADMIN,
       },
       {
-        fullName: 'Brook Feleke',
+        fullName: 'Isabella Garcia',
         prefix: null,
-        email: 'user@gmail.com',
-        password: await bcrypt.hash('user123', 10),
-        phone: '987-654-3210',
-        bio: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        email: 'isabella.garcia@example.com',
+        password: await bcrypt.hash('isabella123', 10),
+        phone: '555-234-5678',
+        bio: 'Compassionate nurse committed to patient care.',
         refreshToken: null,
         occupation: 'Nurse',
-        specialty: 'Pediatrics',
-        yearsOfExperience: 5,
-        medicalLicenseNumber: 'DEF456UVW',
-        role: Role.USER,
+        specialty: null,
+        yearsOfExperience: 6,
+        medicalLicenseNumber: null,
+        role: Role.CREATOR,
       },
       // Add more seed objects as needed
     ],
+  });
+  const user1 = await prisma.user.create({
+    data: {
+      fullName: 'User 1',
+      email: 'user1@example.com',
+      password: 'password1',
+      role: Role.ADMIN,
+    },
+  });
+
+  const user2 = await prisma.user.create({
+    data: {
+      fullName: 'User 2',
+      email: 'user2@example.com',
+      password: await bcrypt.hash('password2', 10),
+      role: Role.CREATOR,
+    },
+  });
+
+  await prisma.user.create({
+    data: {
+      fullName: 'User 3',
+      email: 'user3@example.com',
+      password: await bcrypt.hash('password3', 10),
+    },
+  });
+
+  // Create organization with members
+  await prisma.organization.create({
+    data: {
+      name: 'Organization 1',
+      slug: 'org1',
+      location: 'Location 1',
+      members: {
+        connect: [
+          { id: user1.id }, // Connect user1 to the organization
+          { id: user2.id }, // Connect user2 to the organization
+        ],
+      },
+    },
+  });
+
+  // Create posts by organization members
+  await prisma.post.create({
+    data: {
+      title: 'Post 1',
+      content: 'Content of Post 1',
+      published: true,
+      authorId: user1.id, // User 1 creates this post
+    },
+  });
+
+  await prisma.post.create({
+    data: {
+      title: 'Post 2',
+      content: 'Content of Post 2',
+      published: true,
+      authorId: user2.id, // User 2 creates this post
+    },
   });
 }
 
