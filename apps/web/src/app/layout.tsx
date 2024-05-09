@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import LocalFont from "next/font/local";
-import QueryProvider from "@/lib/query-provider";
+import { Toaster } from "@/components/ui/sonner";
+import Providers from "@/lib/providers";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -24,7 +25,8 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <body className={`${inter.className} ${calSans.variable} antialiased`}>
-        <QueryProvider>{children}</QueryProvider>
+        <Providers>{children}</Providers>
+        <Toaster />
       </body>
     </html>
   );

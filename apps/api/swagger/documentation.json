@@ -495,7 +495,10 @@
           "201": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Posts"
+        ]
       },
       "get": {
         "operationId": "PostsController_findAll",
@@ -504,7 +507,33 @@
           "200": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Posts"
+        ]
+      }
+    },
+    "/api/posts/user/{userId}": {
+      "get": {
+        "operationId": "PostsController_findUserPosts",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Posts"
+        ]
       }
     },
     "/api/posts/{id}": {
@@ -524,7 +553,10 @@
           "200": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Posts"
+        ]
       },
       "patch": {
         "operationId": "PostsController_update",
@@ -552,7 +584,10 @@
           "200": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Posts"
+        ]
       },
       "delete": {
         "operationId": "PostsController_remove",
@@ -570,7 +605,10 @@
           "200": {
             "description": ""
           }
-        }
+        },
+        "tags": [
+          "Posts"
+        ]
       }
     }
   },
@@ -632,11 +670,55 @@
       },
       "CreatePostDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "published": {
+            "type": "boolean"
+          },
+          "authorId": {
+            "type": "string"
+          },
+          "replyToPostId": {
+            "type": "object"
+          },
+          "metadata": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "title",
+          "content",
+          "published",
+          "authorId"
+        ]
       },
       "UpdatePostDto": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "published": {
+            "type": "boolean"
+          },
+          "authorId": {
+            "type": "string"
+          },
+          "replyToPostId": {
+            "type": "object"
+          },
+          "metadata": {
+            "type": "object"
+          }
+        }
       }
     }
   }
