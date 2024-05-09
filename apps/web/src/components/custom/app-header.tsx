@@ -14,7 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -31,6 +31,7 @@ import { toast } from "sonner";
 import { useState } from "react";
 import { redirect } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { cn } from "@/lib/utils";
 
 const publishFormSchema = z.object({
   publishPublic: z.boolean().default(false),
@@ -177,6 +178,34 @@ export function AppHeader({ id }: { id: string }) {
               </Form>
             </DialogContent>
           </Dialog>
+          {status === "authenticated" && <AccountButton session={session!} />}
+        </div>
+      </div>
+    </header>
+  );
+}
+
+export function EditorHeader({ id }: { id: string }) {
+  const { data: session, status } = useSession();
+
+  return (
+    <header className="sticky top-0 left-0 backdrop-blur-3xl gap-4 px-4 md:px-6 border-b-[1px] border-border z-50 items-center">
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-4">
+          <Link href="/">
+            <Icons.logo className="w-28 h-20" />
+          </Link>
+        </div>
+        <div className="flex items-center gap-4 ">
+          <Link
+            href="/new"
+            className={cn(
+              buttonVariants({ variant: "default" }),
+              "hidden md:flex md:gap-2 md:items-center md:justify-center rounded-full",
+            )}
+          >
+            Write
+          </Link>
           {status === "authenticated" && <AccountButton session={session!} />}
         </div>
       </div>

@@ -72,7 +72,7 @@ export function MarketingHeader() {
         )}
         {status === "authenticated" && session ? (
           <Link
-            href="/app"
+            href="/app/spmmc"
             className={cn(
               buttonVariants({ variant: "default" }),
               "rounded-full bg-primary hover:bg-primary/90 hidden md:flex items-center justify-center ease-in transition-colors",

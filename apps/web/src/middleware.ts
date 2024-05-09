@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 
 export const middleware = auth(async (req) => {
@@ -40,10 +39,10 @@ export const middleware = auth(async (req) => {
     }
 
     // TODO: This should resolve to a personal workspace or a team workspace
-    if (pathname.startsWith("/app")) {
-      console.log(">>> Redirecting to / from /app");
-      return Response.redirect(new URL("/", req.url));
-    }
+    // if (pathname.startsWith("/app")) {
+    //   console.log(">>> Redirecting to / from /app");
+    //   return Response.redirect(new URL("/", req.url));
+    // }
   } else {
     if (pathname.startsWith("/auth")) return;
     return Response.redirect(new URL("/auth/signin", req.url));
