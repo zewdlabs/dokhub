@@ -60,9 +60,7 @@ export default function PostCard({ post }: { post: Post }) {
             <AvatarFallback></AvatarFallback>
           </Avatar>
           <Icons.dot className="w-6 h-6 text-muted-foreground/75" />
-          <span className="text-muted-foreground text-sm font-medium">
-            {format(post.publishedAt, "MMM dd, yyyy")}
-          </span>
+          <span className="text-muted-foreground text-sm font-medium"></span>
           <Icons.dot className="w-6 h-6 text-muted-foreground/75" />
           <span className="text-muted-foreground text-sm font-medium">
             {post.minutesToRead}
