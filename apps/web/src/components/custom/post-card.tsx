@@ -13,7 +13,6 @@ import { Icons } from "@/components/icons";
 import { format } from "date-fns";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import type { Post } from "../../app/(app)/app/[workspaceSlug]/(home)/page";
 import {
   DropdownMenuLabel,
   DropdownMenu,
@@ -24,6 +23,7 @@ import {
   DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import { Post } from "./post-list";
 
 export default function PostCard({ post }: { post: Post }) {
   return (
