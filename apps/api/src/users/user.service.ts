@@ -1,6 +1,6 @@
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { Prisma, User } from '@prisma/client'; // Import your Prisma user model
+import { Prisma, Role, User } from '@prisma/client'; // Import your Prisma user model
 import { Logger } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import CreateUserDto from '@/auth/dto/create-user.dto';
@@ -40,10 +40,10 @@ export class UserService {
     const hashedPassword = await bcrypt.hash(data.password, roundsOfHashing);
     data.password = hashedPassword;
     const userData: Prisma.UserCreateInput = { ...data };
-    const createUser = await this.prisma.user.create({
+    const createdUser = await this.prisma.user.create({
       data: userData,
     });
-    return createUser;
+    return createdUser;
   }
 
   async updateUser(params: {
@@ -64,5 +64,12 @@ export class UserService {
       where,
     });
     return deleteUser;
+  }
+
+  async updateUserRole(userId: string, newRole: Role): Promise<User> {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { role: newRole },
+    });
   }
 }
