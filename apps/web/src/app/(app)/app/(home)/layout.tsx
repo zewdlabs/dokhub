@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "Homepage | Dokhub",
 };
 
-export default function WriterLayout({ children }: PropsWithChildren) {
+export default function HomeLayout({ children }: PropsWithChildren) {
   return (
     <>
       <AppHeader />

@@ -29,7 +29,6 @@ import { Switch } from "@/components/ui/switch";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useState } from "react";
-import { redirect } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 
@@ -198,7 +197,7 @@ export function AppHeader() {
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           <Link href="/">
-            <Icons.logo className="w-28 h-20" />
+            <Icons.logo className="w-28 h-16" />
           </Link>
         </div>
         <div className="flex items-center gap-4 ">

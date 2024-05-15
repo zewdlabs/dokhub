@@ -85,6 +85,22 @@ async function main() {
       },
     },
   });
+
+  await prisma.tag.createMany({
+    data: [
+      { name: 'Maternal Health' },
+      { name: 'Pediatrics' },
+      { name: 'Orthopedics' },
+      { name: 'Cardiology' },
+      { name: 'Surgery' },
+      { name: 'Nursing' },
+      { name: 'Preventive Care' },
+      { name: 'Patient Care' },
+      { name: 'Healthcare' },
+      { name: 'Medicine' },
+      { name: 'Medical Education' },
+    ],
+  });
 }
 
 main()

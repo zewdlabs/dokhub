@@ -1,10 +1,9 @@
-import PostCard from "@/components/custom/post-card";
 import PostList from "@/components/custom/post-list";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default async function HomePage() {
   return (
@@ -26,7 +25,7 @@ export default async function HomePage() {
               defaultValue="foryou"
               className="flex flex-col items-start gap-4 w-full"
             >
-              <TabsList className="z-40 sticky top-16 bg-transparent w-full flex justify-start">
+              <TabsList className="z-40 bg-transparent w-full flex justify-start">
                 {/* TODO: think about this button. try to implement it last*/}
                 <Button variant="outline" className="px-3">
                   <Icons.add className="w-4 h-4" />
