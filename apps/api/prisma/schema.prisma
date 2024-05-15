@@ -14,43 +14,57 @@ datasource db {
 }
 
 model User {
-  id           String  @id @default(cuid())
-  prefix       String?
-  fullName     String
-  email        String  @unique
-  password     String
-  phone        String?
-  bio          String?
-  refreshToken String?
+  id String @id @default(cuid())
 
-  occupation        String?
-  specialty         String?
-  yearsOfExperience Int?
-
+  email                String  @unique
+  name                 String
+  prefix               String?
+  password             String?
+  phone                String?
+  bio                  String?
+  occupation           String?
+  specialty            String?
   medicalLicenseNumber String?
+  yearsOfExperience    Int?
+
+  socialLinks       SocialLink[]
+  memberships       Membership[]
+  invitations       Invitation[]
+  subscriptions     Subscription[]
+  likes             PostLike[]
+  tags              Tag[]
+  posts             Post[]             @relation("author")
+  followedBy        Follows[]          @relation("followedBy")
+  followedByCount   Int                @default(0)
+  following         Follows[]          @relation("following")
+  followingCount    Int                @default(0)
+  emailVerification EmailVerification?
+  passwordReset     PasswordReset?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Post      Post[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model Membership {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  socialLinks SocialLink[]
+  role Role
 
-  organizations Organization[]
-  invitations   Invitation[]
-  session       Session[]
-
-  emailVerification EmailVerification?
-  passwordReset     PasswordReset?
-  subscription      Subscription[]
-  post              Post[]
-  postLike          PostLike[]
-
-  followedBy Follows[] @relation("followedBy")
-  following  Follows[] @relation("following")
-
-  role Role @default(USER)
-
-  @@index([email])
-  @@map("users")
+  @@index([userId, organizationId], name: "unique_membership")
+  @@map("memberships")
 }
 
 model Follows {
@@ -64,22 +78,6 @@ model Follows {
   @@id([followingId, followedById])
   @@index([followedById, followingId], name: "unique_follows")
   @@map("follows")
-}
-
-model Session {
-  id String @id @default(cuid())
-
-  token String @unique
-
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  expiresAt DateTime
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId, token], name: "unique_session")
-  @@map("sessions")
 }
 
 model EmailVerification {
@@ -105,56 +103,46 @@ model PasswordReset {
   email  String @unique
   userId String @unique
 
-  expiresAt DateTime @default(dbgenerated("now() + interval '1 day'"))
-
   user User @relation(fields: [userId], references: [id])
+
+  expiresAt DateTime @default(dbgenerated("now() + interval '1 day'"))
 
   @@index([userId, token, email], name: "unique_password_reset")
   @@map("password_resets")
 }
 
-//TODO: Think about this after everything is done
-model Subscription {
-  id String @id @default(cuid())
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-
-  expiresAt DateTime @default(dbgenerated("now() + interval '1 month'"))
-
-  subscriptionType SubscriptionType @default(PRO)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId])
-  @@map("subscriptions")
-}
-
-//TODO: think about how to create a social network
-
+// try to add collaborators
 model Post {
-  id        String  @id @default(cuid())
-  title     String
-  content   String // Markdown content
-  metadata  Json? // JSON metadata
-  published Boolean @default(false)
+  id          String    @id @default(cuid())
+  title       String
+  content     String
+  metadata    Json?
+  publishedAt DateTime?
 
-  reportedAmount Int @default(0)
+  reportedAmount Int     @default(0)
+  minToRead      Int     @default(1)
+  public         Boolean @default(true)
+
+  author   User   @relation("author", fields: [authorId], references: [id])
+  authorId String
 
   replyToPost   Post?   @relation("ReplyToPost", fields: [replyToPostId], references: [id])
   replyToPostId String?
 
-  replies  Post[]     @relation("ReplyToPost")
-  postLike PostLike[]
+  replies Post[] @relation("ReplyToPost")
 
-  tag Tag[]
+  postLikes     PostLike[]
+  postLikeCount Int        @default(0)
 
-  authorId String
-  author   User   @relation(fields: [authorId], references: [id])
+  tags Tag[]
+
+  // If not public, only author, collaborators and specified organizations can see it
+  postAccessOrgs Organization[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  User      User?    @relation(fields: [userId], references: [id])
+  userId    String?
 
   @@index([authorId])
   @@map("posts")
@@ -180,7 +168,11 @@ model Tag {
   id   String @id @default(cuid())
   name String @unique
 
-  posts Post[]
+  posts      Post[]
+  postsCount Int    @default(0)
+
+  usersSubscribed      User[]
+  usersSubscribedCount Int    @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -190,15 +182,18 @@ model Tag {
 }
 
 model SocialLink {
-  id       String @id @default(cuid())
-  username String @unique
-  userId   String
-  user     User   @relation(fields: [userId], references: [id])
+  id String @id @default(cuid())
+
+  username String  @unique
+  url      String? @unique
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([userId, username], name: "unique_social_link")
+  @@index([userId, username, url], name: "unique_social_link")
   @@map("social_links")
 }
 
@@ -210,8 +205,9 @@ model Organization {
 
   institutionLicenseNumber String?
 
-  members    User[]
-  Invitation Invitation[]
+  invitations Invitation[]
+  memberships Membership[]
+  posts       Post[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -221,36 +217,58 @@ model Organization {
 }
 
 model Invitation {
-  id             String       @id @default(cuid())
+  id String @id @default(cuid())
+
   organization   Organization @relation(fields: [organizationId], references: [id])
   organizationId String
 
-  expirationDate DateTime @default(dbgenerated("now() + interval '7 days'"))
-
-  email String
-  role  Role
+  role Role
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
 
   status InvitationStatus @default(PENDING)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  expirationDate DateTime @default(dbgenerated("now() + interval '7 days'"))
 
   @@index([organizationId, userId], name: "unique_invitation")
   @@map("invitations")
+}
+
+//TODO: Think on this a bit more
+model Subscription {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  expiresAt DateTime @default(dbgenerated("now() + interval '1 month'"))
+
+  subscriptionType SubscriptionType @default(PRO)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("subscriptions")
 }
 
 enum InvitationStatus {
   PENDING
   ACCEPTED
   REJECTED
+  EXPIRED
 }
 
 enum SubscriptionType {
   PRO
   ENTERPRISE
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  SUSPENDED
 }
 
 enum Role {
