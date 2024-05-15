@@ -43,7 +43,6 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  Post      Post[]
 
   @@index([email])
   @@map("users")
@@ -116,12 +115,11 @@ model Post {
   id          String    @id @default(cuid())
   title       String
   content     String
-  metadata    Json?
   publishedAt DateTime?
 
-  reportedAmount Int     @default(0)
-  minToRead      Int     @default(1)
-  public         Boolean @default(true)
+  reportedAmount Int      @default(0)
+  minToRead      String?
+  public         Boolean? @default(true)
 
   author   User   @relation("author", fields: [authorId], references: [id])
   authorId String
@@ -141,8 +139,6 @@ model Post {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  User      User?    @relation(fields: [userId], references: [id])
-  userId    String?
 
   @@index([authorId])
   @@map("posts")

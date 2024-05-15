@@ -674,26 +674,27 @@
           "title": {
             "type": "string"
           },
+          "public": {
+            "type": "boolean"
+          },
           "content": {
             "type": "string"
           },
-          "published": {
-            "type": "boolean"
+          "publishedAt": {
+            "type": "object"
           },
           "authorId": {
             "type": "string"
           },
           "replyToPostId": {
             "type": "object"
-          },
-          "metadata": {
-            "type": "object"
           }
         },
         "required": [
           "title",
+          "public",
           "content",
-          "published",
+          "publishedAt",
           "authorId"
         ]
       },
@@ -703,19 +704,19 @@
           "title": {
             "type": "string"
           },
+          "public": {
+            "type": "boolean"
+          },
           "content": {
             "type": "string"
           },
-          "published": {
-            "type": "boolean"
+          "publishedAt": {
+            "type": "object"
           },
           "authorId": {
             "type": "string"
           },
           "replyToPostId": {
-            "type": "object"
-          },
-          "metadata": {
             "type": "object"
           }
         }

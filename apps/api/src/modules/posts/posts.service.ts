@@ -4,6 +4,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from '../users/user.service';
 import { Post } from '@prisma/client';
+import readingDuration from 'reading-duration';
 
 @Injectable()
 export class PostsService {
@@ -20,7 +21,9 @@ export class PostsService {
     }
 
     const post = await this.prisma.post.create({
-      data: { ...createPostDto },
+      data: {
+        ...createPostDto,
+      },
     });
 
     await this.prisma.post.update({
@@ -50,7 +53,13 @@ export class PostsService {
   async update(id: string, updatePostDto: UpdatePostDto): Promise<Post> {
     return await this.prisma.post.update({
       where: { id },
-      data: { ...updatePostDto },
+      data: {
+        ...updatePostDto,
+        minToRead: readingDuration(updatePostDto.content || '', {
+          emoji: false,
+          wordsPerMinute: 200,
+        }),
+      },
     });
   }
 

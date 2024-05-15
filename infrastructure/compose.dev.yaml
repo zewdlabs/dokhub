@@ -18,6 +18,15 @@ services:
       interval: 5s
       timeout: 2s
       retries: 20
+  vectorstore:
+    container_name: vectorstore
+    image: qdrant/qdrant:latest
+    restart: always
+    volumes:
+      - vectordata:/var/lib/qdrant/data
+    ports:
+      - 6333:6333
+      - 6334:6334
   objstorage:
     container_name: objstorage
     image: quay.io/minio/minio:latest
@@ -30,7 +39,7 @@ services:
     ports:
       - 9000:9000
       - 9001:9001
-    command: server --console-address ":9002" /data
+    command: server --console-address ":9001" /data
     healthcheck:
       test: ["CMD", "mc", "ready", "local"]
       interval: 5s
@@ -39,3 +48,4 @@ services:
 volumes:
   objdata:
   dbdata:
+  vectordata:

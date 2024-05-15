@@ -52,7 +52,7 @@ const publishFormSchema = z.object({
   // previewSubtitle: z.string().min(5).max(100),
 });
 
-export function AppHeader({ id }: { id: string }) {
+export function EditorHeader({ id }: { id: string }) {
   const { data: session, status } = useSession();
 
   const [publishModalOpen, setPublishModalOpen] = useState(false);
@@ -95,7 +95,10 @@ export function AppHeader({ id }: { id: string }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ published: true }),
+        body: JSON.stringify({
+          publishedAt: new Date().toJSON(),
+          public: values.publishPublic,
+        }),
       });
 
       if (!req.ok) throw new Error("Failed to publish post");
@@ -108,7 +111,9 @@ export function AppHeader({ id }: { id: string }) {
       onSuccess: () => {
         toast.success("Post published successfully");
         setPublishModalOpen(false);
-        redirect(`/posts/${id}`);
+      },
+      onError: () => {
+        toast.error("Failed to publish post");
       },
     });
   }
@@ -185,7 +190,7 @@ export function AppHeader({ id }: { id: string }) {
   );
 }
 
-export function EditorHeader({ id }: { id: string }) {
+export function AppHeader() {
   const { data: session, status } = useSession();
 
   return (
@@ -198,7 +203,7 @@ export function EditorHeader({ id }: { id: string }) {
         </div>
         <div className="flex items-center gap-4 ">
           <Link
-            href="/new"
+            href="/app/new"
             className={cn(
               buttonVariants({ variant: "default" }),
               "hidden md:flex md:gap-2 md:items-center md:justify-center rounded-full",

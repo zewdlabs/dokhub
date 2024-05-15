@@ -1,8 +1,11 @@
 -- CreateEnum
-CREATE TYPE "InvitationStatus" AS ENUM ('PENDING', 'ACCEPTED', 'REJECTED');
+CREATE TYPE "InvitationStatus" AS ENUM ('PENDING', 'ACCEPTED', 'REJECTED', 'EXPIRED');
 
 -- CreateEnum
 CREATE TYPE "SubscriptionType" AS ENUM ('PRO', 'ENTERPRISE');
+
+-- CreateEnum
+CREATE TYPE "PostStatus" AS ENUM ('DRAFT', 'PUBLISHED', 'SUSPENDED');
 
 -- CreateEnum
 CREATE TYPE "Role" AS ENUM ('SUADMIN', 'CREATOR', 'ADMIN', 'USER');
@@ -10,21 +13,34 @@ CREATE TYPE "Role" AS ENUM ('SUADMIN', 'CREATOR', 'ADMIN', 'USER');
 -- CreateTable
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
-    "firstName" TEXT NOT NULL,
-    "lastName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "prefix" TEXT,
+    "password" TEXT,
     "phone" TEXT,
     "bio" TEXT,
     "occupation" TEXT,
     "specialty" TEXT,
-    "yearsOfExperience" INTEGER,
     "medicalLicenseNumber" TEXT,
+    "yearsOfExperience" INTEGER,
+    "followedByCount" INTEGER NOT NULL DEFAULT 0,
+    "followingCount" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "role" "Role" NOT NULL DEFAULT 'USER',
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "memberships" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "organizationId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "role" "Role" NOT NULL,
+
+    CONSTRAINT "memberships_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -34,18 +50,6 @@ CREATE TABLE "follows" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "follows_pkey" PRIMARY KEY ("followingId","followedById")
-);
-
--- CreateTable
-CREATE TABLE "sessions" (
-    "id" TEXT NOT NULL,
-    "token" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "expiresAt" TIMESTAMP(3) NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "sessions_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -71,27 +75,17 @@ CREATE TABLE "password_resets" (
 );
 
 -- CreateTable
-CREATE TABLE "subscriptions" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "expiresAt" TIMESTAMP(3) NOT NULL DEFAULT now() + interval '1 month',
-    "subscriptionType" "SubscriptionType" NOT NULL DEFAULT 'PRO',
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "subscriptions_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "posts" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "content" TEXT NOT NULL,
-    "metadata" TEXT,
-    "published" BOOLEAN NOT NULL DEFAULT false,
+    "publishedAt" TIMESTAMP(3),
     "reportedAmount" INTEGER NOT NULL DEFAULT 0,
-    "replyToPostId" TEXT,
+    "minToRead" TEXT,
+    "public" BOOLEAN DEFAULT true,
     "authorId" TEXT NOT NULL,
+    "replyToPostId" TEXT,
+    "postLikeCount" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -113,6 +107,8 @@ CREATE TABLE "post_likes" (
 CREATE TABLE "tags" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "postsCount" INTEGER NOT NULL DEFAULT 0,
+    "usersSubscribedCount" INTEGER NOT NULL DEFAULT 0,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -123,6 +119,7 @@ CREATE TABLE "tags" (
 CREATE TABLE "social_links" (
     "id" TEXT NOT NULL,
     "username" TEXT NOT NULL,
+    "url" TEXT,
     "userId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -134,7 +131,8 @@ CREATE TABLE "social_links" (
 CREATE TABLE "organizations" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "location" TEXT NOT NULL,
+    "slug" TEXT NOT NULL,
+    "location" TEXT,
     "institutionLicenseNumber" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -146,15 +144,24 @@ CREATE TABLE "organizations" (
 CREATE TABLE "invitations" (
     "id" TEXT NOT NULL,
     "organizationId" TEXT NOT NULL,
-    "expirationDate" TIMESTAMP(3) NOT NULL DEFAULT now() + interval '7 days',
-    "email" TEXT NOT NULL,
     "role" "Role" NOT NULL,
     "userId" TEXT NOT NULL,
     "status" "InvitationStatus" NOT NULL DEFAULT 'PENDING',
+    "expirationDate" TIMESTAMP(3) NOT NULL DEFAULT now() + interval '7 days',
+
+    CONSTRAINT "invitations_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "subscriptions" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "expiresAt" TIMESTAMP(3) NOT NULL DEFAULT now() + interval '1 month',
+    "subscriptionType" "SubscriptionType" NOT NULL DEFAULT 'PRO',
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "invitations_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "subscriptions_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -164,7 +171,13 @@ CREATE TABLE "_PostToTag" (
 );
 
 -- CreateTable
-CREATE TABLE "_OrganizationToUser" (
+CREATE TABLE "_TagToUser" (
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "_OrganizationToPost" (
     "A" TEXT NOT NULL,
     "B" TEXT NOT NULL
 );
@@ -176,13 +189,10 @@ CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 CREATE INDEX "users_email_idx" ON "users"("email");
 
 -- CreateIndex
+CREATE INDEX "unique_membership" ON "memberships"("userId", "organizationId");
+
+-- CreateIndex
 CREATE INDEX "unique_follows" ON "follows"("followedById", "followingId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "sessions_token_key" ON "sessions"("token");
-
--- CreateIndex
-CREATE INDEX "unique_session" ON "sessions"("userId", "token");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "email_verifications_email_key" ON "email_verifications"("email");
@@ -206,9 +216,6 @@ CREATE UNIQUE INDEX "password_resets_userId_key" ON "password_resets"("userId");
 CREATE INDEX "unique_password_reset" ON "password_resets"("userId", "token", "email");
 
 -- CreateIndex
-CREATE INDEX "subscriptions_userId_idx" ON "subscriptions"("userId");
-
--- CreateIndex
 CREATE INDEX "posts_authorId_idx" ON "posts"("authorId");
 
 -- CreateIndex
@@ -224,10 +231,22 @@ CREATE INDEX "tags_name_idx" ON "tags"("name");
 CREATE UNIQUE INDEX "social_links_username_key" ON "social_links"("username");
 
 -- CreateIndex
-CREATE INDEX "unique_social_link" ON "social_links"("userId", "username");
+CREATE UNIQUE INDEX "social_links_url_key" ON "social_links"("url");
+
+-- CreateIndex
+CREATE INDEX "unique_social_link" ON "social_links"("userId", "username", "url");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "organizations_slug_key" ON "organizations"("slug");
+
+-- CreateIndex
+CREATE INDEX "organizations_slug_idx" ON "organizations"("slug");
 
 -- CreateIndex
 CREATE INDEX "unique_invitation" ON "invitations"("organizationId", "userId");
+
+-- CreateIndex
+CREATE INDEX "subscriptions_userId_idx" ON "subscriptions"("userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_PostToTag_AB_unique" ON "_PostToTag"("A", "B");
@@ -236,10 +255,22 @@ CREATE UNIQUE INDEX "_PostToTag_AB_unique" ON "_PostToTag"("A", "B");
 CREATE INDEX "_PostToTag_B_index" ON "_PostToTag"("B");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "_OrganizationToUser_AB_unique" ON "_OrganizationToUser"("A", "B");
+CREATE UNIQUE INDEX "_TagToUser_AB_unique" ON "_TagToUser"("A", "B");
 
 -- CreateIndex
-CREATE INDEX "_OrganizationToUser_B_index" ON "_OrganizationToUser"("B");
+CREATE INDEX "_TagToUser_B_index" ON "_TagToUser"("B");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_OrganizationToPost_AB_unique" ON "_OrganizationToPost"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_OrganizationToPost_B_index" ON "_OrganizationToPost"("B");
+
+-- AddForeignKey
+ALTER TABLE "memberships" ADD CONSTRAINT "memberships_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "memberships" ADD CONSTRAINT "memberships_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "follows" ADD CONSTRAINT "follows_followedById_fkey" FOREIGN KEY ("followedById") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -248,22 +279,16 @@ ALTER TABLE "follows" ADD CONSTRAINT "follows_followedById_fkey" FOREIGN KEY ("f
 ALTER TABLE "follows" ADD CONSTRAINT "follows_followingId_fkey" FOREIGN KEY ("followingId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "sessions" ADD CONSTRAINT "sessions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "email_verifications" ADD CONSTRAINT "email_verifications_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "password_resets" ADD CONSTRAINT "password_resets_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "posts" ADD CONSTRAINT "posts_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "posts" ADD CONSTRAINT "posts_replyToPostId_fkey" FOREIGN KEY ("replyToPostId") REFERENCES "posts"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "posts" ADD CONSTRAINT "posts_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "post_likes" ADD CONSTRAINT "post_likes_postId_fkey" FOREIGN KEY ("postId") REFERENCES "posts"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -281,13 +306,22 @@ ALTER TABLE "invitations" ADD CONSTRAINT "invitations_organizationId_fkey" FOREI
 ALTER TABLE "invitations" ADD CONSTRAINT "invitations_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "_PostToTag" ADD CONSTRAINT "_PostToTag_A_fkey" FOREIGN KEY ("A") REFERENCES "posts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_PostToTag" ADD CONSTRAINT "_PostToTag_B_fkey" FOREIGN KEY ("B") REFERENCES "tags"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_OrganizationToUser" ADD CONSTRAINT "_OrganizationToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "organizations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_TagToUser" ADD CONSTRAINT "_TagToUser_A_fkey" FOREIGN KEY ("A") REFERENCES "tags"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_OrganizationToUser" ADD CONSTRAINT "_OrganizationToUser_B_fkey" FOREIGN KEY ("B") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_TagToUser" ADD CONSTRAINT "_TagToUser_B_fkey" FOREIGN KEY ("B") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_OrganizationToPost" ADD CONSTRAINT "_OrganizationToPost_A_fkey" FOREIGN KEY ("A") REFERENCES "organizations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_OrganizationToPost" ADD CONSTRAINT "_OrganizationToPost_B_fkey" FOREIGN KEY ("B") REFERENCES "posts"("id") ON DELETE CASCADE ON UPDATE CASCADE;

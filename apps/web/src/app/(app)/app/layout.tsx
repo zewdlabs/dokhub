@@ -1,6 +1,5 @@
 import { auth } from "@/auth";
-import { AppHeader, EditorHeader } from "@/components/custom/app-header";
-import { useSession } from "next-auth/react";
+import { AppHeader } from "@/components/custom/app-header";
 import { PropsWithChildren } from "react";
 
 const workspaces: {
@@ -23,8 +22,7 @@ export default async function HomeLayout({
 
   return (
     <div className="flex min-h-screen w-full flex-col">
-      <EditorHeader id={session?.user?.id!} />
-      <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:px-8 md:py-6">
+      <main className="flex flex-1 flex-col gap-4 conainer px-0">
         {children}
       </main>
     </div>

@@ -26,23 +26,21 @@ export const middleware = auth(async (req) => {
         body: JSON.stringify({
           title: "New Post",
           content: "<h1>Start with a title</h1>",
-          authorId: "clvwebzk40001thm1nq9rjqul",
+          public: false,
+          authorId: "clw89boh10000ssl1b3m9azg6",
+          // authorId: req.auth.user?.id,
         }),
       });
 
       if (newPageReq.ok) {
         const newWriterPage = await newPageReq.json();
-        return Response.redirect(new URL(`/new/${newWriterPage.id}`, req.url));
+        return Response.redirect(
+          new URL(`/app/new/${newWriterPage.id}`, req.url),
+        );
       } else {
         return Response.error();
       }
     }
-
-    // TODO: This should resolve to a personal workspace or a team workspace
-    // if (pathname.startsWith("/app")) {
-    //   console.log(">>> Redirecting to / from /app");
-    //   return Response.redirect(new URL("/", req.url));
-    // }
   } else {
     if (pathname.startsWith("/auth")) return;
     return Response.redirect(new URL("/auth/signin", req.url));
