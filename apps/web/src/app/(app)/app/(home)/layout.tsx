@@ -1,5 +1,10 @@
 import { AppHeader } from "@/components/custom/app-header";
-import { PropsWithChildren } from "react";
+import type { Metadata } from "next";
+import type { PropsWithChildren } from "react";
+
+export const metadata: Metadata = {
+  title: "Homepage | Dokhub",
+};
 
 export default function WriterLayout({ children }: PropsWithChildren) {
   return (
