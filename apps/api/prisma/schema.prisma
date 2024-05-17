@@ -27,17 +27,20 @@ model User {
   medicalLicenseNumber String?
   yearsOfExperience    Int?
 
-  socialLinks       SocialLink[]
-  memberships       Membership[]
-  invitations       Invitation[]
+  socialLinks     SocialLink[]
+  memberships     Membership[]
+  invitations     Invitation[]
   // subscriptions     Subscription[]
-  tags              Tag[]
-  posts             Post[]             @relation("author")
-  likes             PostLike[]
-  followedBy        Follows[]          @relation("followedBy")
-  followedByCount   Int                @default(0)
-  following         Follows[]          @relation("following")
-  followingCount    Int                @default(0)
+  tags            Tag[]
+  posts           Post[]       @relation("author")
+  likes           PostLike[]
+  followedBy      Follows[]    @relation("followedBy")
+  followedByCount Int          @default(0)
+  following       Follows[]    @relation("following")
+  followingCount  Int          @default(0)
+
+  forYou ForYou[]
+
   emailVerification EmailVerification?
   passwordReset     PasswordReset?
 
@@ -46,6 +49,22 @@ model User {
 
   @@index([email])
   @@map("users")
+}
+
+model ForYou {
+  id String @id @default(cuid())
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  post   Post   @relation(fields: [postId], references: [id])
+  postId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("for_you")
 }
 
 model Membership {
@@ -139,6 +158,7 @@ model Post {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  ForYou    ForYou[]
 
   @@index([authorId])
   @@map("posts")
