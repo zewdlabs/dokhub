@@ -30,10 +30,10 @@ model User {
   socialLinks       SocialLink[]
   memberships       Membership[]
   invitations       Invitation[]
-  subscriptions     Subscription[]
-  likes             PostLike[]
+  // subscriptions     Subscription[]
   tags              Tag[]
   posts             Post[]             @relation("author")
+  likes             PostLike[]
   followedBy        Follows[]          @relation("followedBy")
   followedByCount   Int                @default(0)
   following         Follows[]          @relation("following")
@@ -177,6 +177,7 @@ model Tag {
   @@map("tags")
 }
 
+// enum for common social media links
 model SocialLink {
   id String @id @default(cuid())
 
@@ -185,6 +186,8 @@ model SocialLink {
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
+
+  type SocialLinkType
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -232,21 +235,32 @@ model Invitation {
 }
 
 //TODO: Think on this a bit more
-model Subscription {
-  id String @id @default(cuid())
+// model Subscription {
+//   id String @id @default(cuid())
+//
+//   userId String
+//   user   User   @relation(fields: [userId], references: [id])
+//
+//   expiresAt DateTime @default(dbgenerated("now() + interval '1 month'"))
+//
+//   subscriptionType SubscriptionType @default(PRO)
+//
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//
+//   @@index([userId])
+//   @@map("subscriptions")
+// }
 
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-
-  expiresAt DateTime @default(dbgenerated("now() + interval '1 month'"))
-
-  subscriptionType SubscriptionType @default(PRO)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId])
-  @@map("subscriptions")
+enum SocialLinkType {
+  TWITTER
+  LINKEDIN
+  GITHUB
+  INSTAGRAM
+  FACEBOOK
+  YOUTUBE
+  TIKTOK
+  OTHER
 }
 
 enum InvitationStatus {
