@@ -2,15 +2,11 @@
 
 import { useChat } from "ai/react";
 
-export default function WebChatInterfaceInstance({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function Chat() {
   const { messages, input, handleInputChange, handleSubmit } = useChat();
 
   return (
-    <div className="mx-auto w-full overflow-y-scroll max-w-md py-24 flex flex-col stretch">
+    <div className="mx-auto w-full max-w-md py-24 flex flex-col stretch">
       {messages.length > 0
         ? messages.map((m) => (
             <div key={m.id} className="whitespace-pre-wrap mb-4">
