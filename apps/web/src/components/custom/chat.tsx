@@ -25,8 +25,8 @@ export default function ChatWebUI() {
   }, [messages]);
 
   return (
-    <div className="h-[85vh] flex flex-col justify-between">
-      <div className="p-6 overflow-auto" ref={containerRef}>
+    <div className="h-[85vh] flex flex-col justify-between relative">
+      <div className="p-6 h-[85%] overflow-auto" ref={containerRef}>
         {messages.length !== 0
           ? messages.map(({ id, role, content }: Message) => (
               <ChatLine key={id} role={role} content={content} sources={[]} />
@@ -37,7 +37,7 @@ export default function ChatWebUI() {
       <form
         ref={formRef}
         onSubmit={handleSubmit}
-        className="clear-both relative overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring"
+        className="clear-both w-full overflow-hidden rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring absolute -bottom-6"
       >
         <Label htmlFor="message" className="sr-only">
           Message
