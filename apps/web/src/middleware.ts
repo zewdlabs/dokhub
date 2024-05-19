@@ -41,6 +41,12 @@ export const middleware = auth(async (req) => {
         return Response.error();
       }
     }
+
+    if (pathname.endsWith("/c")) {
+      return Response.redirect(
+        new URL(`/app/c/${req.auth.user!.id!}-${crypto.randomUUID()}`, req.url),
+      );
+    }
   } else {
     if (pathname.startsWith("/auth")) return;
     return Response.redirect(new URL("/auth/signin", req.url));

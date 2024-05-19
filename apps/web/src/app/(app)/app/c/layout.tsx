@@ -15,14 +15,25 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Icons } from "@/components/icons";
 import { cn } from "@/lib/utils";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title:
     "Dokbot | Chat with state-of-the-art AI for diagnosis and other crucial tasks, ultimately enhancing patient care.",
 };
 
-export default function ChatLayout({ children }: PropsWithChildren) {
-  const isActive = true;
+export default async function ChatLayout({
+  children,
+  params,
+}: PropsWithChildren<{ params: { id: string } }>) {
+  const session = await auth();
+
+  if (!session || !session.user) {
+    redirect("/auth/signin");
+  }
+
+  const chatHistoryIDs: string[] = [];
 
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
@@ -39,26 +50,22 @@ export default function ChatLayout({ children }: PropsWithChildren) {
           </div>
           <div className="flex-1">
             <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-              <Link
-                href="#"
-                className={cn(
-                  !isActive
-                    ? "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-                    : "flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary",
-                )}
-              >
-                <span className="max-w-56 flex-nowrap text-nowrap overflow-hidden">
-                  Postpartum Depression and Treatment
-                </span>
-              </Link>
-              <Link
-                href="#"
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-              >
-                <span className="max-w-56 flex-nowrap text-nowrap overflow-hidden">
-                  Triaging Patients
-                </span>
-              </Link>
+              {session?.user?.id &&
+                chatHistoryIDs &&
+                chatHistoryIDs.map((id) => (
+                  <Link
+                    href={`/app/c/${id}`}
+                    className={cn(
+                      params.id === id
+                        ? "flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary"
+                        : "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                    )}
+                  >
+                    <span className="max-w-56 flex-nowrap text-nowrap overflow-hidden">
+                      Chat with AI
+                    </span>
+                  </Link>
+                ))}
             </nav>
           </div>
         </div>
@@ -78,46 +85,22 @@ export default function ChatLayout({ children }: PropsWithChildren) {
             </SheetTrigger>
             <SheetContent side="left" className="flex flex-col">
               <nav className="grid gap-2 text-lg font-medium">
-                <Link
-                  href="/"
-                  className="flex items-center gap-2 text-lg font-semibold"
-                >
-                  <Icons.dokbot fill="none" className="w-24" />
-                </Link>
-                <Link
-                  href="#"
-                  className={cn(
-                    !isActive
-                      ? "flex items-center gap-2 text-lg font-semibold"
-                      : "mx-[-0.65rem] flex items-center gap-4 rounded-xl bg-muted px-3 py-2 text-foreground hover:text-foreground",
-                  )}
-                >
-                  Postpartum Depression and Treatment
-                </Link>
-                <Link
-                  href="#"
-                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
-                >
-                  Orders
-                </Link>
-                <Link
-                  href="#"
-                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
-                >
-                  Products
-                </Link>
-                <Link
-                  href="#"
-                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
-                >
-                  Customers
-                </Link>
-                <Link
-                  href="#"
-                  className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
-                >
-                  Analytics
-                </Link>
+                {session?.user?.id &&
+                  chatHistoryIDs &&
+                  chatHistoryIDs.map((id) => (
+                    <Link
+                      href={`/app/c/${id}`}
+                      className={cn(
+                        params.id === id
+                          ? "flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary"
+                          : "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                      )}
+                    >
+                      <span className="max-w-56 flex-nowrap text-nowrap overflow-hidden">
+                        Chat with AI
+                      </span>
+                    </Link>
+                  ))}
               </nav>
             </SheetContent>
           </Sheet>
