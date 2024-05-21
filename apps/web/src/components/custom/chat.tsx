@@ -13,9 +13,20 @@ import { CornerDownLeft } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
+export const initialMessages: Message[] = [
+  {
+    role: "assistant",
+    id: "0",
+    content:
+      "Hi! I am your medical assistant. I am happy to help with any medical questions you may have.",
+  },
+];
+
 export default function ChatWebUI() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } =
-    useChat();
+  const { messages, input, handleInputChange, handleSubmit, isLoading, data } =
+    useChat({
+      initialMessages,
+    });
   const containerRef = useRef<HTMLDivElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
 
@@ -27,12 +38,12 @@ export default function ChatWebUI() {
     <div className="h-[85vh] flex flex-col justify-between relative">
       <div className="p-6 h-[85%] overflow-auto" ref={containerRef}>
         {messages.length !== 0
-          ? messages.map(({ id, role, content }: Message) => (
+          ? messages.map(({ id, role, content }: Message, idx) => (
               <ChatLine
                 key={id}
                 role={role}
                 content={content}
-                sources={["hi there"]}
+                sources={data?.length ? getSources(data, role, idx) : []}
               />
             ))
           : null}
@@ -74,3 +85,13 @@ export default function ChatWebUI() {
     </div>
   );
 }
+
+export const getSources = (data: any[], role: string, index: number) => {
+  if (role === "assistant" && index >= 2 && (index - 2) % 2 === 0) {
+    const sourcesIndex = (index - 2) / 2;
+    if (data[sourcesIndex] && data[sourcesIndex].sources) {
+      return data[sourcesIndex].sources;
+    }
+  }
+  return [];
+};

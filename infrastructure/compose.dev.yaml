@@ -18,6 +18,17 @@ services:
       interval: 5s
       timeout: 2s
       retries: 20
+  chromadb:
+    container_name: chromastore
+    image: chromadb/chroma:latest
+    volumes:
+      - chromadb:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - PERSIST_DIRECTORY=/chroma/chroma # this is the default path, change it as needed
+      - ANONYMIZED_TELEMETRY=${ANONYMIZED_TELEMETRY:-TRUE}
+    ports:
+      - 8000:8000
   vectorstore:
     container_name: vectorstore
     image: qdrant/qdrant:latest
@@ -49,3 +60,4 @@ volumes:
   objdata:
   dbdata:
   vectordata:
+  chromadb:
