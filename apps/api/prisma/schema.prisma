@@ -26,6 +26,8 @@ model User {
   specialty            String?
   medicalLicenseNumber String?
   yearsOfExperience    Int?
+  refreshToken String?
+  role String?
 
   socialLinks     SocialLink[]
   memberships     Membership[]
@@ -42,6 +44,7 @@ model User {
   forYou ForYou[]
 
   emailVerification EmailVerification?
+  emailVerified DateTime?
   passwordReset     PasswordReset?
 
   createdAt DateTime @default(now())
@@ -85,7 +88,7 @@ model Follows {
 model EmailVerification {
   id String @id @default(cuid())
 
-  code String
+  code String @unique
 
   email String @unique
 
@@ -94,7 +97,7 @@ model EmailVerification {
 
   expiresAt DateTime @default(dbgenerated("now() + interval '3 day'"))
 
-  @@index([userId])
+  @@index([userId, email, code])
   @@map("email_verifications")
 }
 

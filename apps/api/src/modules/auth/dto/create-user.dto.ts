@@ -16,7 +16,7 @@ class CreateUserDto {
 
   @IsNotEmpty()
   @IsString()
-  fullName: string;
+  name: string;
 
   @IsNotEmpty()
   @IsEmail()

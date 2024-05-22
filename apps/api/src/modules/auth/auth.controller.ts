@@ -1,4 +1,10 @@
-import { Body, Controller, Get } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Query,
+} from '@nestjs/common';
 
 import { Post, Req, UseGuards } from '@nestjs/common';
 // import { AuthPayloadDto } from './dto/auth.dto';
@@ -27,7 +33,17 @@ export class AuthController {
   // @ApiBody({ type: Prisma.UserCreateInput })
   @ApiBody({ type: CreateUserDto })
   signup(@Body() user: CreateUserDto) {
+    console.log('It is the signup controller------------------');
     return this.authService.signUp(user);
+  }
+
+  @Get('verify-email')
+  async verifyEmail(@Query('code') code: string) {
+    const verification = await this.authService.verifyEmailCode(code);
+    if (!verification) {
+      throw new BadRequestException('Invalid verification code');
+    }
+    return { message: 'Email verified successfully' };
   }
 
   @Post('login')

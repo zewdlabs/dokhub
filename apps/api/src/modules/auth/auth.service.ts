@@ -13,6 +13,7 @@ import { UserService, roundsOfHashing } from '@/modules/users/user.service';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import CreateUserDto from './dto/create-user.dto';
+import { EmailService } from '../email/email.service';
 
 const fakeUsers = [
   {
@@ -34,9 +35,21 @@ export class AuthService {
     private usersService: UserService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private emailService: EmailService,
   ) {}
+  private async sendVerificationEmail(email: string, code: string) {
+    const mailOptions = {
+      from: this.configService.get<string>('EMAIL_USER')!,
+      to: email,
+      subject: 'Email Verification',
+      text: `Please verify your email using this code: ${code}`,
+    };
 
-  async signUp(data: CreateUserDto): Promise<any> {
+    await this.emailService.sendMail(mailOptions);
+  }
+  async signUp(
+    data: CreateUserDto,
+  ): Promise<{ status: string; message: string }> {
     // Check if user exists
     const userExists = await this.usersService.findByEmail(
       data.email as string,
@@ -46,13 +59,27 @@ export class AuthService {
     }
 
     const newUser = await this.usersService.createUser(data);
-    const tokens = await this.getTokens(
-      newUser.id,
-      newUser.email,
-      newUser.role,
-    );
-    await this.updateRefreshToken(newUser, tokens.refreshToken);
-    return tokens;
+    const verificationCode = Math.floor(100000 + Math.random() * 900000);
+    await this.prisma.emailVerification.create({
+      data: {
+        code: verificationCode.toString(),
+        email: data.email,
+        userId: newUser.id,
+      },
+    });
+
+    await this.sendVerificationEmail(data.email, verificationCode.toString());
+    // const tokens = await this.getTokens(
+    //   newUser.id,
+    //   newUser.email,
+    //   newUser.role,
+    // );
+    // await this.updateRefreshToken(newUser, tokens.refreshToken);
+    // return tokens;
+    return {
+      status: 'successful',
+      message: 'user created successfully. please check your email',
+    };
   }
 
   async login(
@@ -66,7 +93,7 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException(`No user found for email: ${email}`);
     }
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, user.password!);
     // console.log(hashedPassword);
     // Step 2: Check if the password is correct
     // const isPasswordValid = user.password === hashedPassword;
@@ -90,7 +117,30 @@ export class AuthService {
       data: user,
     });
   }
-  async getTokens(userId: string, email: string, role: string) {
+
+  async verifyEmailCode(code: string): Promise<boolean> {
+    const verification = await this.prisma.emailVerification.findUnique({
+      where: { code: code },
+    });
+
+    if (!verification || verification.expiresAt < new Date()) {
+      //TODO: we should handle this better
+      return false;
+    }
+
+    await this.prisma.user.update({
+      where: { id: verification.userId },
+      data: { emailVerified: new Date().toISOString() },
+    });
+
+    await this.prisma.emailVerification.delete({
+      where: { id: verification.id },
+    });
+
+    return true;
+  }
+
+  async getTokens(userId: string, email: string, role: string | null) {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {

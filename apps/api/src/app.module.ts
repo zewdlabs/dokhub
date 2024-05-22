@@ -8,6 +8,7 @@ import { PrismaModule } from '@/modules/prisma/prisma.module';
 import { AuthModule } from '@/modules/auth/auth.module';
 import { UserModule } from '@/modules/users/user.module';
 import { PostsModule } from '@/modules/posts/posts.module';
+import { EmailModule } from './modules/email/email.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PostsModule } from '@/modules/posts/posts.module';
     UserModule,
     OrganizationModule,
     PostsModule,
+    EmailModule,
   ],
   controllers: [AppController],
 })
