@@ -5,7 +5,6 @@ import { useChat } from "ai/react";
 import { useEffect, useRef } from "react";
 import { ChatLine } from "./chat-bubble";
 import { Message } from "ai";
-import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Icons } from "../icons";
 
@@ -29,7 +28,12 @@ export default function ChatWebUI() {
       <div className="p-6 h-[85%] overflow-auto" ref={containerRef}>
         {messages.length !== 0
           ? messages.map(({ id, role, content }: Message) => (
-              <ChatLine key={id} role={role} content={content} sources={[]} />
+              <ChatLine
+                key={id}
+                role={role}
+                content={content}
+                sources={["hi there"]}
+              />
             ))
           : null}
       </div>
@@ -70,25 +74,3 @@ export default function ChatWebUI() {
     </div>
   );
 }
-
-// ("use client");
-//
-// import { scrollToBottom, initialMessages, getSources } from "@/lib/utils";
-// import { Input } from "@/components/ui/input";
-// import { Button } from "@/components/ui/button";
-// import { useEffect, useRef } from "react";
-// import { Icons } from "../icons";
-// import { useChat } from "ai/react";
-//
-// export function Chat() {
-//   const containerRef = useRef<HTMLDivElement | null>(null);
-//   const { messages, input, handleInputChange, handleSubmit, isLoading, data } =
-//     useChat();
-//
-//   useEffect(() => {
-//     setTimeout(() => scrollToBottom(containerRef), 100);
-//   }, [messages]);
-//
-//   return (
-//   );
-// }

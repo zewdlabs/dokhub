@@ -30,7 +30,7 @@ export default function PostCard({ post }: { post: Post }) {
 
   return (
     <Card className="w-full p-4 md:pt-6">
-      <Link href={`home`}>
+      <Link href={`/app/new/${post.id}`}>
         <div className="grid grid-cols-4">
           <CardHeader className="p-2 pb-3 col-span-3 w-full space-y-3">
             <CardTitle className="font-cal tracking-normal">

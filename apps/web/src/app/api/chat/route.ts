@@ -1,9 +1,9 @@
 import { StreamingTextResponse, Message } from "ai";
-import { AIMessage, HumanMessage } from "langchain/schema";
-import { ChatOllama } from "langchain/chat_models/ollama";
-import { BytesOutputParser } from "langchain/schema/output_parser";
+import { AIMessage, HumanMessage } from "@langchain/core/messages";
+import { ChatOllama } from "@langchain/community/chat_models/ollama";
+import { BytesOutputParser } from "@langchain/core/output_parsers";
 
-export const runtime = "edge";
+export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   const { messages } = await req.json();

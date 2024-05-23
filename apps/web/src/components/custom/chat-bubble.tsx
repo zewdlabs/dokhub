@@ -57,22 +57,20 @@ export function ChatLine({
           <Balancer>{formattedMessage}</Balancer>
         </CardContent>
         <CardFooter>
-          <CardDescription className="w-full">
-            {sources && sources.length ? (
-              <Accordion type="single" collapsible className="w-full">
-                {sources.map((source, index) => (
-                  <AccordionItem value={`source-${index}`} key={index}>
-                    <AccordionTrigger>{`Source ${index + 1}`}</AccordionTrigger>
-                    <AccordionContent>
-                      <ReactMarkdown>{formattedText(source)}</ReactMarkdown>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            ) : (
-              <></>
-            )}
-          </CardDescription>
+          {sources && sources.length ? (
+            <Accordion type="single" collapsible className="w-full">
+              {sources.map((source, index) => (
+                <AccordionItem value={`source-${index}`} key={index}>
+                  <AccordionTrigger>{`Source ${index + 1}`}</AccordionTrigger>
+                  <AccordionContent>
+                    <ReactMarkdown>{formattedText(source)}</ReactMarkdown>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          ) : (
+            <></>
+          )}
         </CardFooter>
       </Card>
     </div>
