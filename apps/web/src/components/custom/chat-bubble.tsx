@@ -2,7 +2,6 @@ import Balancer from "react-wrap-balancer";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,

@@ -13,15 +13,6 @@ import { CornerDownLeft } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
-export const initialMessages: Message[] = [
-  {
-    role: "assistant",
-    id: "0",
-    content:
-      "Hi! I am your medical assistant. I am happy to help with any medical questions you may have.",
-  },
-];
-
 export default function ChatWebUI() {
   const { messages, input, handleInputChange, handleSubmit, isLoading, data } =
     useChat({
@@ -95,3 +86,12 @@ export const getSources = (data: any[], role: string, index: number) => {
   }
   return [];
 };
+
+const initialMessages: Message[] = [
+  {
+    role: "assistant",
+    id: "0",
+    content:
+      "Hi! I am your medical assistant. I am happy to help with any medical questions you may have.",
+  },
+];

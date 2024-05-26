@@ -4,9 +4,8 @@ import { DirectoryLoader } from "langchain/document_loaders/fs/directory";
 import { PDFLoader } from "@langchain/community/document_loaders/fs/pdf";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import path from "path";
-import { getQdrantClient } from "./qdrant-client";
 
-const vectorStore = (async (): Promise<QdrantVectorStore> => {
+(async (): Promise<QdrantVectorStore> => {
   const embeddings = new OllamaEmbeddings({
     model: "nomic-embed-text",
     baseUrl: process.env.OLLAMA_BASE_URL!,
