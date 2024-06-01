@@ -27,23 +27,25 @@ model User {
   medicalLicenseNumber String?
   yearsOfExperience    Int?
 
-  socialLinks       SocialLink[]
-  memberships       Membership[]
-  invitations       Invitation[]
-  subscriptions     Subscription[]
-  likes             PostLike[]
-  tags              Tag[]
-  posts             Post[]             @relation("author")
-  followedBy        Follows[]          @relation("followedBy")
-  followedByCount   Int                @default(0)
-  following         Follows[]          @relation("following")
-  followingCount    Int                @default(0)
+  socialLinks     SocialLink[]
+  memberships     Membership[]
+  invitations     Invitation[]
+  // subscriptions     Subscription[]
+  tags            Tag[]
+  posts           Post[]       @relation("author")
+  likes           PostLike[]
+  followedBy      Follows[]    @relation("followedBy")
+  followedByCount Int          @default(0)
+  following       Follows[]    @relation("following")
+  followingCount  Int          @default(0)
+
+  forYou ForYou[]
+
   emailVerification EmailVerification?
   passwordReset     PasswordReset?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  Post      Post[]
 
   @@index([email])
   @@map("users")
@@ -116,12 +118,11 @@ model Post {
   id          String    @id @default(cuid())
   title       String
   content     String
-  metadata    Json?
   publishedAt DateTime?
 
-  reportedAmount Int     @default(0)
-  minToRead      Int     @default(1)
-  public         Boolean @default(true)
+  reportedAmount Int      @default(0)
+  minToRead      String?
+  public         Boolean? @default(true)
 
   author   User   @relation("author", fields: [authorId], references: [id])
   authorId String
@@ -138,11 +139,10 @@ model Post {
 
   // If not public, only author, collaborators and specified organizations can see it
   postAccessOrgs Organization[]
+  forYou         ForYou[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  User      User?    @relation(fields: [userId], references: [id])
-  userId    String?
 
   @@index([authorId])
   @@map("posts")
@@ -181,6 +181,7 @@ model Tag {
   @@map("tags")
 }
 
+// enum for common social media links
 model SocialLink {
   id String @id @default(cuid())
 
@@ -189,6 +190,8 @@ model SocialLink {
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
+
+  type SocialLinkType
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -235,22 +238,49 @@ model Invitation {
   @@map("invitations")
 }
 
-//TODO: Think on this a bit more
-model Subscription {
+model ForYou {
   id String @id @default(cuid())
 
-  userId String
   user   User   @relation(fields: [userId], references: [id])
+  userId String
 
-  expiresAt DateTime @default(dbgenerated("now() + interval '1 month'"))
-
-  subscriptionType SubscriptionType @default(PRO)
+  post   Post   @relation(fields: [postId], references: [id])
+  postId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([userId])
-  @@map("subscriptions")
+  @@map("for_you")
+}
+
+//TODO: Think on this a bit more
+// model Subscription {
+//   id String @id @default(cuid())
+//
+//   userId String
+//   user   User   @relation(fields: [userId], references: [id])
+//
+//   expiresAt DateTime @default(dbgenerated("now() + interval '1 month'"))
+//
+//   subscriptionType SubscriptionType @default(PRO)
+//
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//
+//   @@index([userId])
+//   @@map("subscriptions")
+// }
+
+enum SocialLinkType {
+  TWITTER
+  LINKEDIN
+  GITHUB
+  INSTAGRAM
+  FACEBOOK
+  YOUTUBE
+  TIKTOK
+  OTHER
 }
 
 enum InvitationStatus {

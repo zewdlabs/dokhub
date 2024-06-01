@@ -29,9 +29,9 @@ import { Switch } from "@/components/ui/switch";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useState } from "react";
-import { redirect } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
 
 const publishFormSchema = z.object({
   publishPublic: z.boolean().default(false),
@@ -52,7 +52,7 @@ const publishFormSchema = z.object({
   // previewSubtitle: z.string().min(5).max(100),
 });
 
-export function AppHeader({ id }: { id: string }) {
+export function EditorHeader({ id }: { id: string }) {
   const { data: session, status } = useSession();
 
   const [publishModalOpen, setPublishModalOpen] = useState(false);
@@ -95,7 +95,10 @@ export function AppHeader({ id }: { id: string }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ published: true }),
+        body: JSON.stringify({
+          publishedAt: new Date().toJSON(),
+          public: values.publishPublic,
+        }),
       });
 
       if (!req.ok) throw new Error("Failed to publish post");
@@ -108,7 +111,9 @@ export function AppHeader({ id }: { id: string }) {
       onSuccess: () => {
         toast.success("Post published successfully");
         setPublishModalOpen(false);
-        redirect(`/posts/${id}`);
+      },
+      onError: () => {
+        toast.error("Failed to publish post");
       },
     });
   }
@@ -185,20 +190,38 @@ export function AppHeader({ id }: { id: string }) {
   );
 }
 
-export function EditorHeader({ id }: { id: string }) {
+export function AppHeader() {
   const { data: session, status } = useSession();
+  const pathname = usePathname();
 
   return (
     <header className="sticky top-0 left-0 backdrop-blur-3xl gap-4 px-4 md:px-6 border-b-[1px] border-border z-50 items-center">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           <Link href="/">
-            <Icons.logo className="w-28 h-20" />
+            {pathname.startsWith("/app/c") ? (
+              <Icons.dokbot fill="none" className="w-28" />
+            ) : (
+              <Icons.logo className="w-28 h-16" />
+            )}
           </Link>
         </div>
         <div className="flex items-center gap-4 ">
+          {status === "authenticated" && !pathname.startsWith("/app/c") && (
+            <Link
+              href="/app/c"
+              className={cn(
+                buttonVariants({
+                  variant: "outline",
+                }),
+                "flex items-center justify-center gap-2 rounded-lg px-2 py-4",
+              )}
+            >
+              <Icons.chat className="w-6 h-6" />
+            </Link>
+          )}
           <Link
-            href="/new"
+            href="/app/new"
             className={cn(
               buttonVariants({ variant: "default" }),
               "hidden md:flex md:gap-2 md:items-center md:justify-center rounded-full",

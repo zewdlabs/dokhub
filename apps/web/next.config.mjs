@@ -6,6 +6,14 @@ const nextConfig = {
   // transpilePackages: ["@dokhub/ui"],
   output: "standalone",
   pageExtensions: ["js", "jsx", "mdx", "ts", "tsx"],
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+    ],
+  },
 };
 
 const withMDXConfig = withMDX({

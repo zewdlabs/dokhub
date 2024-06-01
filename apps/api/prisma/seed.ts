@@ -19,7 +19,7 @@ async function main() {
     },
   });
 
-  const user2 = await prisma.user.create({
+  await prisma.user.create({
     data: {
       name: 'Sophia Patel',
       prefix: null,
@@ -34,7 +34,7 @@ async function main() {
     },
   });
 
-  const user3 = await prisma.user.create({
+  await prisma.user.create({
     data: {
       name: 'Elijah Chang',
       prefix: 'Dr.',
@@ -49,7 +49,7 @@ async function main() {
     },
   });
 
-  const user4 = await prisma.user.create({
+  await prisma.user.create({
     data: {
       name: 'Isabella Garcia',
       prefix: null,
@@ -74,7 +74,7 @@ async function main() {
   });
 
   // Create posts by organization members
-  const post1 = await prisma.post.create({
+  await prisma.post.create({
     data: {
       title: 'New post',
       content: '<h1>Start with a title</h1>',
@@ -84,6 +84,22 @@ async function main() {
         },
       },
     },
+  });
+
+  await prisma.tag.createMany({
+    data: [
+      { name: 'Maternal Health' },
+      { name: 'Pediatrics' },
+      { name: 'Orthopedics' },
+      { name: 'Cardiology' },
+      { name: 'Surgery' },
+      { name: 'Nursing' },
+      { name: 'Preventive Care' },
+      { name: 'Patient Care' },
+      { name: 'Healthcare' },
+      { name: 'Medicine' },
+      { name: 'Medical Education' },
+    ],
   });
 }
 

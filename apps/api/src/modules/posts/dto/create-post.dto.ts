@@ -1,26 +1,24 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Post } from '@prisma/client';
-import { IsBoolean, IsOptional, IsString } from 'class-validator';
+import { Prisma } from '@prisma/client';
+import { IsBoolean, IsDateString, IsOptional, IsString } from 'class-validator';
 
-export class CreatePostDto
-  implements
-    Omit<
-      Post,
-      'id' | 'createdAt' | 'updatedAt' | 'reportedAmount' | 'published'
-    >
-{
+export class CreatePostDto implements Omit<Prisma.PostCreateInput, 'author'> {
   @IsString()
   @ApiProperty()
   title: string;
+
+  @IsBoolean()
+  @ApiProperty()
+  public?: boolean;
 
   @IsString()
   @ApiProperty()
   content: string;
 
-  @IsBoolean()
+  @IsDateString()
   @IsOptional()
   @ApiProperty()
-  published: boolean;
+  publishedAt: Date | null;
 
   @IsString()
   @ApiProperty()
@@ -30,9 +28,4 @@ export class CreatePostDto
   @IsOptional()
   @ApiPropertyOptional()
   replyToPostId: string | null;
-
-  @IsString()
-  @IsOptional()
-  @ApiPropertyOptional()
-  metadata: string | null;
 }

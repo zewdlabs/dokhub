@@ -42,7 +42,10 @@ const testimonials = [
 
 export default function Testimonials() {
   return (
-    <section className="relative min-h-screen grid grid-cols-1 lg:grid-cols-12 place-content-center lg:gap-16 md:container mx-auto">
+    <section
+      id="testimonials"
+      className="relative min-h-screen grid grid-cols-1 lg:grid-cols-12 place-content-center lg:gap-16 md:container mx-auto"
+    >
       <div className="relative z-10 mb-10 lg:mb-0 flex flex-col justify-center col-span-6">
         <h1 className="relative z-10 sm:text-5xl text-3xl 2xl:text-6xl font-bold sm:leading-snug 2xl:leading-tight font-cal">
           Bringing value across different brands.

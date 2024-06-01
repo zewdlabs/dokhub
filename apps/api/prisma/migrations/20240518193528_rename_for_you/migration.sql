@@ -6,13 +6,3 @@ ALTER TABLE "invitations" ALTER COLUMN "expirationDate" SET DEFAULT now() + inte
 
 -- AlterTable
 ALTER TABLE "password_resets" ALTER COLUMN "expiresAt" SET DEFAULT now() + interval '1 day';
-
--- AlterTable
-ALTER TABLE "subscriptions" ALTER COLUMN "expiresAt" SET DEFAULT now() + interval '1 month';
-
--- AlterTable
-ALTER TABLE "users" ADD COLUMN     "avatarUrl" TEXT,
-ADD COLUMN     "coverUrl" TEXT,
-ADD COLUMN     "location" TEXT,
-ADD COLUMN     "refreshToken" TEXT,
-ADD COLUMN     "website" TEXT;

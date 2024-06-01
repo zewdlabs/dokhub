@@ -10,7 +10,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Icons } from "@/components/icons";
 
-import { format } from "date-fns";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,23 +23,31 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { Post } from "./post-list";
+import { useSession } from "next-auth/react";
 
 export default function PostCard({ post }: { post: Post }) {
+  const { data: session, status } = useSession();
+
   return (
     <Card className="w-full p-4 md:pt-6">
-      <Link href={`home`}>
+      <Link href={`/app/new/${post.id}`}>
         <div className="grid grid-cols-4">
           <CardHeader className="p-2 pb-3 col-span-3 w-full space-y-3">
             <CardTitle className="font-cal tracking-normal">
               {post.title}
             </CardTitle>
             <CardDescription className="max-w-lg leading-relaxed">
-              {post.description}
+              lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat.
             </CardDescription>
           </CardHeader>
           <div className="relative mr-4 rounded-lg h-36 overflow-hidden">
             <Image
-              src={post.imageUrl}
+              src={
+                "https://images.unsplash.com/photo-1478144592103-25e218a04891?q=80&w=2275&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              }
               fill={true}
               alt={post.title}
               style={{
@@ -54,8 +61,8 @@ export default function PostCard({ post }: { post: Post }) {
         <div className="flex items-center">
           <Avatar className="h-8 w-8">
             <AvatarImage
-              src={post.user.avatarUrl}
-              alt={`${post.user.prefix} ${post.user.name}`.trim()}
+              src={session?.user?.image!}
+              alt={`${session?.user?.name}`.trim()}
             />
             <AvatarFallback></AvatarFallback>
           </Avatar>
@@ -63,7 +70,7 @@ export default function PostCard({ post }: { post: Post }) {
           <span className="text-muted-foreground text-sm font-medium"></span>
           <Icons.dot className="w-6 h-6 text-muted-foreground/75" />
           <span className="text-muted-foreground text-sm font-medium">
-            {post.minutesToRead}
+            {post.minToRead}
           </span>
         </div>
         <div>
