@@ -1,6 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { AppController } from './app.controller';
-import { AppLoggerMiddleware } from './applogger.middleware';
+import { AppLoggerMiddleware } from '@/middlewares/applogger.middleware';
 import { OrganizationModule } from '@/modules/organization/organization.module';
 import { ConfigModule } from '@nestjs/config';
 import { HealthModule } from '@/modules/health/health.module';

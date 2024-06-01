@@ -26,12 +26,6 @@ importers:
       '@datalust/winston-seq':
         specifier: ^2.0.0
         version: 2.0.0(encoding@0.1.13)(winston@3.13.0)
-      '@dokhub/database':
-        specifier: workspace:*
-        version: link:../../packages/database
-      '@dokhub/logging':
-        specifier: workspace:*
-        version: link:../../packages/logging
       '@nestjs/axios':
         specifier: ^3.0.2
         version: 3.0.2(@nestjs/common@10.3.7(class-transformer@0.5.1)(class-validator@0.14.1)(reflect-metadata@0.2.2)(rxjs@7.8.1))(axios@1.6.8)(rxjs@7.8.1)
@@ -490,9 +484,6 @@ importers:
       '@dokhub/eslint-config':
         specifier: workspace:^
         version: link:../../packages/eslint-config
-      '@dokhub/tailwind-config':
-        specifier: workspace:^
-        version: link:../../packages/tailwind-config
       '@dokhub/typescript-config':
         specifier: workspace:^
         version: link:../../packages/typescript-config

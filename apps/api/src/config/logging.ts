@@ -46,13 +46,14 @@ export const loggerConfig = (): LoggerOptions => {
     level: process.env.LOG_LEVEL ?? 'warn',
     format: isProduction ? WINSTON_PROD_FORMAT : WINSTON_DEV_FORMAT,
     transports: [
-      new transports.Console(),
-      // new SeqTransport({
-      //   serverUrl: isProduction ? process.env.SEQ_URL : '',
-      //   onError: (err) => {
-      //     console.error('error sending log to seq', err);
-      //   },
-      // }),
+      isProduction
+        ? new SeqTransport({
+            serverUrl: isProduction ? process.env.SEQ_URL : '',
+            onError: (err) => {
+              console.error('error sending log to seq', err);
+            },
+          })
+        : new transports.Console(),
     ],
   };
 };
