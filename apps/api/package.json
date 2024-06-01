@@ -24,8 +24,6 @@
   },
   "dependencies": {
     "@datalust/winston-seq": "^2.0.0",
-    "@dokhub/database": "workspace:*",
-    "@dokhub/logging": "workspace:*",
     "@nestjs/axios": "^3.0.2",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.2",

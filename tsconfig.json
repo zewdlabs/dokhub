@@ -6,21 +6,6 @@
     },
     {
       "path": "./apps/web"
-    },
-    {
-      "path": "./packages/database"
-    },   
-    {
-      "path": "./packages/logging"
-    },
-    {
-      "path": "./packages/eslint-config"
-    },
-    {
-      "path": "./packages/typescript-config"
-    },
-    { 
-      "path": "./packages/tailwind-config/"
     }
   ]
 }

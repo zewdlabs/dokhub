@@ -18,17 +18,6 @@ services:
       interval: 5s
       timeout: 2s
       retries: 20
-  chromadb:
-    container_name: chromastore
-    image: chromadb/chroma:latest
-    volumes:
-      - chromadb:/chroma/chroma
-    environment:
-      - IS_PERSISTENT=TRUE
-      - PERSIST_DIRECTORY=/chroma/chroma # this is the default path, change it as needed
-      - ANONYMIZED_TELEMETRY=${ANONYMIZED_TELEMETRY:-TRUE}
-    ports:
-      - 8000:8000
   vectorstore:
     container_name: vectorstore
     image: qdrant/qdrant:latest
@@ -40,17 +29,15 @@ services:
       - 6334:6334
   objstorage:
     container_name: objstorage
-    image: quay.io/minio/minio:latest
-    restart: always
-    volumes:
-      - ~/minio/data:/data
-    environment:
-      - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=password
+    image: bitnami/minio:latest
     ports:
       - 9000:9000
       - 9001:9001
-    command: server --console-address ":9001" /data
+    volumes:
+      - objdata:/var/lib/minio/data
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
     healthcheck:
       test: ["CMD", "mc", "ready", "local"]
       interval: 5s
@@ -60,4 +47,3 @@ volumes:
   objdata:
   dbdata:
   vectordata:
-  chromadb:

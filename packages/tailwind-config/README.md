@@ -1,1 +1,0 @@
-# `@dokhub/tailwind-config`
