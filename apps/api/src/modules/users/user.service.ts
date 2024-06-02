@@ -43,6 +43,13 @@ export class UserService {
     const createdUser = await this.prisma.user.create({
       data: userData,
     });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const membership = await this.prisma.membership.create({
+      data: {
+        userId: createdUser.id,
+        role: Role.USER,
+      },
+    });
     return createdUser;
   }
 
@@ -66,10 +73,10 @@ export class UserService {
     return deleteUser;
   }
 
-  async updateUserRole(userId: string, newRole: Role): Promise<User> {
-    return this.prisma.user.update({
-      where: { id: userId },
-      data: { role: newRole },
-    });
-  }
+  // async updateUserRole(userId: string, newRole: Role): Promise<User> {
+  //   return this.prisma.user.update({
+  //     where: { id: userId },
+  //     data: { role: newRole },
+  //   });
+  // }
 }
