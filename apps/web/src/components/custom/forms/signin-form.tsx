@@ -16,7 +16,7 @@ import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Icons } from "../icons";
+import { Icons } from "../../icons";
 import { signIn } from "next-auth/react";
 
 const signInSchema = z.object({
@@ -38,7 +38,7 @@ export default function SigninForm() {
       await signIn("credentials", {
         ...values,
       });
-    },
+    }
   );
 
   return (
