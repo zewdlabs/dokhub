@@ -13,6 +13,7 @@ import { UserService, roundsOfHashing } from '@/modules/users/user.service';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import CreateUserDto from './dto/create-user.dto';
+// import { CLIENT_RENEG_LIMIT } from 'tls';
 
 const fakeUsers = [
   {
@@ -27,6 +28,7 @@ const fakeUsers = [
   },
 ];
 
+const EXPIRE_TIME = 20 * 1000;
 @Injectable()
 export class AuthService {
   constructor(
@@ -49,7 +51,7 @@ export class AuthService {
     const tokens = await this.getTokens(
       newUser.id,
       newUser.email,
-      newUser.role,
+      // newUser.role,
     );
     await this.updateRefreshToken(newUser, tokens.refreshToken);
     return tokens;
@@ -66,7 +68,10 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException(`No user found for email: ${email}`);
     }
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      user.password as string,
+    );
     // console.log(hashedPassword);
     // Step 2: Check if the password is correct
     // const isPasswordValid = user.password === hashedPassword;
@@ -77,8 +82,10 @@ export class AuthService {
     }
 
     // Step 3: Generate a JWT containing the user's ID and return it
-    const tokens = await this.getTokens(user.id, user.email, user.role);
+    const tokens = await this.getTokens(user.id, user.email); //user.role
     await this.updateRefreshToken(user, tokens.refreshToken);
+    console.log('IT IS IN THE LOGIN');
+    console.log(tokens);
     return { tokens, user };
   }
 
@@ -90,13 +97,15 @@ export class AuthService {
       data: user,
     });
   }
-  async getTokens(userId: string, email: string, role: string) {
+  async getTokens(userId: string, email: string) {
+    console.log('IT IS IN THE GET TOKENS');
+    //, role: string
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
         {
           sub: userId,
           email,
-          role,
+          // role,
         },
         {
           secret:
@@ -108,7 +117,7 @@ export class AuthService {
         {
           sub: userId,
           email,
-          role,
+          // role,
         },
         {
           secret:
@@ -122,6 +131,7 @@ export class AuthService {
     return {
       accessToken,
       refreshToken,
+      expiresIn: new Date().setTime(new Date().getTime() + EXPIRE_TIME),
     };
   }
   validateUser({ email, password }: LoginDto) {
@@ -132,5 +142,26 @@ export class AuthService {
       const { password, ...user } = findUser;
       return this.jwtService.sign(user);
     }
+  }
+  async refreshToken(user: any) {
+    // console.log('123213213231231231', user);
+    const payload = {
+      username: user.username,
+      sub: user.sub,
+    };
+
+    return {
+      accessToken: await this.jwtService.signAsync(payload, {
+        expiresIn: '20s',
+        secret:
+          this.configService.get<string>('JWT_ACCESS_SECRET') || 'secrtuteiw',
+      }),
+      refreshToken: await this.jwtService.signAsync(payload, {
+        expiresIn: '7d',
+        secret:
+          this.configService.get<string>('JWT_REFRESH_SECRET') || 'secrtuteiw',
+      }),
+      expiresIn: new Date().setTime(new Date().getTime() + EXPIRE_TIME),
+    };
   }
 }

@@ -26,7 +26,8 @@ model User {
   specialty            String?
   medicalLicenseNumber String?
   yearsOfExperience    Int?
-   refreshToken String?
+  refreshToken String?
+  verificationStatus   VerificationStatus @default(INCOMPLETE)
 
   socialLinks     SocialLink[]
   memberships     Membership[]
@@ -290,6 +291,14 @@ enum InvitationStatus {
   ACCEPTED
   REJECTED
   EXPIRED
+}
+
+enum VerificationStatus {
+  INCOMPLETE
+  PENDING
+  REVIEW
+  VERIFIED
+  REJECTED
 }
 
 enum SubscriptionType {

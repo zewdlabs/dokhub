@@ -13,6 +13,7 @@ import { AccessTokenGuard } from './guards/accessToken.guard';
 // import CreateUserDto from '@/users/inputs/create-user-dto';
 // import { Prisma } from '@prisma/client';
 import CreateUserDto from './dto/create-user.dto';
+import { RefreshJwtGuard } from './guards/refreshToken.guards';
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
@@ -41,5 +42,11 @@ export class AuthController {
   @UseGuards(AccessTokenGuard)
   status(@Req() req: Request) {
     return req.user;
+  }
+  @Post('refresh')
+  @UseGuards(RefreshJwtGuard)
+  async refreshToken(@Req() req: Request) {
+    console.log('refreshed');
+    return await this.authService.refreshToken(req.user);
   }
 }

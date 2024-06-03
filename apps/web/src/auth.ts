@@ -2,6 +2,25 @@ import NextAuth from "next-auth";
 import credentials from "next-auth/providers/credentials";
 import google from "next-auth/providers/google";
 
+async function refreshToken(token: JWT): Promise<JWT> {
+  console.log(token.tokens.refreshToken);
+  const res = await fetch("http://localhost:4231" + "/api/auth/refresh", {
+    method: "POST",
+    headers: {
+      authorization: `Refresh ${token.tokens.refreshToken}`,
+    },
+    // body: JSON.stringify(token.user)
+  });
+  console.log("refreshed");
+
+  const response = await res.json();
+  console.log("===============", response);
+  return {
+    ...token,
+    backendTokens: response,
+  };
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   session: {
     strategy: "jwt",
@@ -17,18 +36,48 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       async authorize(credentials) {
         if (credentials.email && credentials.password) {
-          const res = await fetch(`${process.env.BACKEND_URL}/auth/signin`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(credentials),
-          });
+          // console.log("Entered the credentials:", credentials);
+          try {
+            const res = await fetch(
+              `${process.env.BACKEND_URL}/api/auth/login`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(credentials),
+              }
+            );
 
-          if (res.ok) {
-            return await res.json();
+            if (res.ok) {
+              const data = await res.json();
+              console.log(data);
+              return data;
+
+            } else if (res.status === 401) {
+              // Unauthorized
+              return { error: "Unauthorized: Incorrect email or password." };
+            } else if (res.status === 400) {
+              // Bad Request, possibly missing parameters
+              return { error: "Bad Request: Missing or invalid parameters." };
+            } else if (res.status === 500) {
+              // Internal Server Error
+              return {
+                error: "Internal Server Error: Please try again later.",
+              };
+            } else {
+              // Other error responses
+              return { error: `Error: ${res.statusText}` };
+            }
+          } catch (error) {
+            // Network or other errors
+            console.error("Network or other error:", error);
+            return {
+              error:
+                "Network error: Please check your connection and try again.",
+            };
           }
         }
 
-        return null;
+        return { message: "wrong creds " };
       },
     }),
   ],
@@ -39,6 +88,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // if the user exists in the database, return the user object
         // if not, create the user on the backend with the information from the google account and return the user object
         console.log("google triggered");
+        
+        
+
+        console.log(account);
       }
 
       if (credentials) {
@@ -54,24 +107,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       return true;
     },
-    async jwt({ token, user, account, profile, trigger }) {
-      console.log("JWT callback called");
+    async jwt({ token, user }) {
+      if (user) return { ...token, ...user };
+      // console.log("---------------------------");
+      console.log("---------------------------", token);
+      if (new Date().getTime() < token.tokens.expiresIn) return token;
 
-      console.log({ token });
-      console.log({ user });
-      console.log({ trigger });
-      account && console.log({ account });
-      profile && console.log({ profile });
-
-      return token;
+      return await refreshToken(token);
     },
 
-    async session({ session, token, user, trigger }) {
-      console.log(">>> Session callback called");
-      console.log({ session });
-      console.log({ token });
-      console.log({ user });
-      console.log({ trigger });
+    async session({ token, session }) {
+      //@ts-expect-error
+      session.user = token.user;
+      session.tokens = token.tokens;
 
       return session;
     },
@@ -83,6 +131,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
 import type { DefaultSession } from "next-auth";
 import { JWT } from "next-auth/jwt";
+import { TokenTextSplitter } from "langchain/text_splitter";
 
 declare module "next-auth" {
   /**
@@ -99,12 +148,36 @@ declare module "next-auth" {
   /**
    * Returned by `useSession`, `auth`, contains information about the active session.
    */
-  interface Session {}
+  interface Session {
+    user: {
+      id: number;
+      email: string;
+      fullName: string;
+    };
+
+    tokens: {
+      accessToken: string;
+      refreshToken: string;
+      expiresIn: number;
+    };
+  }
 }
 
 // The `JWT` interface can be found in the `next-auth/jwt` submodule
 
 declare module "next-auth/jwt" {
   /** Returned by the `jwt` callback and `auth`, when using JWT sessions */
-  interface JWT {}
+  interface JWT {
+    user: {
+      id: number;
+      email: string;
+      fullName: string;
+    };
+
+    tokens: {
+      accessToken: string;
+      refreshToken: string;
+      expiresIn: number;
+    };
+  }
 }

@@ -1,11 +1,11 @@
-import { Role } from '@prisma/client';
+// import { Role } from '@prisma/client';
 import {
   IsString,
   IsOptional,
   IsEmail,
   IsNotEmpty,
   IsInt,
-  IsAlphanumeric,
+  // IsAlphanumeric,
 } from 'class-validator';
 // import { Role } from '@prisma/client';
 
@@ -58,9 +58,9 @@ class CreateUserDto {
   //   @IsNotEmpty({ each: true })
   //   socialLinks?: string[];
 
-  @IsOptional()
-  @IsAlphanumeric()
-  role: Role;
+  // @IsOptional()
+  // @IsAlphanumeric()
+  // role: Role;
 }
 
 export default CreateUserDto;
