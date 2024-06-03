@@ -132,10 +132,7 @@ export default function OnboardingSocialInfoForm() {
                   onClick={() => {
                     toast(
                       "You can always modify the informations later in your profile",
-                      {
-                        onAutoClose: () => router.push("/app"),
-                      },
-                    );
+                    ) && router.push("/app");
                   }}
                   variant="default"
                   className="w-full"

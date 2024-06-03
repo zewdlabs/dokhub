@@ -17,3 +17,26 @@ export const onboardingSocialInfoSchema = z.object({
   linkedin: z.string(),
   instagram: z.string(),
 });
+
+export const signInSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+});
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().email(),
+});
+
+export const resetPasswordSchema = z.object({
+  code: z.string().length(6),
+});
+
+export const signUpSchema = z
+  .object({
+    firstName: z.string(),
+    lastName: z.string(),
+    email: z.string().email(),
+    password: z.string().min(6),
+    confirmPassword: z.string().min(6),
+  })
+  .refine((data) => data.password === data.confirmPassword);

@@ -25,7 +25,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { onboardingPersonalInfoSchema } from "@/types/schema";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function OnboardingPersonalInfoForm() {
   const router = useRouter();
@@ -141,9 +141,12 @@ export default function OnboardingPersonalInfoForm() {
                       <FormControl>
                         <Input
                           id="yearsOfExperience"
-                          type="text"
+                          type="number"
                           required
                           {...field}
+                          {...form.register("yearsOfExperience", {
+                            valueAsNumber: true,
+                          })}
                         />
                       </FormControl>
                       <FormMessage />

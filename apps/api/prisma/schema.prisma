@@ -66,6 +66,7 @@ model Membership {
 
   role Role
 
+  @@unique([userId, organizationId])
   @@index([userId, organizationId], name: "unique_membership")
   @@map("memberships")
 }
