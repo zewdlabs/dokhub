@@ -25,7 +25,7 @@ export class UserController {
   @Roles(Role.ADMIN, Role.SUADMIN)
   @UseGuards(AccessTokenGuard, RoleGuard)
   @ApiBearerAuth()
-  async getAllUsers(@Body() userData: { email: string; name: string }) {
+  async getAllUsers() {
     return this.userService.getAllUsers();
   }
 

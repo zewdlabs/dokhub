@@ -38,6 +38,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // Perform nest backend call to check if the user is in the database
         // if the user exists in the database, return the user object
         // if not, create the user on the backend with the information from the google account and return the user object
+        console.log("google triggered");
       }
 
       if (credentials) {

@@ -13,7 +13,10 @@ export const middleware = auth(async (req) => {
   }
 
   if (req.auth) {
-    if (pathname.startsWith("/auth")) {
+    if (
+      pathname.startsWith("/auth") &&
+      !pathname.startsWith("/auth/onboarding")
+    ) {
       return Response.redirect(new URL("/app", req.url));
     }
 
@@ -27,7 +30,7 @@ export const middleware = auth(async (req) => {
           title: "New Post",
           content: "<h1>Start with a title</h1>",
           public: false,
-          authorId: "clw89boh10000ssl1b3m9azg6",
+          authorId: "clwwc1nst0000141z9muh78pp",
           // authorId: req.auth.user?.id,
         }),
       });

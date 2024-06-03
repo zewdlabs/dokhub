@@ -1,3 +1,5 @@
+"use client";
+
 import Balancer from "react-wrap-balancer";
 import {
   Card,
@@ -15,6 +17,7 @@ import {
 import { Message } from "ai/react";
 import ReactMarkdown from "react-markdown";
 import { formattedText } from "@/lib/utils";
+import { useSession } from "next-auth/react";
 
 const convertNewLines = (text: string) =>
   text.split("\n").map((line, i) => (
@@ -38,6 +41,8 @@ export function ChatLine({
   }
   const formattedMessage = convertNewLines(content);
 
+  const session = useSession();
+
   return (
     <div>
       <Card className="mb-2">
@@ -49,7 +54,7 @@ export function ChatLine({
                 : "text-blue-500 dark:text-blue-200"
             }
           >
-            {role == "assistant" ? "AI" : "You"}
+            {role == "assistant" ? "Dokbot" : session.data?.user?.name || "you"}
           </CardTitle>
         </CardHeader>
         <CardContent className="text-sm">
