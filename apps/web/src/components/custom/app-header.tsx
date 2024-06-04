@@ -22,34 +22,28 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Switch } from "@/components/ui/switch";
-import { useMutation } from "@tanstack/react-query";
+import {
+  QueryClient,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
 
 const publishFormSchema = z.object({
   publishPublic: z.boolean().default(false),
-  // organizations: z.array(
-  //   z.object({
-  //     id: z.string(),
-  //     text: z.string(),
-  //   }),
-  // ),
-  // topics: z.array(
-  //   z.object({
-  //     id: z.string(),
-  //     text: z.string(),
-  //   }),
-  // ),
-  // image: z.string().url(),
-  // previewTitle: z.string().min(5).max(50),
-  // previewSubtitle: z.string().min(5).max(100),
+  previewTitle: z.string().min(5).max(50),
+  previewSubtitle: z.string().min(5).max(200),
 });
 
 export function EditorHeader({ id }: { id: string }) {
@@ -64,29 +58,7 @@ export function EditorHeader({ id }: { id: string }) {
     },
   });
 
-  // TODO: Add tag support
-
-  // const { data: orgTags, isLoading: orgTagsLoading } = useQuery({
-  //   queryKey: ["orgsOfUser"],
-  //   queryFn: async () => {
-  //     const req = await fetch(
-  //       `${process.env.BACKEND_URL}/api/orgs/user/clvwebzk40001thm1nq9rjqul`,
-  //     );
-  //     if (!req.ok) throw new Error("Failed to fetch organizations");
-  //     return req.json();
-  //   },
-  // });
-  //
-  // const { data: topicTags, isLoading: topicTagsLoading } = useQuery({
-  //   queryKey: ["orgsOfUser"],
-  //   queryFn: async () => {
-  //     const req = await fetch(
-  //       `${process.env.BACKEND_URL}/api/orgs/user/clvwebzk40001thm1nq9rjqul`,
-  //     );
-  //     if (!req.ok) throw new Error("Failed to fetch organizations");
-  //     return req.json();
-  //   },
-  // });
+  const client = useQueryClient();
 
   const publishPost = useMutation({
     mutationFn: async (values: z.infer<typeof publishFormSchema>) => {
@@ -98,15 +70,22 @@ export function EditorHeader({ id }: { id: string }) {
         body: JSON.stringify({
           publishedAt: new Date().toJSON(),
           public: values.publishPublic,
+          title: values.previewTitle,
+          description: values.previewSubtitle,
         }),
       });
-
       if (!req.ok) throw new Error("Failed to publish post");
       return await req.json();
+    },
+    onSuccess: () => {
+      client.invalidateQueries({
+        queryKey: ["posts", "drafts", session?.user.id],
+      });
     },
   });
 
   function onSubmit(values: z.infer<typeof publishFormSchema>) {
+    console.log(values);
     publishPost.mutate(values, {
       onSuccess: () => {
         toast.success("Post published successfully");
@@ -126,7 +105,7 @@ export function EditorHeader({ id }: { id: string }) {
             <Icons.logo className="w-28 h-20" />
           </Link>
           <Separator orientation="vertical" className="h-8" />
-          <span className="text-center">Drafts in {session?.user?.name}</span>
+          <Input value={"Title"} readOnly />
         </div>
         <div className="flex items-center gap-4 ">
           <Dialog open={publishModalOpen} onOpenChange={setPublishModalOpen}>
@@ -170,6 +149,37 @@ export function EditorHeader({ id }: { id: string }) {
                       </FormItem>
                     )}
                   />
+                  <FormField
+                    control={form.control}
+                    name="previewTitle"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel htmlFor="title">Title</FormLabel>
+                        <FormControl>
+                          <Input id="title" type="text" required {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="previewSubtitle"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Subtitle</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Small description for the post"
+                            className="resize-none"
+                            maxLength={200}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <DialogFooter>
                     <Button
                       variant="default"
@@ -183,7 +193,7 @@ export function EditorHeader({ id }: { id: string }) {
               </Form>
             </DialogContent>
           </Dialog>
-          {status === "authenticated" && <AccountButton session={session!} />}
+          {status === "authenticated" && <AccountButton session={session} />}
         </div>
       </div>
     </header>

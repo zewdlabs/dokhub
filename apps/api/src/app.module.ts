@@ -8,6 +8,8 @@ import { PrismaModule } from '@/modules/prisma/prisma.module';
 import { AuthModule } from '@/modules/auth/auth.module';
 import { UserModule } from '@/modules/users/user.module';
 import { PostsModule } from '@/modules/posts/posts.module';
+import { MinioModule } from '@/modules/minio/minio.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { PostsModule } from '@/modules/posts/posts.module';
     UserModule,
     OrganizationModule,
     PostsModule,
+    MinioModule,
+    EventEmitterModule.forRoot(),
   ],
   controllers: [AppController],
 })

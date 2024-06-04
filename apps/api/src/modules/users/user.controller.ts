@@ -39,6 +39,13 @@ export class UserController {
     return this.userService.user({ id: id });
   }
 
+  @Get('profile/:id')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  async getUserForProfile(@Param('id') id: string) {
+    return this.userService.getUserForProfile(id);
+  }
+
   @Post()
   async signupUser(@Body() userData: CreateUserDto): Promise<UserModel> {
     return this.userService.createUser(userData);

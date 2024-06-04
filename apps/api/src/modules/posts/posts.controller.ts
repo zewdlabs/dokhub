@@ -27,9 +27,24 @@ export class PostsController {
     return this.postsService.findAll();
   }
 
-  @Get('user/:userId')
-  findUserPosts(@Param('userId') userId: string) {
-    return this.postsService.findUserPosts(userId);
+  @Get('drafts/:userId')
+  findUserDrafts(@Param('userId') userId: string) {
+    return this.postsService.findUserDrafts(userId);
+  }
+
+  @Get('published/:userId')
+  findUserPublishedPosts(@Param('userId') userId: string) {
+    return this.postsService.findUserPublishedPosts(userId);
+  }
+
+  @Get('foryou/:userId')
+  findUserForyouPosts(@Param('userId') userId: string) {
+    return this.postsService.findUserForyouPosts(userId);
+  }
+
+  @Get('following/:userId')
+  findUserFollowingPosts(userId: string) {
+    return this.postsService.findUserFollowingPosts(userId);
   }
 
   @Get(':id')

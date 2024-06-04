@@ -35,6 +35,18 @@ export class UserService {
     return users;
   }
 
+  async getUserForProfile(id: string): Promise<User> {
+    return await this.prisma.user.findUniqueOrThrow({
+      where: { id },
+      include: {
+        socialLinks: true,
+        following: true,
+        followedBy: true,
+        memberships: true,
+      },
+    });
+  }
+
   async createUser(data: CreateUserDto): Promise<User> {
     this.logger.log('createUser');
     const hashedPassword = await bcrypt.hash(data.password, roundsOfHashing);

@@ -23,15 +23,15 @@ export const middleware = auth(async (req) => {
     if (pathname.endsWith("/new")) {
       const newPageReq = await fetch(`${process.env.BACKEND_URL}/api/posts`, {
         method: "POST",
+        cache: "no-store",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          title: "New Post",
+          title: "Untitled",
           content: "<h1>Start with a title</h1>",
           public: false,
-          authorId: "clwwc1nst0000141z9muh78pp",
-          // authorId: req.auth.user?.id,
+          authorId: req.auth.user.id,
         }),
       });
 
