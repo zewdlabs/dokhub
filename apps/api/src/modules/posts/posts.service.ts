@@ -38,7 +38,12 @@ export class PostsService {
   }
 
   async findAll(): Promise<Post[]> {
-    return await this.prisma.post.findMany();
+    return await this.prisma.post.findMany({
+      where: {
+        publishedAt: { not: null },
+      },
+      include: { author: true },
+    });
   }
 
   async findUserFollowingPosts(userId: string): Promise<Partial<Post>[]> {
@@ -113,6 +118,10 @@ export class PostsService {
   async findOne(id: string): Promise<Post | null> {
     return await this.prisma.post.findUnique({
       where: { id },
+      include: {
+        author: true,
+        replies: true,
+      },
     });
   }
 

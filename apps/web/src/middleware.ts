@@ -1,4 +1,6 @@
 import { auth } from "@/auth";
+import { url } from "inspector";
+import { Post } from "./components/custom/post-list";
 
 export const middleware = auth(async (req) => {
   const pathname = req.nextUrl.pathname;
@@ -49,6 +51,18 @@ export const middleware = auth(async (req) => {
       return Response.redirect(
         new URL(`/app/c/${req.auth.user!.id!}-${crypto.randomUUID()}`, req.url),
       );
+    }
+
+    if (pathname.endsWith("/admin/posts")) {
+      const blog = (await (
+        await fetch("http://localhost:4231/api/posts", {
+          headers: {
+            Authorization: `Bearer ${req.auth.tokens.accessToken}`,
+          },
+        })
+      ).json()) as Post[];
+
+      return Response.redirect(new URL(`/admin/posts/${blog[0].id}`, req.url));
     }
   } else {
     if (pathname.startsWith("/auth")) return;
