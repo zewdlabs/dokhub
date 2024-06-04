@@ -25,7 +25,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`${inter.className} ${calSans.variable} antialiased`}>
+      <body
+        className={`${inter.className} ${calSans.variable} antialiased`}
+        suppressHydrationWarning
+      >
         <Providers>{children}</Providers>
         <Toaster />
       </body>

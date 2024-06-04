@@ -8,6 +8,8 @@ const formatMessage = (message: Message) => {
   }`;
 };
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   const body = await req.json();
   const messages: Message[] = body.messages ?? [];
@@ -55,7 +57,6 @@ export async function POST(req: NextRequest) {
 // import { QdrantVectorStore } from "@langchain/qdrant";
 // import { ConversationalRetrievalQAChain } from "langchain/chains";
 //
-// export const dynamic = "force-dynamic";
 //
 // export async function POST(req: Request) {
 //   const { messages } = (await req.json()) as { messages: Message[] };

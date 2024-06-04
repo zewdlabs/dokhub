@@ -1,6 +1,8 @@
 import { auth } from "@/auth";
 import { url } from "inspector";
 import { Post } from "./components/custom/post-list";
+import { Organization } from "./app/(app)/admin/organizations/[organizationId]/layout";
+import { User } from "next-auth";
 
 export const middleware = auth(async (req) => {
   const pathname = req.nextUrl.pathname;
@@ -63,6 +65,32 @@ export const middleware = auth(async (req) => {
       ).json()) as Post[];
 
       return Response.redirect(new URL(`/admin/posts/${blog[0].id}`, req.url));
+    }
+
+    if (pathname.endsWith("/admin/organizations")) {
+      const orgs = (await (
+        await fetch("http://localhost:4231/api/organization", {
+          headers: {
+            Authorization: `Bearer ${req.auth.tokens.accessToken}`,
+          },
+        })
+      ).json()) as Organization[];
+
+      return Response.redirect(
+        new URL(`/admin/organizations/${orgs[0].id}`, req.url),
+      );
+    }
+
+    if (pathname.endsWith("/admin/users")) {
+      const users = (await (
+        await fetch("http://localhost:4231/api/user/verified", {
+          headers: {
+            Authorization: `Bearer ${req.auth.tokens.accessToken}`,
+          },
+        })
+      ).json()) as User[];
+
+      return Response.redirect(new URL(`/admin/users/${users[0].id}`, req.url));
     }
   } else {
     if (pathname.startsWith("/auth")) return;

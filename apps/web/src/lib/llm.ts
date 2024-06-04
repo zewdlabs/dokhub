@@ -1,4 +1,4 @@
-import { ChatOllama } from "@langchain/community/chat_models/ollama";
+import { ChatOllama } from "langchain/chat_models/ollama";
 
 export const StreamingModel = new ChatOllama({
   baseUrl: process.env.OLLAMA_BASE_URL,

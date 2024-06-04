@@ -1,4 +1,4 @@
-import { File, ListFilter, Search } from "lucide-react";
+import { File, Search } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -8,14 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -27,22 +19,31 @@ import {
 } from "@/components/ui/table";
 import { PropsWithChildren } from "react";
 import { auth } from "@/auth";
-import { Post } from "@/components/custom/post-list";
 import Link from "next/link";
+
+export interface Organization {
+  id: string;
+  name: string;
+  institutionLicenseNumber?: string;
+  memberships: any[];
+  posts: any[];
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default async function PostsDashboardPageLayout({
   children,
 }: PropsWithChildren) {
   const session = await auth();
 
-  const posts = (await (
-    await fetch("http://localhost:4231/api/posts", {
+  const orgs = (await (
+    await fetch("http://localhost:4231/api/organization", {
       cache: "no-store",
       headers: {
         Authorization: `Bearer ${session?.tokens.accessToken}`,
       },
     })
-  ).json()) as Post[];
+  ).json()) as Organization[];
 
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 lg:grid-cols-3 xl:grid-cols-3">
@@ -57,27 +58,6 @@ export default async function PostsDashboardPageLayout({
                 className="w-1/2 rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
               />
             </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="h-7 gap-1 text-sm"
-                >
-                  <ListFilter className="h-3.5 w-3.5" />
-                  <span className="sr-only sm:not-sr-only">Filter</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Filter by</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuCheckboxItem checked>
-                  Fulfilled
-                </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem>Declined</DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem>Refunded</DropdownMenuCheckboxItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
             <Button size="sm" variant="outline" className="h-7 gap-1 text-sm">
               <File className="h-3.5 w-3.5" />
               <span className="sr-only sm:not-sr-only">Export</span>
@@ -86,39 +66,40 @@ export default async function PostsDashboardPageLayout({
         </div>
         <Card>
           <CardHeader className="px-7">
-            <CardTitle>Posts</CardTitle>
-            <CardDescription>All posts in the platform</CardDescription>
+            <CardTitle>Organizations</CardTitle>
+            <CardDescription>All organizations in the platform</CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>PostName</TableHead>
-                  <TableHead className="hidden sm:table-cell">Type</TableHead>
-                  <TableHead className="hidden md:table-cell">
-                    Published Date
+                  <TableHead>Organization Name</TableHead>
+                  <TableHead className="hidden sm:table-cell">
+                    Membership Count
                   </TableHead>
-                  <TableHead className="text-right">Writer</TableHead>
+                  <TableHead className="hidden md:table-cell">
+                    Post Count
+                  </TableHead>
+                  <TableHead className="text-right">Established Date</TableHead>
+                  <TableHead className="text-right">Owner Name</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {posts.map((post) => (
-                  <TableRow
-                  // className={cn("bg-accent")}
-                  >
+                {orgs.map((org) => (
+                  <TableRow>
                     <TableCell>
-                      <Link href={`/admin/posts/${post.id}`}>
-                        <div className="font-medium">{post.title}</div>
+                      <Link href={`/admin/posts/${org.id}`}>
+                        <div className="font-medium">{org.name}</div>
                       </Link>
                     </TableCell>
                     <TableCell className="hidden sm:table-cell">
-                      {post.public ? "Public" : "Private"}
+                      {org.memberships.length}
                     </TableCell>
                     <TableCell className="hidden md:table-cell">
-                      {new Date(post.publishedAt).toLocaleDateString()}
+                      {org.posts.length}
                     </TableCell>
                     <TableCell className="text-right">
-                      {post.author.name}
+                      {new Date(org.createdAt).toLocaleDateString()}
                     </TableCell>
                   </TableRow>
                 ))}

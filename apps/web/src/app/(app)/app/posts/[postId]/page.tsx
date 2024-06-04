@@ -11,6 +11,10 @@ import StarterKit from "@tiptap/starter-kit";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import { useEffect } from "react";
+import { AppHeader } from "@/components/custom/app-header";
+import PostAction from "@/components/custom/post-actions";
+import PostInfo from "@/components/custom/post-info";
+import { MarketingFooter } from "@/components/custom/footer";
 
 export default function Page({ params }: { params: { postId: string } }) {
   const { data: postDetails, isLoading: isPostsLoading } = useQuery({
@@ -60,12 +64,25 @@ export default function Page({ params }: { params: { postId: string } }) {
 
   return (
     <>
-      {!isPostsLoading && postDetails && (
-        <EditorContent
-          editor={editor}
-          className="px-8 prose max-w-none md:px-24 py-12 min-h-[70vh] border border-t-0"
+      <div className="pb-12 gap-8">
+        <AppHeader />
+        <PostInfo postDetails={postDetails} />
+        <PostAction
+          likes={postDetails?.postLikeCount}
+          replies={postDetails?.replies.length}
         />
-      )}
+        {!isPostsLoading && postDetails && (
+          <EditorContent
+            editor={editor}
+            className="px-8 prose max-w-screen-lg mx-auto md:px-24 py-12 min-h-[70vh]"
+          />
+        )}
+        <PostAction
+          likes={postDetails?.postLikeCount}
+          replies={postDetails?.replies.length}
+        />
+      </div>
+      <MarketingFooter />
     </>
   );
 }

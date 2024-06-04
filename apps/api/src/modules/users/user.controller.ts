@@ -41,6 +41,24 @@ export class UserController {
     return this.userService.getAllUsers();
   }
 
+  @Get('verified')
+  @Roles(Role.ADMIN, Role.SUADMIN)
+  // @Verification(VerificationStatus.INCOMPLETE)
+  @UseGuards(AccessTokenGuard, RoleGuard)
+  @ApiBearerAuth()
+  async getAllVerifiedUsers() {
+    return this.userService.getAllVerifiedUsers();
+  }
+
+  @Get('pending')
+  @Roles(Role.ADMIN, Role.SUADMIN)
+  // @Verification(VerificationStatus.INCOMPLETE)
+  @UseGuards(AccessTokenGuard, RoleGuard)
+  @ApiBearerAuth()
+  async getAllVerifications() {
+    return this.userService.getAllVerifications();
+  }
+
   @Get(':id')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()

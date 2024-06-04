@@ -316,6 +316,38 @@
         }
       }
     },
+    "/api/user/verified": {
+      "get": {
+        "operationId": "UserController_getAllVerifiedUsers",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/user/pending": {
+      "get": {
+        "operationId": "UserController_getAllVerifications",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/user/{id}": {
       "get": {
         "operationId": "UserController_getUser",
