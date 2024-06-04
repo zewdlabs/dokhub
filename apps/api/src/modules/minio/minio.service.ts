@@ -33,20 +33,37 @@ export class MinioService {
       file.buffer,
       file.size,
     );
+    await this.makeFilePublic(fileName);
     return fileName;
   }
-
-  async getFileUrl(fileName: string) {
-    // const endPoint = this.configService.get<string>('MINIO_ENDPOINT');
-    // const bucketName = this.configService.get<string>('MINIO_BUCKET_NAME');
-    // const useSSL = this.configService.get<string>('MINIO_USE_SSL') === 'true';
-    // const protocol = useSSL ? 'https' : 'http';
-    // return `${protocol}://${endPoint}/${bucketName}/${fileName}`;
-    return await this.minioClient.presignedUrl(
-      'GET',
+  async makeFilePublic(fileName: string): Promise<void> {
+    const policy = {
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Effect: 'Allow',
+          Principal: '*',
+          Action: ['s3:GetObject'],
+          Resource: [`arn:aws:s3:::${this.bucketName}/${fileName}`],
+        },
+      ],
+    };
+    await this.minioClient.setBucketPolicy(
       this.bucketName,
-      fileName,
+      JSON.stringify(policy),
     );
+  }
+  async getFileUrl(fileName: string) {
+    const endPoint = this.configService.get<string>('MINIO_ENDPOINT');
+    const bucketName = this.configService.get<string>('MINIO_BUCKET_NAME');
+    const useSSL = this.configService.get<string>('MINIO_USE_SSL') === 'true';
+    const protocol = useSSL ? 'https' : 'http';
+    return `${protocol}://${endPoint}:9001/${bucketName}/${fileName}`;
+    // return await this.minioClient.presignedUrl(
+    //   'GET',
+    //   this.bucketName,
+    //   fileName,
+    // );
   }
 
   async deleteFile(fileName: string) {
