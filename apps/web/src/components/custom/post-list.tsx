@@ -6,7 +6,14 @@ import PostCard from "@/components/custom/post-card";
 import { useQuery } from "@tanstack/react-query";
 
 export interface Post {
+  author: {
+    name: string;
+    email: string;
+    yearsOfExperience: string;
+  };
   id: string;
+  reportedAmount: number;
+  replies: any[];
   title: string;
   description: string | null;
   content: string;
