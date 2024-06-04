@@ -15,7 +15,12 @@ export class OrganizationService {
   }
 
   findAll() {
-    return this.db.organization.findMany();
+    return this.db.organization.findMany({
+      include: {
+        memberships: true,
+        posts: true,
+      },
+    });
   }
 
   findOne(id: string) {

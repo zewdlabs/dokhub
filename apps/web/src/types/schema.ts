@@ -4,6 +4,18 @@ export const verifyEmailSchema = z.object({
   code: z.string().length(6),
 });
 
+export const deletePostSchema = z.object({
+  id: z.string(),
+});
+
+export const deleteUserSchema = z.object({
+  id: z.string(),
+});
+
+export const deleteOrgSchema = z.object({
+  id: z.string(),
+});
+
 export const onboardingPersonalInfoSchema = z.object({
   occupation: z.string(),
   speciality: z.string(),

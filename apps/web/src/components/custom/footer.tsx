@@ -5,15 +5,24 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export function MarketingFooter() {
-  const pathname = usePathname();
+  return (
+    <footer className="backdrop-blur-sm border-t-[1px] border-border pt-10 md:pt-16">
+      <div className="container">
+        <p className="text-xs mb-12">
+          Dokhub.co&reg; is a registered trademark by Dokhub.co, Inc. All rights
+          reserved. Apple.com® is a registered trademark by Apple.com, Inc. All
+          rights reserved. Discord.com® is a registered trademark by
+          Discord.com, Inc. All rights reserved. Github.com® is a registered
+          trademark by Github.com, Inc. All rights reserved. Notion.com® is a
+          registered trademark by Notion.com, Inc. All rights reserved.
+        </p>
+      </div>
+    </footer>
+  );
+}
 
-  if (
-    pathname.includes("pitch") ||
-    pathname.includes("pricing") ||
-    pathname.includes("app")
-  ) {
-    return null;
-  }
+export function AppFooter() {
+  const pathname = usePathname();
 
   return (
     <footer className="backdrop-blur-sm border-t-[1px] border-border pt-10 md:pt-16">

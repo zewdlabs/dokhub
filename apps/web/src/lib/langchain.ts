@@ -24,23 +24,15 @@ export async function callChain({ question, chatHistory }: callChainArgs) {
     });
     const data = new experimental_StreamData();
 
-    const chain = ConversationalRetrievalQAChain.fromLLM(
-      StreamingModel,
-      vectorStore?.asRetriever({
-        searchKwargs: {
-          lambda: 0.6,
-        },
-      })!,
-      {
-        qaTemplate: QA_TEMPLATE,
-        questionGeneratorTemplate: STANDALONE_QUESTION_TEMPLATE,
-        returnSourceDocuments: true,
-        returnGeneratedQuestion: false,
-        questionGeneratorChainOptions: {
-          llm: NonStreamingModel,
-        },
+    const chain = ConversationalRetrievalQAChain.fromLLM(StreamingModel, {
+      qaTemplate: QA_TEMPLATE,
+      questionGeneratorTemplate: STANDALONE_QUESTION_TEMPLATE,
+      returnSourceDocuments: true,
+      returnGeneratedQuestion: false,
+      questionGeneratorChainOptions: {
+        llm: NonStreamingModel,
       },
-    );
+    });
 
     // Question using chat-history
     // Reference https://js.langchain.com/docs/modules/chains/popular/chat_vector_db#externally-managed-memory

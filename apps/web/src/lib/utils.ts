@@ -30,3 +30,10 @@ export function formattedText(inputText: string) {
     .replace(/(\w) - (\w)/g, "$1$2") // Join hyphenated words together
     .replace(/\s+/g, " "); // Replace multiple consecutive spaces with a single space
 }
+
+export function genFallback(name: string) {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("");
+}

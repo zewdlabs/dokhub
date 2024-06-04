@@ -18,11 +18,15 @@ export class UserService {
     this.logger.log('userById');
     const user = await this.prisma.user.findUnique({
       where: userWhereUniqueInput,
+      include: { posts: true },
     });
     return user;
   }
   async findOne(id: string): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+      include: { posts: true },
+    });
     return user;
   }
   async findByEmail(email: string): Promise<User | null> {
@@ -34,6 +38,24 @@ export class UserService {
     const users = await this.prisma.user.findMany();
     return users;
   }
+
+  async getAllVerifiedUsers() {
+    const users = await this.prisma.user.findMany({
+      where: { verificationStatus: VerificationStatus.VERIFIED },
+      include: {
+        posts: true,
+      },
+    });
+    return users;
+  }
+
+  async getAllVerifications() {
+    const users = await this.prisma.user.findMany({
+      where: { verificationStatus: VerificationStatus.INCOMPLETE },
+    });
+    return users;
+  }
+
   async findAll(verificationStatus?: VerificationStatus): Promise<User[]> {
     const filter = verificationStatus ? { verificationStatus } : {}; // Build filter object
     return await this.prisma.user.findMany({ where: filter });
