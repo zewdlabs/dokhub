@@ -10,7 +10,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import Link from "@tiptap/extension-link";
 import { BubbleMenu as BubbleMenuConfig } from "@tiptap/extension-bubble-menu";
 import EditorToolbar from "./editor/toolbar";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useDebounce } from "@/hooks/use-debounce";
 import { buttonVariants } from "../ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -25,7 +25,10 @@ export default function Tiptap({
   title: string;
   content: string;
 }) {
+  console.log("state received", title, content);
+
   const [editorState, setEditorState] = useState(content);
+
   const [titleState, setTitleState] = useState(title);
 
   const editor = useEditor({
@@ -60,6 +63,8 @@ export default function Tiptap({
     autofocus: true,
   });
 
+  const client = useQueryClient();
+
   const saveNote = useMutation({
     mutationFn: async () => {
       const response = await fetch(`http://localhost:4231/api/posts/${id}`, {
@@ -78,8 +83,11 @@ export default function Tiptap({
       }
 
       const data = await response.json();
-      console.log("data after request", data);
       return data;
+    },
+
+    onSuccess: () => {
+      client.invalidateQueries({ queryKey: ["post", id] });
     },
   });
 
@@ -87,6 +95,10 @@ export default function Tiptap({
   useEffect(() => {
     if (debouncedEditorState === "") return;
     saveNote.mutate(undefined, {
+      onSettled: (data) => {
+        setTitleState(data.title);
+        setEditorState(data.content);
+      },
       onError: (err) => {
         console.error(err);
       },

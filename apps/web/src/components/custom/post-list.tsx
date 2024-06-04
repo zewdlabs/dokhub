@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 export interface Post {
   id: string;
   title: string;
+  description: string | null;
   content: string;
   publishedAt: string;
   minToRead: string;
@@ -23,14 +24,34 @@ export default function PostList({ tag }: { tag?: string }) {
   const { data: session, status } = useSession();
 
   const { data: posts, isLoading: isPostsLoading } = useQuery({
-    queryKey: ["posts"],
+    queryKey: ["posts", tag, session?.user.id],
     queryFn: async () => {
-      const req = await fetch(
-        `http://localhost:4231/api/posts/user/clw89boh10000ssl1b3m9azg6`,
-      );
-      if (!req.ok) throw new Error("Failed to fetch posts");
+      let res = null;
+      if (tag === "published") {
+        res = await fetch(
+          // `${process.env.BACKEND_URL}/api/posts/published/${userId}`,
+          `http://localhost:4231/api/posts/published/${session?.user.id}`,
+        );
+      } else if (tag === "drafts") {
+        res = await fetch(
+          // `${process.env.BACKEND_URL}/api/posts/drafts/${userId}`,
+          `http://localhost:4231/api/posts/drafts/${session?.user.id}`,
+        );
+      } else if (tag === "following") {
+        res = await fetch(
+          `http://localhost:4231/api/posts/following/${session?.user.id}`,
+          // `${process.env.BACKEND_URL}/api/posts/following/${userId}`,
+        );
+      } else {
+        res = await fetch(
+          `http://localhost:4231/api/posts/foryou/${session?.user.id}`,
+          // `${process.env.BACKEND_URL}/api/posts/foryou/${userId}`,
+        );
+      }
 
-      const data = await req.json();
+      if (!res.ok) throw new Error("Failed to fetch posts");
+
+      const data = await res.json();
 
       console.log("from posts of specific user", data);
 
@@ -43,7 +64,9 @@ export default function PostList({ tag }: { tag?: string }) {
       value={tag || "foryou"}
       className="space-y-2 md:space-y-4 w-full"
     >
-      {posts && posts.map((post) => <PostCard post={post} key={post.id} />)}
+      {isPostsLoading
+        ? "loading"
+        : posts && posts.map((post) => <PostCard post={post} key={post.id} />)}
     </TabsContent>
   );
 }

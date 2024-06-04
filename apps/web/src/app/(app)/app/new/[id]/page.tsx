@@ -1,21 +1,29 @@
+"use client";
+
+import { Post } from "@/components/custom/post-list";
 import Tiptap from "@/components/custom/tiptap";
+import { useQuery } from "@tanstack/react-query";
 
-const getPostDetails = async (id: string) => {
-  const req = await fetch(`${process.env.BACKEND_URL}/api/posts/${id}`);
-  if (req.status === 404 || !req.ok) return null;
-  return req.json();
-};
+export default function WriterPage({ params }: { params: { id: string } }) {
+  const { data: postDetails, isLoading: isPostsLoading } = useQuery({
+    queryKey: ["post", params.id],
+    queryFn: async () => {
+      const req = await fetch(`http://localhost:4231/api/posts/${params.id}`);
 
-export default async function WriterPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const data = (await getPostDetails(params.id)) as {
-    id: string;
-    title: string;
-    content: string;
-  };
+      if (!req.ok) throw new Error("Failed to fetch posts");
 
-  return <Tiptap id={params.id} title={data.title} content={data.content} />;
+      const data = (await req.json()) as Post;
+      return data;
+    },
+  });
+
+  if (isPostsLoading) return <div>Loading...</div>;
+
+  return (
+    <Tiptap
+      id={params.id}
+      title={postDetails?.title!}
+      content={postDetails?.content!}
+    />
+  );
 }

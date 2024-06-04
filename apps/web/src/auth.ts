@@ -5,6 +5,7 @@ import google from "next-auth/providers/google";
 async function refreshToken(token: JWT): Promise<JWT> {
   console.log(token.tokens.refreshToken);
   const res = await fetch("http://localhost:4231" + "/api/auth/refresh", {
+    cache: "no-store",
     method: "POST",
     headers: {
       authorization: `Refresh ${token.tokens.refreshToken}`,
@@ -44,14 +45,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(credentials),
-              }
+              },
             );
 
             if (res.ok) {
               const data = await res.json();
               console.log(data);
               return data;
-
             } else if (res.status === 401) {
               // Unauthorized
               return { error: "Unauthorized: Incorrect email or password." };
@@ -88,8 +88,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         // if the user exists in the database, return the user object
         // if not, create the user on the backend with the information from the google account and return the user object
         console.log("google triggered");
-        
-        
 
         console.log(account);
       }
@@ -152,7 +150,7 @@ declare module "next-auth" {
     user: {
       id: number;
       email: string;
-      fullName: string;
+      name: string;
     };
 
     tokens: {
@@ -171,7 +169,7 @@ declare module "next-auth/jwt" {
     user: {
       id: number;
       email: string;
-      fullName: string;
+      name: string;
     };
 
     tokens: {

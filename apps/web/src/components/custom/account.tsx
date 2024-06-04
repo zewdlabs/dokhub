@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { Session } from "next-auth";
 import { signOut } from "next-auth/react";
+import Link from "next/link";
 
 function genFallback(name: string) {
   return name
@@ -25,10 +26,7 @@ export default function AccountButton({ session }: { session: Session }) {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-10 w-10">
-            <AvatarImage
-              src={session?.user?.image!}
-              alt={session?.user?.name!}
-            />
+            <AvatarImage src={undefined} alt={session?.user?.name!} />
             <AvatarFallback>{genFallback(session?.user?.name!)}</AvatarFallback>
           </Avatar>
         </Button>
@@ -46,19 +44,15 @@ export default function AccountButton({ session }: { session: Session }) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>Profile</DropdownMenuItem>
-          <DropdownMenuItem>Settings</DropdownMenuItem>
-          <DropdownMenuItem>Library</DropdownMenuItem>
+          <DropdownMenuItem>
+            <Link href={`/app/profile/${session.user.id}`}>Profile</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Link href={`/app/settings/account`}>Settings</Link>
+          </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          {/*
-          <DropdownMenuItem>
-            Profile
-            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          */}
-        </DropdownMenuGroup>
+        <DropdownMenuGroup></DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
           Log out

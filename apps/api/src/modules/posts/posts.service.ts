@@ -5,12 +5,15 @@ import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from '../users/user.service';
 import { Post } from '@prisma/client';
 import readingDuration from 'reading-duration';
+import { PostPublishedEvent } from './events/post-published.event';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class PostsService {
   constructor(
     private prisma: PrismaService,
     private usersService: UserService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   async create(createPostDto: CreatePostDto): Promise<Post> {
@@ -38,9 +41,72 @@ export class PostsService {
     return await this.prisma.post.findMany();
   }
 
-  async findUserPosts(userId: string): Promise<Post[]> {
+  async findUserFollowingPosts(userId: string): Promise<Partial<Post>[]> {
+    const following = await this.prisma.follows.findMany({
+      where: { followedById: userId },
+      select: { followingId: true },
+    });
+
+    const posts = await this.prisma.post.findMany({
+      where: { authorId: { in: following.map((f) => f.followingId) } },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        publishedAt: true,
+        authorId: true,
+        minToRead: true,
+      },
+    });
+
+    return posts;
+  }
+
+  async findUserForyouPosts(userId: string): Promise<Partial<Post>[]> {
+    const posts = await this.prisma.forYou.findMany({
+      where: { userId: userId },
+      select: {
+        post: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            publishedAt: true,
+            authorId: true,
+            minToRead: true,
+          },
+        },
+      },
+    });
+
+    return posts.map((post) => post.post);
+  }
+
+  async findUserDrafts(userId: string): Promise<Partial<Post>[]> {
     return await this.prisma.post.findMany({
-      where: { authorId: userId },
+      where: { authorId: userId, publishedAt: null },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        publishedAt: true,
+        authorId: true,
+        minToRead: true,
+      },
+    });
+  }
+
+  async findUserPublishedPosts(userId: string): Promise<Partial<Post>[]> {
+    return await this.prisma.post.findMany({
+      where: { authorId: userId, publishedAt: { not: null } },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        publishedAt: true,
+        authorId: true,
+        minToRead: true,
+      },
     });
   }
 
@@ -51,16 +117,37 @@ export class PostsService {
   }
 
   async update(id: string, updatePostDto: UpdatePostDto): Promise<Post> {
-    return await this.prisma.post.update({
+    console.log('__________', updatePostDto);
+    const post = await this.prisma.post.findUnique({
+      where: { id },
+    });
+
+    const data = await this.prisma.post.update({
       where: { id },
       data: {
         ...updatePostDto,
-        minToRead: readingDuration(updatePostDto.content || '', {
+        minToRead: readingDuration(updatePostDto.content || post?.content!, {
           emoji: false,
           wordsPerMinute: 200,
         }),
       },
     });
+
+    if (data.publishedAt) {
+      console.log('Post published', data);
+      const postPublishedEvent = new PostPublishedEvent();
+      postPublishedEvent.post = data;
+      const user = await this.usersService.findOne(data.authorId);
+      if (user) {
+        postPublishedEvent.author = user;
+      }
+
+      console.log('event payload', postPublishedEvent);
+
+      this.eventEmitter.emit('post.published', postPublishedEvent);
+    }
+
+    return data;
   }
 
   async remove(id: string): Promise<void> {

@@ -23,11 +23,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 import { Post } from "./post-list";
-import { useSession } from "next-auth/react";
 
 export default function PostCard({ post }: { post: Post }) {
-  const { data: session, status } = useSession();
-
+  console.log("post", post);
   return (
     <Card className="w-full p-4 md:pt-6">
       <Link href={`/app/new/${post.id}`}>
@@ -37,10 +35,7 @@ export default function PostCard({ post }: { post: Post }) {
               {post.title}
             </CardTitle>
             <CardDescription className="max-w-lg leading-relaxed">
-              lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat.
+              {post.description || "Lorem ipsum dolor sit amet"}
             </CardDescription>
           </CardHeader>
           <div className="relative mr-4 rounded-lg h-36 overflow-hidden">
@@ -60,14 +55,13 @@ export default function PostCard({ post }: { post: Post }) {
       <CardFooter className="flex justify-between items-center pt-2 pb-0 px-2 w-full">
         <div className="flex items-center">
           <Avatar className="h-8 w-8">
-            <AvatarImage
-              src={session?.user?.image!}
-              alt={`${session?.user?.name}`.trim()}
-            />
+            <AvatarImage src={undefined} alt={""} />
             <AvatarFallback></AvatarFallback>
           </Avatar>
           <Icons.dot className="w-6 h-6 text-muted-foreground/75" />
-          <span className="text-muted-foreground text-sm font-medium"></span>
+          <span className="text-muted-foreground text-sm font-medium">
+            {new Date(post.publishedAt).toLocaleDateString()}
+          </span>
           <Icons.dot className="w-6 h-6 text-muted-foreground/75" />
           <span className="text-muted-foreground text-sm font-medium">
             {post.minToRead}

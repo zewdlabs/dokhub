@@ -40,3 +40,26 @@ export const signUpSchema = z
     confirmPassword: z.string().min(6),
   })
   .refine((data) => data.password === data.confirmPassword);
+
+export const profileFormSchema = z.object({
+  name: z
+    .string()
+    .min(2, {
+      message: "Name must be at least 2 characters.",
+    })
+    .max(30, {
+      message: "Name must not be longer than 30 characters.",
+    })
+    .optional(),
+  email: z.string().email().optional(),
+  bio: z.string().max(160).min(4).optional(),
+  urls: z
+    .array(
+      z.object({
+        name: z.string().min(2).max(30),
+        value: z.string().url({ message: "Please enter a valid URL." }),
+      }),
+    )
+    .optional(),
+  //TODO: add profile iamge
+});
