@@ -1,6 +1,6 @@
 import { PrismaService } from '@/modules/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { Prisma, User } from '@prisma/client'; // Import your Prisma user model
+import { Prisma, User, VerificationStatus } from '@prisma/client'; // Import your Prisma user model
 import { Logger } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import CreateUserDto from '@/modules/auth/dto/create-user.dto';
@@ -34,6 +34,10 @@ export class UserService {
     const users = await this.prisma.user.findMany();
     return users;
   }
+  async findAll(verificationStatus?: VerificationStatus): Promise<User[]> {
+    const filter = verificationStatus ? { verificationStatus } : {}; // Build filter object
+    return await this.prisma.user.findMany({ where: filter });
+  }
 
   async getUserForProfile(id: string): Promise<User> {
     return await this.prisma.user.findUniqueOrThrow({
@@ -47,6 +51,13 @@ export class UserService {
     });
   }
 
+  async getUsersByVerificationStatus(status?: VerificationStatus) {
+    return this.prisma.user.findMany({
+      where: {
+        verificationStatus: status,
+      },
+    });
+  }
   async createUser(data: CreateUserDto): Promise<User> {
     this.logger.log('createUser');
     const hashedPassword = await bcrypt.hash(data.password, roundsOfHashing);

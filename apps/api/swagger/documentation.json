@@ -412,6 +412,52 @@
         ]
       }
     },
+    "/api/user/getAll": {
+      "get": {
+        "operationId": "UserController_findAll",
+        "parameters": [
+          {
+            "name": "verificationStatus",
+            "required": true,
+            "in": "path",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/user/filter-by-status/{status}": {
+      "get": {
+        "operationId": "UserController_filterByStatus",
+        "parameters": [
+          {
+            "name": "status",
+            "required": true,
+            "in": "query",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/organization": {
       "post": {
         "operationId": "OrganizationController_create",
