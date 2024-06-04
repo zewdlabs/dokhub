@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -31,6 +31,7 @@ async function main() {
       specialty: 'Pediatrics',
       yearsOfExperience: 8,
       medicalLicenseNumber: 'MNO012PQR',
+      role: Role.USER,
     },
   });
 
@@ -46,6 +47,7 @@ async function main() {
       specialty: 'Cardiology',
       yearsOfExperience: 12,
       medicalLicenseNumber: 'STU345VWX',
+      role: Role.CREATOR,
     },
   });
 
@@ -61,6 +63,7 @@ async function main() {
       specialty: null,
       yearsOfExperience: 6,
       medicalLicenseNumber: null,
+      role: Role.SUADMIN,
     },
   });
 
