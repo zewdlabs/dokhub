@@ -9,21 +9,24 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { Role, User as UserModel } from '@prisma/client';
+import { User as UserModel, VerificationStatus } from '@prisma/client';
 // import CreatePlatformUserInput from './inputs/create-user-dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 // import { JwtAuthGuard } from '@/auth/guards/jwt.guard';
 import { AccessTokenGuard } from '@/modules/auth/guards/accessToken.guard';
-import { Roles } from '@/modules/auth/role.decorate';
-import { RoleGuard } from '@/modules/auth/guards/role.guard';
+// import { Roles } from '@/modules/auth/decorators/role.decorate';
+// import { RoleGuard } from '@/modules/auth/guards/role.guard';
 import CreateUserDto from '@/modules/auth/dto/create-user.dto';
+import { VerificationGuard } from '../auth/guards/post.guard';
+import { Verification } from '../auth/decorators/verificationstatus.decorate';
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  @Roles(Role.ADMIN, Role.SUADMIN)
-  @UseGuards(AccessTokenGuard, RoleGuard)
+  // @Roles(Role.ADMIN, Role.SUADMIN)
+  @Verification(VerificationStatus.INCOMPLETE)
+  @UseGuards(AccessTokenGuard, VerificationGuard)
   @ApiBearerAuth()
   async getAllUsers() {
     return this.userService.getAllUsers();

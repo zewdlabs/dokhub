@@ -1,6 +1,6 @@
 import { PrismaService } from '@/modules/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { Prisma, Role, User } from '@prisma/client'; // Import your Prisma user model
+import { Prisma, User } from '@prisma/client'; // Import your Prisma user model
 import { Logger } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import CreateUserDto from '@/modules/auth/dto/create-user.dto';
@@ -44,12 +44,12 @@ export class UserService {
       data: userData,
     });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const membership = await this.prisma.membership.create({
-      data: {
-        userId: createdUser.id,
-        role: Role.USER,
-      },
-    });
+    // const membership = await this.prisma.membership.create({
+    //   data: {
+    //     userId: createdUser.id,
+    //     role: Role.USER,
+    //   },
+    // });
     return createdUser;
   }
 

@@ -13,6 +13,7 @@ import { UserService, roundsOfHashing } from '@/modules/users/user.service';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import CreateUserDto from './dto/create-user.dto';
+import { UserDto } from './dto/user.dto';
 // import { CLIENT_RENEG_LIMIT } from 'tls';
 
 const fakeUsers = [
@@ -51,7 +52,7 @@ export class AuthService {
     const tokens = await this.getTokens(
       newUser.id,
       newUser.email,
-      // newUser.role,
+      newUser.role,
     );
     await this.updateRefreshToken(newUser, tokens.refreshToken);
     return tokens;
@@ -60,7 +61,7 @@ export class AuthService {
   async login(
     email: string,
     password: string,
-  ): Promise<{ tokens: AuthEntity; user: User }> {
+  ): Promise<{ tokens: AuthEntity; user: UserDto }> {
     // Step 1: Fetch a user with the given email
     const user = await this.prisma.user.findUnique({ where: { email: email } });
 
@@ -82,11 +83,30 @@ export class AuthService {
     }
 
     // Step 3: Generate a JWT containing the user's ID and return it
-    const tokens = await this.getTokens(user.id, user.email); //user.role
+    const tokens = await this.getTokens(user.id, user.email, user.role); //user.role
     await this.updateRefreshToken(user, tokens.refreshToken);
     console.log('IT IS IN THE LOGIN');
     console.log(tokens);
-    return { tokens, user };
+    const userDto: UserDto = {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      prefix: user.prefix,
+      phone: user.phone,
+      bio: user.bio,
+      occupation: user.occupation,
+      specialty: user.specialty,
+      medicalLicenseNumber: user.medicalLicenseNumber,
+      yearsOfExperience: user.yearsOfExperience,
+      verificationStatus: user.verificationStatus,
+      role: user.role,
+      followedByCount: user.followedByCount,
+      followingCount: user.followingCount,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+    // const { password, refreshToken, ...safeUser } = user;
+    return { tokens, user: userDto };
   }
 
   async updateRefreshToken(user: User, refreshToken: string) {
@@ -97,7 +117,7 @@ export class AuthService {
       data: user,
     });
   }
-  async getTokens(userId: string, email: string) {
+  async getTokens(userId: string, email: string, role: string) {
     console.log('IT IS IN THE GET TOKENS');
     //, role: string
     const [accessToken, refreshToken] = await Promise.all([
@@ -105,19 +125,19 @@ export class AuthService {
         {
           sub: userId,
           email,
-          // role,
+          role,
         },
         {
           secret:
             this.configService.get<string>('JWT_ACCESS_SECRET') || 'secretyy',
-          expiresIn: '15m',
+          expiresIn: '5h',
         },
       ),
       this.jwtService.signAsync(
         {
           sub: userId,
           email,
-          // role,
+          role,
         },
         {
           secret:
@@ -144,24 +164,23 @@ export class AuthService {
     }
   }
   async refreshToken(user: any) {
-    // console.log('123213213231231231', user);
-    const payload = {
-      username: user.username,
-      sub: user.sub,
-    };
-
-    return {
-      accessToken: await this.jwtService.signAsync(payload, {
-        expiresIn: '20s',
-        secret:
-          this.configService.get<string>('JWT_ACCESS_SECRET') || 'secrtuteiw',
-      }),
-      refreshToken: await this.jwtService.signAsync(payload, {
-        expiresIn: '7d',
-        secret:
-          this.configService.get<string>('JWT_REFRESH_SECRET') || 'secrtuteiw',
-      }),
-      expiresIn: new Date().setTime(new Date().getTime() + EXPIRE_TIME),
-    };
+    console.log('123213213231231231=================', user);
+    const tokens = await this.getTokens(user.sub, user.email, user.role);
+    const userUpdate = await this.usersService.findOne(user.sub);
+    await this.updateRefreshToken(userUpdate as User, tokens.refreshToken);
+    return tokens;
+    // return {
+    //   accessToken: await this.jwtService.signAsync(payload, {
+    //     expiresIn: '5h',
+    //     secret:
+    //       this.configService.get<string>('JWT_ACCESS_SECRET') || 'secrtuteiw',
+    //   }),
+    //   refreshToken: await this.jwtService.signAsync(payload, {
+    //     expiresIn: '7d',
+    //     secret:
+    //       this.configService.get<string>('JWT_REFRESH_SECRET') || 'secrtuteiw',
+    //   }),
+    //   expiresIn: new Date().setTime(new Date().getTime() + EXPIRE_TIME),
+    // };
   }
 }

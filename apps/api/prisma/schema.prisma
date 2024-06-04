@@ -28,6 +28,7 @@ model User {
   yearsOfExperience    Int?
   refreshToken String?
   verificationStatus   VerificationStatus @default(INCOMPLETE)
+  role Role @default(USER)
 
   socialLinks     SocialLink[]
   memberships     Membership[]

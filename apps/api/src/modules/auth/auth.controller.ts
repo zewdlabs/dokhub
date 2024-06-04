@@ -28,6 +28,7 @@ export class AuthController {
   // @ApiBody({ type: Prisma.UserCreateInput })
   @ApiBody({ type: CreateUserDto })
   signup(@Body() user: CreateUserDto) {
+    // console.log('IN THE CONTROLER', user);
     return this.authService.signUp(user);
   }
 
