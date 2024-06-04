@@ -8,14 +8,14 @@ export class MinioService {
   private bucketName: string;
 
   constructor(private readonly configService: ConfigService) {
-    // this.minioClient = new Minio.Client({
-    //   endPoint: this.configService.get('MINIO_ENDPOINT')!,
-    //   port: Number(this.configService.get('MINIO_PORT')),
-    //   useSSL: this.configService.get('MINIO_USE_SSL') === 'true',
-    //   accessKey: this.configService.get('MINIO_ACCESS_KEY')!,
-    //   secretKey: this.configService.get('MINIO_SECRET_KEY')!,
-    // });
-    // this.bucketName = this.configService.get('MINIO_BUCKET_NAME')!;
+    this.minioClient = new Minio.Client({
+      endPoint: this.configService.get('MINIO_ENDPOINT')!,
+      port: Number(this.configService.get('MINIO_PORT')),
+      useSSL: this.configService.get('MINIO_USE_SSL') === 'true',
+      accessKey: this.configService.get('MINIO_ACCESS_KEY')!,
+      secretKey: this.configService.get('MINIO_SECRET_KEY')!,
+    });
+    this.bucketName = this.configService.get('MINIO_BUCKET_NAME')!;
   }
 
   async createBucketIfNotExists() {
@@ -37,6 +37,11 @@ export class MinioService {
   }
 
   async getFileUrl(fileName: string) {
+    // const endPoint = this.configService.get<string>('MINIO_ENDPOINT');
+    // const bucketName = this.configService.get<string>('MINIO_BUCKET_NAME');
+    // const useSSL = this.configService.get<string>('MINIO_USE_SSL') === 'true';
+    // const protocol = useSSL ? 'https' : 'http';
+    // return `${protocol}://${endPoint}/${bucketName}/${fileName}`;
     return await this.minioClient.presignedUrl(
       'GET',
       this.bucketName,

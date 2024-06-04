@@ -1,6 +1,6 @@
 import { PrismaService } from '@/modules/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
-import { Prisma, User, VerificationStatus } from '@prisma/client'; // Import your Prisma user model
+import { Prisma, Role, User, VerificationStatus } from '@prisma/client'; // Import your Prisma user model
 import { Logger } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import CreateUserDto from '@/modules/auth/dto/create-user.dto';
@@ -96,10 +96,17 @@ export class UserService {
     return deleteUser;
   }
 
-  // async updateUserRole(userId: string, newRole: Role): Promise<User> {
-  //   return this.prisma.user.update({
-  //     where: { id: userId },
-  //     data: { role: newRole },
-  //   });
-  // }
+  async updateUserRole(userId: string, newRole: Role): Promise<User> {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { role: newRole },
+    });
+  }
+
+  async validateUser(userId: string): Promise<User> {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { verificationStatus: VerificationStatus.VERIFIED },
+    });
+  }
 }

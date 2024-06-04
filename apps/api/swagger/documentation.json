@@ -352,6 +352,16 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": ""
@@ -456,6 +466,59 @@
             "bearer": []
           }
         ]
+      }
+    },
+    "/api/user/validate/{id}": {
+      "patch": {
+        "operationId": "UserController_validateUser",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/user/upload-profile-picture": {
+      "post": {
+        "operationId": "UserController_uploadProfilePicture",
+        "summary": "Upload profile picture",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The URL of the uploaded file."
+          }
+        }
       }
     },
     "/api/organization": {
@@ -804,6 +867,10 @@
           "email",
           "password"
         ]
+      },
+      "UserDto": {
+        "type": "object",
+        "properties": {}
       },
       "CreateOrganizationDto": {
         "type": "object",
