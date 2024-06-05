@@ -40,7 +40,8 @@ export const forgotPasswordSchema = z.object({
 });
 
 export const resetPasswordSchema = z.object({
-  code: z.string().length(6),
+  password: z.string().min(6),
+  confirmPassword: z.string().min(6),
 });
 
 export const signUpSchema = z

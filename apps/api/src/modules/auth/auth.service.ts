@@ -14,6 +14,9 @@ import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import CreateUserDto from './dto/create-user.dto';
 import { UserDto } from './dto/user.dto';
+import * as nodemailer from 'nodemailer';
+import crypto from 'crypto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 // import { CLIENT_RENEG_LIMIT } from 'tls';
 
 const fakeUsers = [
@@ -49,6 +52,17 @@ export class AuthService {
     }
 
     const newUser = await this.usersService.createUser(data);
+    const verificationCode = this.generateVerificationCode().toString();
+    console.log(verificationCode);
+    await this.prisma.emailVerification.create({
+      data: {
+        code: verificationCode,
+        email: data.email,
+        userId: newUser.id,
+      },
+    });
+
+    await this.sendVerificationEmail(data.email, verificationCode);
     const tokens = await this.getTokens(
       newUser.id,
       newUser.email,
@@ -107,6 +121,27 @@ export class AuthService {
     };
     // const { password, refreshToken, ...safeUser } = user;
     return { tokens, user: userDto };
+  }
+
+  private async sendVerificationEmail(email: string, code: string) {
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.ethereal.email',
+      port: 587,
+      secure: false,
+      auth: {
+        user: this.configService.get<string>('EMAIL_USERNAME'),
+        pass: this.configService.get<string>('EMAIL_PASSWORD'),
+      },
+    });
+
+    const mailOptions = {
+      from: this.configService.get<string>('EMAIL_USERNAME'),
+      to: email,
+      subject: 'Email Verification',
+      text: `Please verify your email using this code: ${code}`,
+    };
+
+    await transporter.sendMail(mailOptions);
   }
 
   async updateRefreshToken(user: User, refreshToken: string) {
@@ -182,5 +217,100 @@ export class AuthService {
     //   }),
     //   expiresIn: new Date().setTime(new Date().getTime() + EXPIRE_TIME),
     // };
+  }
+
+  async verifyEmailCode(code: string, email: string): Promise<boolean> {
+    const verification = await this.prisma.emailVerification.findUnique({
+      where: { code, email },
+    });
+
+    if (!verification || verification.expiresAt < new Date()) {
+      return false;
+    }
+
+    await this.prisma.user.update({
+      where: { id: verification.userId },
+      data: { emailVerified: new Date() },
+    });
+
+    await this.prisma.emailVerification.delete({
+      where: { id: verification.id },
+    });
+
+    return true;
+  }
+
+  generateVerificationCode() {
+    const min = 100000;
+    const max = 999999;
+    const range = max - min + 1;
+
+    const randomBuffer = crypto.randomBytes(4);
+    const randomNumber = randomBuffer.readUInt32BE(0);
+
+    return min + (randomNumber % range);
+  }
+
+  async requestPasswordReset(data: { email: string }): Promise<void> {
+    const user = await this.usersService.findByEmail(data.email);
+    if (!user) {
+      throw new BadRequestException('User does not exist');
+    }
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const hashedToken = await bcrypt.hash(resetToken, 10);
+
+    await this.prisma.emailVerification.create({
+      data: {
+        code: hashedToken,
+        email: user.email,
+        userId: user.id,
+        expiresAt: new Date(Date.now() + 3600000), // 1 hour
+      },
+    });
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.ethereal.email',
+      port: 587,
+      secure: false,
+      auth: {
+        user: this.configService.get<string>('EMAIL_USERNAME'),
+        pass: this.configService.get<string>('EMAIL_PASSWORD'),
+      },
+    });
+    const resetLink = `${this.configService.get('FRONTEND_URL')}/auth/reset-password?token=${resetToken}&email=${user.email}`;
+    await transporter.sendMail({
+      to: user.email,
+      subject: 'Password Reset Request',
+      text: `You requested a password reset. Click here to reset your password: ${resetLink}`,
+    });
+  }
+
+  async resetPassword(data: ResetPasswordDto): Promise<void> {
+    console.log(']]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]', data);
+    const { email, token, newPassword } = data;
+
+    const emailVerification = await this.prisma.emailVerification.findUnique({
+      where: { email },
+    });
+
+    if (
+      !emailVerification ||
+      !(await bcrypt.compare(token, emailVerification.code)) ||
+      emailVerification.expiresAt < new Date()
+    ) {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await this.prisma.user.update({
+      where: { email },
+      data: { password: hashedPassword },
+    });
+
+    const deleted = await this.prisma.emailVerification.delete({
+      where: { email },
+    });
+    console.log(await deleted);
   }
 }

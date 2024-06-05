@@ -37,23 +37,24 @@ export default function ForgotPasswordForm() {
     async (values: z.infer<typeof forgotPasswordSchema>) => {
       // NOTE: Do some api calls which send verification code to the email
       // Redirect the user to the reset password page
-      // const res = await fetch(
-      //   `${process.env.BACKEND_URL!}/api/auth/forgot-password`,
-      //   {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify(values),
-      //   },
-      // );
-      //
-      // if (!res.ok) {
-      //   throw new Error("Failed to send verification code");
-      // }
+      console.log(values);
+      const res = await fetch(
+        `http://localhost:4231/api/auth/request-password-reset`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to send verification code");
+      }
       toast("Verification code sent to your email");
-      router.push("reset-password");
-    },
+      // router.push("reset-password");
+    }
   );
 
   return (
@@ -90,7 +91,7 @@ export default function ForgotPasswordForm() {
                 />
               </div>
               <Button type="submit" className="w-full">
-                Send Code
+                Send Reset Link
               </Button>
             </div>
           </CardContent>

@@ -24,10 +24,10 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { z } from "zod";
 import { signUpSchema } from "@/types/schema";
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 export default function SignupForm() {
-  const router= useRouter();
+  const router = useRouter();
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -60,10 +60,10 @@ export default function SignupForm() {
         return;
       }
       const response = await res.json();
-      console.log("----------------",response)
-      router.push("http://localhost:3000/api/auth/signin");
+      console.log("----------------", response);
+      router.push(`/auth/verify-email?email=${values.email}`);
       console.log({ response });
-    },
+    }
   );
 
   return (

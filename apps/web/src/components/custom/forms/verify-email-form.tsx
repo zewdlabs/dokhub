@@ -22,13 +22,18 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { verifyEmailSchema } from "@/types/schema";
 import { z } from "zod";
 
 export default function VerifyEmailForm() {
   const router = useRouter();
+
+  const searchParams = useSearchParams();
+
+  const email = searchParams.get("email");
+  console.log(email);
 
   const form = useForm<z.infer<typeof verifyEmailSchema>>({
     resolver: zodResolver(verifyEmailSchema),
@@ -40,7 +45,7 @@ export default function VerifyEmailForm() {
   const onSubmit = form.handleSubmit(
     async (values: z.infer<typeof verifyEmailSchema>) => {
       const res = await fetch(
-        `http://localhost:4231/api/auth/verify-email?code=${values.code}`,
+        `http://localhost:4231/api/auth/verify-email?code=${values.code}&email=${email}`
       );
 
       if (!res.ok) {
@@ -49,7 +54,7 @@ export default function VerifyEmailForm() {
       }
 
       return router.push("/auth/signin");
-    },
+    }
   );
 
   return (

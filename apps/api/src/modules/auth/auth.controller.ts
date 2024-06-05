@@ -1,4 +1,10 @@
-import { Body, Controller, Get } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Query,
+} from '@nestjs/common';
 
 import { Post, Req, UseGuards } from '@nestjs/common';
 // import { AuthPayloadDto } from './dto/auth.dto';
@@ -14,6 +20,7 @@ import { AccessTokenGuard } from './guards/accessToken.guard';
 // import { Prisma } from '@prisma/client';
 import CreateUserDto from './dto/create-user.dto';
 import { RefreshJwtGuard } from './guards/refreshToken.guards';
+// import { ResetPasswordDto } from './dto/reset-password.dto';
 @Controller('auth')
 @ApiTags('auth')
 export class AuthController {
@@ -49,5 +56,30 @@ export class AuthController {
   async refreshToken(@Req() req: Request) {
     console.log('refreshed');
     return await this.authService.refreshToken(req.user);
+  }
+
+  @Get('verify-email')
+  async verifyEmail(
+    @Query('code') code: string,
+    @Query('email') email: string,
+  ) {
+    console.log(email, code);
+    const verification = await this.authService.verifyEmailCode(code, email);
+    if (!verification) {
+      throw new BadRequestException('Invalid verification code');
+    }
+    return { message: 'Email verified successfully' };
+  }
+
+  @Post('request-password-reset')
+  async requestPasswordReset(@Body() requestResetDto: { email: string }) {
+    await this.authService.requestPasswordReset(requestResetDto);
+  }
+  @Post('reset-password')
+  async resetPassword(
+    @Body() data: { email: string; token: string; newPassword: string },
+  ) {
+    console.log('=====================================', data);
+    await this.authService.resetPassword(data);
   }
 }

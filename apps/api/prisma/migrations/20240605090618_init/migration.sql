@@ -1,5 +1,11 @@
 -- CreateEnum
+CREATE TYPE "SocialLinkType" AS ENUM ('TWITTER', 'LINKEDIN', 'GITHUB', 'INSTAGRAM', 'FACEBOOK', 'YOUTUBE', 'TIKTOK', 'OTHER');
+
+-- CreateEnum
 CREATE TYPE "InvitationStatus" AS ENUM ('PENDING', 'ACCEPTED', 'REJECTED', 'EXPIRED');
+
+-- CreateEnum
+CREATE TYPE "VerificationStatus" AS ENUM ('INCOMPLETE', 'PENDING', 'REVIEW', 'VERIFIED', 'REJECTED');
 
 -- CreateEnum
 CREATE TYPE "SubscriptionType" AS ENUM ('PRO', 'ENTERPRISE');
@@ -23,8 +29,13 @@ CREATE TABLE "users" (
     "specialty" TEXT,
     "medicalLicenseNumber" TEXT,
     "yearsOfExperience" INTEGER,
+    "refreshToken" TEXT,
+    "verificationStatus" "VerificationStatus" NOT NULL DEFAULT 'INCOMPLETE',
+    "role" "Role" NOT NULL DEFAULT 'USER',
     "followedByCount" INTEGER NOT NULL DEFAULT 0,
     "followingCount" INTEGER NOT NULL DEFAULT 0,
+    "profileUrl" TEXT,
+    "emailVerified" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -35,7 +46,7 @@ CREATE TABLE "users" (
 CREATE TABLE "memberships" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "organizationId" TEXT NOT NULL,
+    "organizationId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "role" "Role" NOT NULL,
@@ -78,6 +89,7 @@ CREATE TABLE "password_resets" (
 CREATE TABLE "posts" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
+    "description" TEXT,
     "content" TEXT NOT NULL,
     "publishedAt" TIMESTAMP(3),
     "reportedAmount" INTEGER NOT NULL DEFAULT 0,
@@ -121,6 +133,7 @@ CREATE TABLE "social_links" (
     "username" TEXT NOT NULL,
     "url" TEXT,
     "userId" TEXT NOT NULL,
+    "type" "SocialLinkType" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -153,15 +166,14 @@ CREATE TABLE "invitations" (
 );
 
 -- CreateTable
-CREATE TABLE "subscriptions" (
+CREATE TABLE "for_you" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
-    "expiresAt" TIMESTAMP(3) NOT NULL DEFAULT now() + interval '1 month',
-    "subscriptionType" "SubscriptionType" NOT NULL DEFAULT 'PRO',
+    "postId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "subscriptions_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "for_you_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -192,7 +204,13 @@ CREATE INDEX "users_email_idx" ON "users"("email");
 CREATE INDEX "unique_membership" ON "memberships"("userId", "organizationId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "memberships_userId_organizationId_key" ON "memberships"("userId", "organizationId");
+
+-- CreateIndex
 CREATE INDEX "unique_follows" ON "follows"("followedById", "followingId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "email_verifications_code_key" ON "email_verifications"("code");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "email_verifications_email_key" ON "email_verifications"("email");
@@ -201,7 +219,7 @@ CREATE UNIQUE INDEX "email_verifications_email_key" ON "email_verifications"("em
 CREATE UNIQUE INDEX "email_verifications_userId_key" ON "email_verifications"("userId");
 
 -- CreateIndex
-CREATE INDEX "email_verifications_userId_idx" ON "email_verifications"("userId");
+CREATE INDEX "email_verifications_userId_code_email_idx" ON "email_verifications"("userId", "code", "email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "password_resets_token_key" ON "password_resets"("token");
@@ -246,7 +264,7 @@ CREATE INDEX "organizations_slug_idx" ON "organizations"("slug");
 CREATE INDEX "unique_invitation" ON "invitations"("organizationId", "userId");
 
 -- CreateIndex
-CREATE INDEX "subscriptions_userId_idx" ON "subscriptions"("userId");
+CREATE INDEX "for_you_userId_idx" ON "for_you"("userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "_PostToTag_AB_unique" ON "_PostToTag"("A", "B");
@@ -270,7 +288,7 @@ CREATE INDEX "_OrganizationToPost_B_index" ON "_OrganizationToPost"("B");
 ALTER TABLE "memberships" ADD CONSTRAINT "memberships_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "memberships" ADD CONSTRAINT "memberships_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "memberships" ADD CONSTRAINT "memberships_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "follows" ADD CONSTRAINT "follows_followedById_fkey" FOREIGN KEY ("followedById") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -306,7 +324,10 @@ ALTER TABLE "invitations" ADD CONSTRAINT "invitations_organizationId_fkey" FOREI
 ALTER TABLE "invitations" ADD CONSTRAINT "invitations_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "subscriptions" ADD CONSTRAINT "subscriptions_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "for_you" ADD CONSTRAINT "for_you_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "for_you" ADD CONSTRAINT "for_you_postId_fkey" FOREIGN KEY ("postId") REFERENCES "posts"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "_PostToTag" ADD CONSTRAINT "_PostToTag_A_fkey" FOREIGN KEY ("A") REFERENCES "posts"("id") ON DELETE CASCADE ON UPDATE CASCADE;

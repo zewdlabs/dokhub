@@ -41,6 +41,8 @@ model User {
   followedByCount Int          @default(0)
   following       Follows[]    @relation("following")
   followingCount  Int          @default(0)
+  profileUrl String?
+  emailVerified DateTime?
 
   forYou ForYou[]
 
@@ -89,7 +91,7 @@ model Follows {
 model EmailVerification {
   id String @id @default(cuid())
 
-  code String
+  code String @unique
 
   email String @unique
 
@@ -98,7 +100,7 @@ model EmailVerification {
 
   expiresAt DateTime @default(dbgenerated("now() + interval '3 day'"))
 
-  @@index([userId])
+  @@index([userId, code, email])
   @@map("email_verifications")
 }
 
