@@ -37,9 +37,6 @@ export default function Dashboard({ params }: { params: { postId: string } }) {
       if (!req.ok) throw new Error("Failed to publish post");
       return await req.json();
     },
-    onSuccess: () => {
-      revalidateTag("post");
-    },
   });
 
   const { data: postData, isLoading } = useQuery({
@@ -52,7 +49,7 @@ export default function Dashboard({ params }: { params: { postId: string } }) {
           headers: {
             Authorization: `Bearer ${session.data?.tokens.accessToken}`,
           },
-        },
+        }
       );
 
       if (!res.ok) {

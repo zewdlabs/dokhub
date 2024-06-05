@@ -8,10 +8,10 @@ const sidebarNavItems = [
     title: "Account",
     href: "/app/settings/account",
   },
-  {
-    title: "Notification",
-    href: "/app/settings/notification",
-  },
+  // {
+  //   title: "Notification",
+  //   href: "/app/settings/notification",
+  // },
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {

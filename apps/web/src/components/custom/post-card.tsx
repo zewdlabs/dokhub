@@ -24,10 +24,22 @@ import {
 import Link from "next/link";
 import { Post } from "./post-list";
 import { useSession } from "next-auth/react";
+import { useMutation } from "@tanstack/react-query";
+import { deletePostSchema } from "@/types/schema";
+import { z } from "zod";
 
 export default function PostCard({ post, tag }: { post: Post; tag: string }) {
   const session = useSession();
-
+  const removePost = useMutation({
+    mutationKey: ["post", post.id],
+    mutationFn: async (values: z.infer<typeof deletePostSchema>) => {
+      const req = await fetch(`http://localhost:4231/api/posts/${values.id}`, {
+        method: "DELETE",
+      });
+      if (!req.ok) throw new Error("Failed to publish post");
+      return await req.json();
+    },
+  });
   return (
     <Card className="w-full p-4 md:pt-6">
       <Link
@@ -94,16 +106,31 @@ export default function PostCard({ post, tag }: { post: Post; tag: string }) {
             <DropdownMenuContent align="end">
               <DropdownMenuGroup>
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem>Add to library</DropdownMenuItem>
-                <DropdownMenuItem>Not interested</DropdownMenuItem>
-                <DropdownMenuItem
-                  disabled={
-                    tag === "published" &&
-                    post.authorId !== session.data?.user.id
-                  }
-                >
-                  <Link href={`/app/new/${post.id}`}>Edit</Link>
-                </DropdownMenuItem>
+                {/*<DropdownMenuItem>Add to library</DropdownMenuItem>*/}
+
+                {post.authorId === session.data?.user.id ? (
+                  <>
+                    <DropdownMenuItem>
+                      <Link href={`/app/new/${post.id}`}>Edit</Link>
+                    </DropdownMenuItem>
+                    <form
+                      onSubmit={() =>
+                        removePost.mutate({
+                          id: post.id,
+                        })
+                      }
+                    >
+                      <DropdownMenuItem>
+                        <button type="submit">Delete</button>
+                      </DropdownMenuItem>
+                    </form>
+                  </>
+                ) : (
+                  <>
+                    <DropdownMenuItem>Not interested</DropdownMenuItem>
+                    <DropdownMenuItem>Report</DropdownMenuItem>
+                  </>
+                )}
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
             </DropdownMenuContent>
