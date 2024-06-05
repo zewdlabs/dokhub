@@ -45,16 +45,16 @@ export default function SignupForm() {
       console.log(values);
       const res = await fetch("http://localhost:4231/api/auth/signup", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           name: `${values.firstName} ${values.lastName}`,
           email: values.email,
           password: values.password,
         }),
-        headers: {
-          "Content-Type": "application/json",
-        },
       });
-      console.log(await res);
+
       if (!res.ok) {
         alert(res.statusText);
         return;

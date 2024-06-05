@@ -88,7 +88,7 @@ export default async function PostsDashboardPageLayout({
                 {orgs.map((org) => (
                   <TableRow>
                     <TableCell>
-                      <Link href={`/admin/posts/${org.id}`}>
+                      <Link href={`/admin/organizations/${org.id}`}>
                         <div className="font-medium">{org.name}</div>
                       </Link>
                     </TableCell>

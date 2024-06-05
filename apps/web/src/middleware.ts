@@ -1,5 +1,4 @@
 import { auth } from "@/auth";
-import { url } from "inspector";
 import { Post } from "./components/custom/post-list";
 import { Organization } from "./app/(app)/admin/organizations/[organizationId]/layout";
 import { User } from "next-auth";
@@ -82,13 +81,17 @@ export const middleware = auth(async (req) => {
     }
 
     if (pathname.endsWith("/admin/users")) {
-      const users = (await (
-        await fetch("http://localhost:4231/api/user/verified", {
-          headers: {
-            Authorization: `Bearer ${req.auth.tokens.accessToken}`,
-          },
-        })
-      ).json()) as User[];
+      const res = await fetch("http://localhost:4231/api/user/verified", {
+        headers: {
+          Authorization: `Bearer ${req.auth.tokens.accessToken}`,
+        },
+      });
+
+      if (!res.ok) {
+        console.error(res.statusText);
+        return Response.error();
+      }
+      const users = (await res.json()) as User[];
 
       return Response.redirect(new URL(`/admin/users/${users[0].id}`, req.url));
     }

@@ -42,11 +42,10 @@ export class AuthService {
     private configService: ConfigService,
   ) {}
 
-  async signUp(data: CreateUserDto): Promise<any> {
+  async signUp(data: CreateUserDto) {
     // Check if user exists
-    const userExists = await this.usersService.findByEmail(
-      data.email as string,
-    );
+    const userExists = await this.usersService.findByEmail(data.email);
+
     if (userExists) {
       throw new BadRequestException('User already exists');
     }
@@ -69,7 +68,7 @@ export class AuthService {
       newUser.role,
     );
     await this.updateRefreshToken(newUser, tokens.refreshToken);
-    return tokens;
+    return;
   }
 
   async login(

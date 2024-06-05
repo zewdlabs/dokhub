@@ -45,7 +45,7 @@ export class OrganizationService {
   findAllOrgOfUser(userId: string) {
     return this.db.organization.findMany({
       where: {
-        members: {
+        memberships: {
           some: {
             id: userId,
           },
@@ -58,7 +58,7 @@ export class OrganizationService {
     return this.db.organization.findFirst({
       where: {
         id: orgId,
-        members: {
+        memberships: {
           some: {
             id: userId,
           },
@@ -70,7 +70,7 @@ export class OrganizationService {
   findOrgWithUsers(orgId: string) {
     return this.db.organization.findFirst({
       where: { id: orgId },
-      include: { members: true },
+      include: { memberships: true },
     });
   }
 
@@ -78,7 +78,7 @@ export class OrganizationService {
     return this.db.organization.update({
       where: { id: orgId },
       data: {
-        members: {
+        memberships: {
           connect: {
             id: userId,
           },
@@ -91,7 +91,7 @@ export class OrganizationService {
     return this.db.organization.update({
       where: { id: orgId },
       data: {
-        members: {
+        memberships: {
           disconnect: {
             id: userId,
           },
@@ -104,7 +104,7 @@ export class OrganizationService {
     return this.db.organization.update({
       where: { id: orgId },
       data: {
-        members: {
+        memberships: {
           update: {
             where: { id: userId },
             data: { role },
