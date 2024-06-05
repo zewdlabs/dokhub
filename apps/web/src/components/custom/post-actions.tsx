@@ -1,11 +1,16 @@
+"use client";
+
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
-import { Ban, Flag, Heart, Reply, Share } from "lucide-react";
+import { Ban, Check, Flag, Heart, Reply, Share } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { usePathname } from "next/navigation";
+import { toast } from "sonner";
+import { object } from "zod";
 
 export default function PostAction({
   likes,
@@ -14,6 +19,8 @@ export default function PostAction({
   likes?: number;
   replies?: number;
 }) {
+  const pathname = usePathname();
+  const base = "http://localhost:3000";
   return (
     <div className="container max-w-screen-lg px-24">
       <Separator orientation="horizontal" className="my-4" />
@@ -42,7 +49,16 @@ export default function PostAction({
         <div className="flex items-center">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => {
+                  navigator.clipboard.writeText(base + pathname);
+                  toast("Link copied to clipboard", {
+                    icon: <Check size={"sm"} />,
+                  });
+                }}
+              >
                 <Share className="h-5 w-5" />
                 <span className="sr-only">Share</span>
               </Button>
