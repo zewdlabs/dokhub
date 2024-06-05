@@ -159,6 +159,7 @@ async function main() {
     data: [
       { followedById: user1.id, followingId: user2.id },
       { followedById: user1.id, followingId: user3.id },
+      { followedById: user1.id, followingId: user4.id },
       { followedById: user1.id, followingId: user5.id },
       { followedById: user1.id, followingId: user6.id },
       { followedById: user1.id, followingId: user7.id },
