@@ -18,14 +18,13 @@ export class UserService {
     this.logger.log('userById');
     const user = await this.prisma.user.findUnique({
       where: userWhereUniqueInput,
-      include: { posts: true },
+      include: { posts: {} },
     });
     return user;
   }
   async findOne(id: string): Promise<User | null> {
     const user = await this.prisma.user.findUnique({
       where: { id },
-      include: { posts: true },
     });
     return user;
   }

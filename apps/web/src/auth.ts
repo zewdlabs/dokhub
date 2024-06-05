@@ -1,6 +1,8 @@
 import NextAuth from "next-auth";
 import credentials from "next-auth/providers/credentials";
 import google from "next-auth/providers/google";
+import type { DefaultSession } from "next-auth";
+import { JWT } from "next-auth/jwt";
 
 async function refreshToken(token: JWT): Promise<JWT> {
   console.log(token.tokens.refreshToken);
@@ -115,8 +117,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
 
     async session({ token, session }) {
-      //@ts-expect-error
-      session.user = token.user;
+      session.user = { ...session.user, ...token.user };
       session.tokens = token.tokens;
 
       return session;
@@ -126,10 +127,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     signIn: "/auth/signin",
   },
 });
-
-import type { DefaultSession } from "next-auth";
-import { JWT } from "next-auth/jwt";
-import { TokenTextSplitter } from "langchain/text_splitter";
 
 declare module "next-auth" {
   /**
@@ -148,10 +145,10 @@ declare module "next-auth" {
    */
   interface Session {
     user: {
-      id: number;
+      id: string;
       email: string;
       name: string;
-    };
+    } & DefaultSession["user"];
 
     tokens: {
       accessToken: string;
@@ -167,10 +164,10 @@ declare module "next-auth/jwt" {
   /** Returned by the `jwt` callback and `auth`, when using JWT sessions */
   interface JWT {
     user: {
-      id: number;
+      id: string;
       email: string;
       name: string;
-    };
+    } & DefaultSession["user"];
 
     tokens: {
       accessToken: string;

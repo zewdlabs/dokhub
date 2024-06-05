@@ -24,7 +24,7 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { z } from "zod";
 import { signUpSchema } from "@/types/schema";
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 export default function SignupForm() {
   const router= useRouter();
@@ -45,24 +45,23 @@ export default function SignupForm() {
       console.log(values);
       const res = await fetch("http://localhost:4231/api/auth/signup", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           name: `${values.firstName} ${values.lastName}`,
           email: values.email,
           password: values.password,
         }),
-        headers: {
-          "Content-Type": "application/json",
-        },
       });
-      console.log(await res);
+
       if (!res.ok) {
         alert(res.statusText);
         return;
       }
       const response = await res.json();
       console.log("----------------",response)
-      router.push("http://localhost:3000/api/auth/signin");
-      console.log({ response });
+      router.push("/auth/verify-email");
     },
   );
 

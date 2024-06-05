@@ -17,10 +17,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
-import { Post } from "@/components/custom/post-list";
 import { z } from "zod";
 import { deleteOrgSchema } from "@/types/schema";
 import { revalidateTag } from "next/cache";
