@@ -24,6 +24,7 @@ import {
 import Link from "next/link";
 import { Post } from "./post-list";
 import { useSession } from "next-auth/react";
+import { genFallback } from "@/lib/utils";
 
 export default function PostCard({ post, tag }: { post: Post; tag: string }) {
   const session = useSession();
@@ -60,9 +61,9 @@ export default function PostCard({ post, tag }: { post: Post; tag: string }) {
       </Link>
       <CardFooter className="flex justify-between items-center pt-2 pb-0 px-2 w-full">
         <div className="flex items-center">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={undefined} alt={""} />
-            <AvatarFallback></AvatarFallback>
+          <Avatar>
+            <AvatarImage src={undefined} alt={post.author.name} />
+            <AvatarFallback>{genFallback(post.author.name)}</AvatarFallback>
           </Avatar>
           <Icons.dot className="w-6 h-6 text-muted-foreground/75" />
           <span className="text-muted-foreground text-sm font-medium">

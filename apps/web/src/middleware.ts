@@ -91,6 +91,7 @@ export const middleware = auth(async (req) => {
         console.error(res.statusText);
         return Response.error();
       }
+
       const users = (await res.json()) as User[];
 
       return Response.redirect(new URL(`/admin/users/${users[0].id}`, req.url));
