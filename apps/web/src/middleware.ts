@@ -50,7 +50,7 @@ export const middleware = auth(async (req) => {
 
     if (pathname.endsWith("/c")) {
       return Response.redirect(
-        new URL(`/app/c/${req.auth.user!.id!}-${crypto.randomUUID()}`, req.url),
+        new URL(`/app/c/${crypto.randomUUID()}`, req.url),
       );
     }
 
@@ -91,6 +91,7 @@ export const middleware = auth(async (req) => {
         console.error(res.statusText);
         return Response.error();
       }
+
       const users = (await res.json()) as User[];
 
       return Response.redirect(new URL(`/admin/users/${users[0].id}`, req.url));

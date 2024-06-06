@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import Image from "@tiptap/extension-image";
+import Text from "@tiptap/extension-text";
 import TextAlign from "@tiptap/extension-text-align";
 import Link from "@tiptap/extension-link";
 import { BubbleMenu as BubbleMenuConfig } from "@tiptap/extension-bubble-menu";
@@ -15,6 +16,7 @@ import { useDebounce } from "@/hooks/use-debounce";
 import { buttonVariants } from "../ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Icons } from "@/components/icons";
+import { useCompletion } from "ai/react";
 
 export default function Tiptap({
   id,
@@ -31,9 +33,30 @@ export default function Tiptap({
 
   const [titleState, setTitleState] = useState(title);
 
+  const { complete, completion } =
+    useCompletion({
+      api: "/api/completion",
+    });
+
+
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({}),
+      StarterKit.configure(),
+      Text.extend({
+        addKeyboardShortcuts() {
+          return {
+            "Mod-Enter": () => {
+              const prompt = this.editor
+                .getText()
+
+              console.log(this.editor.getJSON());
+
+              complete(prompt);
+              return true;
+            },
+          };
+        },
+      }),
       TextAlign.configure({
         defaultAlignment: "left",
         alignments: ["left", "center", "right", "justify"],
@@ -62,6 +85,15 @@ export default function Tiptap({
     content: editorState,
     autofocus: true,
   });
+
+  const lastCompletion = useRef("");
+
+  useEffect(() => {
+    if (!completion || !editor) return;
+    const diff = completion.slice(lastCompletion.current.length);
+    lastCompletion.current = completion;
+    editor.commands.insertContent(diff);
+  }, [completion, editor]);
 
   const client = useQueryClient();
 
@@ -110,6 +142,33 @@ export default function Tiptap({
       {editor && <EditorToolbar editor={editor} />}
       {editor && (
         <BubbleMenu editor={editor}>
+          <ToggleGroup type="multiple">
+            <ToggleGroupItem
+              value="bold"
+              aria-label="Toggle bold"
+              onClick={() => editor.chain().focus().toggleBold().run()}
+              disabled={!editor.can().chain().focus().toggleBold().run()}
+            >
+              <Icons.bold className="h-5 w-5" />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="italic"
+              aria-label="Toggle italic"
+              onClick={() => editor.chain().focus().toggleItalic().run()}
+              disabled={!editor.can().chain().focus().toggleItalic().run()}
+            >
+              <Icons.italic className="h-5 w-5" />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="underline"
+              aria-label="Toggle underline"
+              onClick={() => editor.chain().focus().toggleUnderline().run()}
+              disabled={!editor.can().chain().focus().toggleStrike().run()}
+            >
+              <Icons.underline className="h-5 w-5" />
+            </ToggleGroupItem>
+          </ToggleGroup>
+
           <ToggleGroup type="multiple">
             <ToggleGroupItem
               value="bold"

@@ -61,6 +61,7 @@ export class PostsService {
         publishedAt: true,
         authorId: true,
         minToRead: true,
+        author: true,
       },
     });
 
@@ -79,6 +80,7 @@ export class PostsService {
             publishedAt: true,
             authorId: true,
             minToRead: true,
+            author: true,
           },
         },
       },
@@ -97,6 +99,7 @@ export class PostsService {
         publishedAt: true,
         authorId: true,
         minToRead: true,
+        author: true,
       },
     });
   }
@@ -111,6 +114,7 @@ export class PostsService {
         publishedAt: true,
         authorId: true,
         minToRead: true,
+        author: true,
       },
     });
   }
