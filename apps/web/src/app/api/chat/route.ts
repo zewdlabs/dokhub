@@ -1,169 +1,204 @@
+import { getQdrantClient } from "@/lib/ai/vector-store";
+import { QdrantVectorStore } from "@langchain/qdrant";
+import { OllamaEmbeddings } from "@langchain/community/embeddings/ollama";
+import { BaseChatModel } from "@langchain/core/language_models/chat_models";
+import { HumanMessage, AIMessage, BaseMessage } from "@langchain/core/messages";
+import {
+  Runnable,
+  RunnableSequence,
+  RunnableMap,
+  RunnableBranch,
+  RunnableLambda,
+} from "@langchain/core/runnables";
+import { REPHRASE_TEMPLATE, RESPONSE_TEMPLATE } from "@/lib/ai/template";
+import {
+  PromptTemplate,
+  ChatPromptTemplate,
+  MessagesPlaceholder,
+} from "@langchain/core/prompts";
+import { StringOutputParser } from "@langchain/core/output_parsers";
+import type { Document } from "@langchain/core/documents";
+import { ChatOllama } from "@langchain/community/chat_models/ollama";
 import { NextRequest, NextResponse } from "next/server";
-import { callChain } from "@/lib/langchain";
-import { Message } from "ai";
-
-const formatMessage = (message: Message) => {
-  return `${message.role === "user" ? "Human" : "Assistant"}: ${
-    message.content
-  }`;
-};
+import { LangChainAdapter, Message, StreamingTextResponse } from "ai";
 
 export const dynamic = "force-dynamic";
 
-export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const messages: Message[] = body.messages ?? [];
-  console.log("Messages ", messages);
-  const formattedPreviousMessages = messages.slice(0, -1).map(formatMessage);
-  const question = messages[messages.length - 1].content;
+type RetrievalChainInput = {
+  chat_history: string;
+  question: string;
+};
 
-  console.log("Chat history ", formattedPreviousMessages.join("\n"));
+const getRetriever = async () => {
+  const client = await getQdrantClient();
 
-  if (!question) {
-    return NextResponse.json("Error: No question in the request", {
-      status: 400,
-    });
+  const embeddings = new OllamaEmbeddings({
+    model: "nomic-embed-text",
+    baseUrl: process.env.OLLAMA_BASE_URL!,
+  });
+
+  const retriever = (
+    await QdrantVectorStore.fromExistingCollection(embeddings, {
+      url: process.env.QDRANT_URL!,
+      collectionName: process.env.QDRANT_COLLECTION_NAME!,
+      client: client,
+    })
+  ).asRetriever({
+    k: 6,
+  });
+
+  return retriever;
+};
+
+const createRetrieverChain = (llm: BaseChatModel, retriever: Runnable) => {
+  // Small speed/accuracy optimization: no need to rephrase the first question
+  // since there shouldn't be any meta-references to prior chat history
+  const CONDENSE_QUESTION_PROMPT =
+    PromptTemplate.fromTemplate(REPHRASE_TEMPLATE);
+  const condenseQuestionChain = RunnableSequence.from([
+    CONDENSE_QUESTION_PROMPT,
+    llm,
+    new StringOutputParser(),
+  ]).withConfig({
+    runName: "CondenseQuestion",
+  });
+  const hasHistoryCheckFn = RunnableLambda.from(
+    (input: RetrievalChainInput) => input.chat_history.length > 0,
+  ).withConfig({ runName: "HasChatHistoryCheck" });
+  const conversationChain = condenseQuestionChain.pipe(retriever).withConfig({
+    runName: "RetrievalChainWithHistory",
+  });
+  const basicRetrievalChain = RunnableLambda.from(
+    (input: RetrievalChainInput) => input.question,
+  )
+    .withConfig({
+      runName: "Itemgetter:question",
+    })
+    .pipe(retriever)
+    .withConfig({ runName: "RetrievalChainWithNoHistory" });
+
+  return RunnableBranch.from([
+    [hasHistoryCheckFn, conversationChain],
+    basicRetrievalChain,
+  ]).withConfig({
+    runName: "FindDocs",
+  });
+};
+
+const formatDocs = (docs: Document[]) => {
+  return docs
+    .map((doc, i) => `<doc id='${i}'>${doc.pageContent}</doc>`)
+    .join("\n");
+};
+
+const formatChatHistoryAsString = (history: BaseMessage[]) => {
+  return history
+    .map((message) => `${message._getType()}: ${message.content}`)
+    .join("\n");
+};
+
+const serializeHistory = (input: any) => {
+  const chatHistory = input.chat_history || [];
+  const convertedChatHistory = [];
+  for (const message of chatHistory) {
+    if (message.human !== undefined) {
+      convertedChatHistory.push(new HumanMessage({ content: message.human }));
+    }
+    if (message["ai"] !== undefined) {
+      convertedChatHistory.push(new AIMessage({ content: message.ai }));
+    }
   }
+  return convertedChatHistory;
+};
 
+const createChain = (llm: BaseChatModel, retriever: Runnable) => {
+  const retrieverChain = createRetrieverChain(llm, retriever);
+  const context = RunnableMap.from({
+    context: RunnableSequence.from([
+      ({ question, chat_history }) => ({
+        question,
+        chat_history: formatChatHistoryAsString(chat_history),
+      }),
+      retrieverChain,
+      RunnableLambda.from(formatDocs).withConfig({
+        runName: "FormatDocumentChunks",
+      }),
+    ]),
+    question: RunnableLambda.from(
+      (input: RetrievalChainInput) => input.question,
+    ).withConfig({
+      runName: "Itemgetter:question",
+    }),
+    chat_history: RunnableLambda.from(
+      (input: RetrievalChainInput) => input.chat_history,
+    ).withConfig({
+      runName: "Itemgetter:chat_history",
+    }),
+  }).withConfig({ tags: ["RetrieveDocs"] });
+
+  // return 2 of the sources
+  console.log("context", context);
+
+  const prompt = ChatPromptTemplate.fromMessages([
+    ["system", RESPONSE_TEMPLATE],
+    new MessagesPlaceholder("chat_history"),
+    ["user", "{question}"],
+  ]);
+
+  const responseSynthesizerChain = RunnableSequence.from([
+    prompt,
+    llm,
+    new StringOutputParser(),
+  ]).withConfig({
+    tags: ["GenerateResponse"],
+  });
+
+  return RunnableSequence.from([
+    {
+      question: RunnableLambda.from(
+        (input: RetrievalChainInput) => input.question,
+      ).withConfig({
+        runName: "Itemgetter:question",
+      }),
+      chat_history: RunnableLambda.from(serializeHistory).withConfig({
+        runName: "SerializeHistory",
+      }),
+    },
+    context,
+    responseSynthesizerChain,
+  ]);
+};
+
+export async function POST(req: NextRequest) {
   try {
-    const streamingTextResponse = callChain({
-      question,
-      chatHistory: formattedPreviousMessages.join("\n"),
+    const { messages } = (await req.json()) as { messages: Message[] };
+
+    const input = {
+      chat_history: messages,
+      question: messages[messages.length - 1].content,
+    };
+
+    console.log();
+
+    const llm = new ChatOllama({
+      baseUrl: process.env.OLLAMA_BASE_URL,
+      model: "llama3:latest",
+      temperature: 0.4,
     });
 
-    return streamingTextResponse;
-  } catch (error) {
-    console.error("Internal server error ", error);
-    return NextResponse.json("Error: Something went wrong. Try again!", {
-      status: 500,
-    });
+    const retriever = await getRetriever();
+    const answerChain = createChain(llm, retriever);
+
+    const chainStream = await answerChain.stream(input);
+
+    const stream = LangChainAdapter.toAIStream(chainStream);
+
+    return new StreamingTextResponse(stream);
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json(
+      { error: (e as unknown as Error).message },
+      { status: 500 },
+    );
   }
 }
-// import {
-//   StreamingTextResponse,
-//   Message,
-//   experimental_StreamData,
-//   LangChainStream,
-// } from "ai";
-// import {
-//   AIMessage,
-//   HumanMessage,
-//   SystemMessage,
-// } from "@langchain/core/messages";
-// import { ChatOllama } from "@langchain/community/chat_models/ollama";
-// import { BytesOutputParser } from "@langchain/core/output_parsers";
-// import { OllamaEmbeddings } from "@langchain/community/embeddings/ollama";
-// import { getQdrantClient } from "@/lib/qdrant-client";
-// import { QdrantVectorStore } from "@langchain/qdrant";
-// import { ConversationalRetrievalQAChain } from "langchain/chains";
-//
-//
-// export async function POST(req: Request) {
-//   const { messages } = (await req.json()) as { messages: Message[] };
-//
-//   const contextSearchModel = new ChatOllama({
-//     baseUrl: process.env.OLLAMA_BASE_URL,
-//     model: "llama3:latest",
-//     temperature: 0,
-//   });
-//
-//   const chatModel = new ChatOllama({
-//     baseUrl: process.env.OLLAMA_BASE_URL,
-//     model: process.env.OLLAMA_MODEL_NAME,
-//     temperature: 0.4,
-//   });
-//
-//   const embeddings = new OllamaEmbeddings({
-//     model: "nomic-embed-text",
-//     baseUrl: process.env.OLLAMA_BASE_URL!,
-//   });
-//
-//   const formattedPreviousMessages = messages.slice(0, -1).map(parseMessages);
-//
-//   const question = messages[messages.length - 1].content;
-//
-//   try {
-//     // Open AI recommendation
-//     const sanitizedQuestion = question.trim().replaceAll("\n", " ");
-//
-//     const qdrantClient = await getQdrantClient();
-//
-//     const vectorStore = await QdrantVectorStore.fromDocuments([], embeddings, {
-//       url: process.env.QDRANT_URL!,
-//       collectionName: process.env.QDRANT_COLLECTION_NAME!,
-//       client: qdrantClient,
-//     });
-//
-//     const { stream, handlers } = LangChainStream({
-//       experimental_streamData: true,
-//     });
-//     const data = new experimental_StreamData();
-//
-//     // Creates a standalone question from the chat-history and the current question
-//     const STANDALONE_QUESTION_TEMPLATE = `Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.
-// Chat History:
-// {chat_history}
-// Follow Up Input: {question}
-// Standalone question:`;
-//
-//     // Actual question you ask the chat and send the response to client
-//     const QA_TEMPLATE = `You are a medical assistant expert specifically trained on medical books.
-// If the user asks something that does not exist within the provided context, Answer the question and add, at the end: 'This is not a 100% reliable. So make your research before using the information you received just now'.
-// If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context.
-// {context}
-//
-// Question: {question}
-// Helpful answer in markdown:`;
-//
-//     const chain = ConversationalRetrievalQAChain.fromLLM(
-//       chatModel,
-//       vectorStore.asRetriever(),
-//       {
-//         qaTemplate: QA_TEMPLATE,
-//         returnSourceDocuments: true, //default 4
-//         returnGeneratedQuestion: false, //default false
-//         questionGeneratorChainOptions: {
-//           llm: contextSearchModel,
-//           template: STANDALONE_QUESTION_TEMPLATE,
-//         },
-//       },
-//     );
-//
-//     // Question using chat-history
-//     // Reference https://js.langchain.com/docs/modules/chains/popular/chat_vector_db#externally-managed-memory
-//     chain
-//       .call(
-//         {
-//           question: sanitizedQuestion,
-//           chat_history: formattedPreviousMessages.join("\n"),
-//         },
-//         [handlers],
-//       )
-//       .then(async (res) => {
-//         const sourceDocuments = res?.sourceDocuments;
-//         const firstTwoDocuments = sourceDocuments.slice(0, 2);
-//         const pageContents = firstTwoDocuments.map(
-//           ({ pageContent }: { pageContent: string }) => pageContent,
-//         );
-//         console.log("already appended ", data);
-//         data.append({
-//           sources: pageContents,
-//         });
-//         data.close();
-//       });
-//
-//     // Return the readable stream
-//     return new StreamingTextResponse(stream, {}, data);
-//   } catch (e) {
-//     console.error(e);
-//     throw new Error("Call chain method failed to execute successfully!!");
-//   }
-// }
-//
-// function parseMessages(m: Message) {
-//   return m.role == "user"
-//     ? new HumanMessage(m.content)
-//     : m.role == "system"
-//       ? new SystemMessage(m.content)
-//       : new AIMessage(m.content);
-// }

@@ -14,7 +14,7 @@ import { useEffect } from "react";
 import { AppHeader } from "@/components/custom/app-header";
 import PostAction from "@/components/custom/post-actions";
 import PostInfo from "@/components/custom/post-info";
-import { MarketingFooter } from "@/components/custom/footer";
+import { AppFooter, MarketingFooter } from "@/components/custom/footer";
 
 export default function Page({ params }: { params: { postId: string } }) {
   const { data: postDetails, isLoading: isPostsLoading } = useQuery({
@@ -82,7 +82,7 @@ export default function Page({ params }: { params: { postId: string } }) {
           replies={postDetails?.replies.length}
         />
       </div>
-      <MarketingFooter />
+      <AppFooter />
     </>
   );
 }

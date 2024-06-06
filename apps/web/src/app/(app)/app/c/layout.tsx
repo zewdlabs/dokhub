@@ -17,6 +17,7 @@ import { Icons } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import AccountButton from "@/components/custom/account";
 
 export const metadata: Metadata = {
   title:
@@ -105,22 +106,7 @@ export default async function ChatLayout({
             </SheetContent>
           </Sheet>
           <div className="w-full flex-1"></div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="icon" className="rounded-full">
-                <CircleUser className="h-5 w-5" />
-                <span className="sr-only">Toggle user menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Support</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <AccountButton session={session} />
         </header>
         <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
           {children}

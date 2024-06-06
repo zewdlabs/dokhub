@@ -50,7 +50,7 @@ export const middleware = auth(async (req) => {
 
     if (pathname.endsWith("/c")) {
       return Response.redirect(
-        new URL(`/app/c/${req.auth.user!.id!}-${crypto.randomUUID()}`, req.url),
+        new URL(`/app/c/${crypto.randomUUID()}`, req.url),
       );
     }
 
