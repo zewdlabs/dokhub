@@ -9,6 +9,8 @@ import { PrismaService } from '@/modules/prisma/prisma.service';
 import { PrismaModule } from '@/modules/prisma/prisma.module';
 import { UserModule } from '@/modules/users/user.module';
 import { AccessTokenStrategy } from './strategies/accessToken.strategy';
+import { EmailService } from '../email/email.service';
+// import { EmailService } from '@/email/email.service';
 
 @Module({
   imports: [PrismaModule, PassportModule, JwtModule.register({}), UserModule],
@@ -19,6 +21,7 @@ import { AccessTokenStrategy } from './strategies/accessToken.strategy';
     RefreshTokenStrategy,
     PrismaService,
     AccessTokenStrategy,
+    EmailService,
   ],
 })
 export class AuthModule {}

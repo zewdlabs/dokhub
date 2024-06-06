@@ -124,7 +124,9 @@ export class UserController {
     return this.userService.deleteUser({ id: id });
   }
 
-  @Post('upload-profile-picture')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @Post('upload-profile-picture/:id')
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -142,10 +144,22 @@ export class UserController {
   @ApiResponse({ status: 201, description: 'The URL of the uploaded file.' })
   async uploadProfilePicture(
     @UploadedFile() file: Express.Multer.File,
+    @Param('id') id: string,
   ): Promise<{ url: string }> {
     const fileName = await this.minioService.uploadFile(file);
     const fileUrl = await this.minioService.getFileUrl(fileName);
+    await this.userService.updateProfilePath(id, fileUrl);
     console.log('================================', fileUrl);
     return { url: fileUrl };
+  }
+
+  @Post('follow')
+  @UseGuards(AccessTokenGuard, RoleGuard)
+  @ApiBearerAuth()
+  async followUser(
+    @Body() followData: { userId: string; userToFollowId: string },
+  ): Promise<void> {
+    const { userId, userToFollowId } = followData;
+    await this.userService.updateUserFollowing(userId, userToFollowId);
   }
 }

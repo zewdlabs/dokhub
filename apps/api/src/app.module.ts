@@ -10,6 +10,7 @@ import { UserModule } from '@/modules/users/user.module';
 import { PostsModule } from '@/modules/posts/posts.module';
 import { MinioModule } from '@/modules/minio/minio.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { EmailService } from '@/modules/email/email.service';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     EventEmitterModule.forRoot(),
   ],
   controllers: [AppController],
+  providers: [EmailService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

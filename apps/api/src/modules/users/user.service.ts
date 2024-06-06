@@ -130,4 +130,65 @@ export class UserService {
       data: { verificationStatus: VerificationStatus.VERIFIED },
     });
   }
+  async updateProfilePath(userId: string, url: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { profileUrl: url },
+    });
+  }
+  async updateUserFollowing(
+    userId: string,
+    userToFollowId: string,
+  ): Promise<void> {
+    // Check if the user exists
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // Check if the user to follow exists
+    const userToFollow = await this.prisma.user.findUnique({
+      where: { id: userToFollowId },
+    });
+    if (!userToFollow) {
+      throw new Error('User to follow not found');
+    }
+    await this.prisma.follows.create({
+      data: {
+        followedById: userId,
+        followingId: userToFollowId,
+      },
+    });
+
+    // Update the followedBy list and counts for the user being followed
+    await this.prisma.follows.create({
+      data: {
+        followedById: userToFollowId,
+        followingId: userId,
+      },
+    });
+    // Update the following list
+    // await this.prisma.user.update({
+    //   where: { id: userId },
+    //   data: {
+    //     following: {
+    //       connect: { id: userToFollowId },
+    //     },
+    //     followingCount: user.followingCount + 1, // Increment following count
+    //   },
+    // });
+
+    // // Update the followedBy list and counts for the user being followed
+    // await this.prisma.user.update({
+    //   where: { id: userToFollowId },
+    //   data: {
+    //     followedBy: {
+    //       connect: { id: userId },
+    //     },
+    //     followedByCount: userToFollow.followingCount + 1, // Increment followedBy count
+    //   },
+    // });
+  }
 }

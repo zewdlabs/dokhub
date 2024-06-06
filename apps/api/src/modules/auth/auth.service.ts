@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -17,6 +18,7 @@ import { UserDto } from './dto/user.dto';
 import * as nodemailer from 'nodemailer';
 import crypto from 'crypto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { EmailService } from '@/modules/email/email.service';
 // import { CLIENT_RENEG_LIMIT } from 'tls';
 
 const fakeUsers = [
@@ -39,36 +41,60 @@ export class AuthService {
     private prisma: PrismaService,
     private usersService: UserService,
     private jwtService: JwtService,
+    private emailService: EmailService,
     private configService: ConfigService,
   ) {}
 
   async signUp(data: CreateUserDto) {
-    // Check if user exists
-    const userExists = await this.usersService.findByEmail(data.email);
+    try {
+      // Check if user exists
+      const userExists = await this.usersService.findByEmail(data.email);
+      if (userExists) {
+        throw new BadRequestException('User already exists');
+      }
 
-    if (userExists) {
-      throw new BadRequestException('User already exists');
+      // Create new user
+      const newUser = await this.usersService.createUser(data);
+
+      // Generate verification code
+      const verificationCode = this.generateVerificationCode().toString();
+      console.log(verificationCode);
+
+      // Save verification code in database
+      await this.prisma.emailVerification.create({
+        data: {
+          code: verificationCode,
+          email: data.email,
+          userId: newUser.id,
+        },
+      });
+
+      // Send verification email
+      await this.sendVerificationEmail(data.email, verificationCode);
+
+      // Generate tokens
+      const tokens = await this.getTokens(
+        newUser.id,
+        newUser.email,
+        newUser.role,
+      );
+      await this.updateRefreshToken(newUser, tokens.refreshToken);
+
+      // Return success message
+      return { message: 'User created successfully' };
+    } catch (error) {
+      console.error('Error during user sign up:', error);
+
+      // Handle known errors
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+
+      // Handle unknown errors
+      throw new InternalServerErrorException(
+        'An error occurred during sign up',
+      );
     }
-
-    const newUser = await this.usersService.createUser(data);
-    const verificationCode = this.generateVerificationCode().toString();
-    console.log(verificationCode);
-    await this.prisma.emailVerification.create({
-      data: {
-        code: verificationCode,
-        email: data.email,
-        userId: newUser.id,
-      },
-    });
-
-    await this.sendVerificationEmail(data.email, verificationCode);
-    const tokens = await this.getTokens(
-      newUser.id,
-      newUser.email,
-      newUser.role,
-    );
-    await this.updateRefreshToken(newUser, tokens.refreshToken);
-    return;
   }
 
   async login(
@@ -123,24 +149,34 @@ export class AuthService {
   }
 
   private async sendVerificationEmail(email: string, code: string) {
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
-      secure: false,
-      auth: {
-        user: this.configService.get<string>('EMAIL_USERNAME'),
-        pass: this.configService.get<string>('EMAIL_PASSWORD'),
-      },
-    });
+    // const transporter = nodemailer.createTransport({
+    //   host: 'https://smtp.gmail.com',
+    //   port: 587,
+    //   secure: false,
+    //   auth: {
+    //     user: this.configService.get<string>('EMAIL_USERNAME'),
+    //     pass: this.configService.get<string>('EMAIL_PASSWORD'),
+    //   },
+    // });
 
-    const mailOptions = {
-      from: this.configService.get<string>('EMAIL_USERNAME'),
-      to: email,
-      subject: 'Email Verification',
-      text: `Please verify your email using this code: ${code}`,
-    };
+    // const transporter = nodemailer.createTransport({
+    //   host: this.configService.get<string>('EMAIL_HOST'),
+    //   port: this.configService.get<number>('EMAIL_PORT'),
+    //   secure: false, // false for TLS
+    //   auth: {
+    //     user: this.configService.get<string>('EMAIL_USERNAME'),
+    //     pass: this.configService.get<string>('EMAIL_PASSWORD'),
+    //   },
+    // });
 
-    await transporter.sendMail(mailOptions);
+    // const mailOptions = {
+    //   from: this.configService.get<string>('EMAIL_USERNAME'),
+    //   to: email,
+    //   subject: 'Email Verification',
+    //   text: `Please verify your email using this code: ${code}`,
+    // };
+    await this.emailService.sendVerificationEmail(email, code);
+    // await transporter.sendMail(mailOptions);
   }
 
   async updateRefreshToken(user: User, refreshToken: string) {
@@ -259,6 +295,16 @@ export class AuthService {
     const resetToken = crypto.randomBytes(32).toString('hex');
     const hashedToken = await bcrypt.hash(resetToken, 10);
 
+    const existingVerification = await this.prisma.emailVerification.findUnique(
+      {
+        where: { email: user.email },
+      },
+    );
+    if (existingVerification) {
+      await this.prisma.emailVerification.delete({
+        where: { email: user.email },
+      });
+    }
     await this.prisma.emailVerification.create({
       data: {
         code: hashedToken,
@@ -267,10 +313,11 @@ export class AuthService {
         expiresAt: new Date(Date.now() + 3600000), // 1 hour
       },
     });
+    // await this.emailService.sendPasswordResetEmail(user.email, hashedToken);
     const transporter = nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
-      secure: false,
+      host: this.configService.get<string>('EMAIL_HOST'),
+      port: this.configService.get<number>('EMAIL_PORT'),
+      secure: false, // false for TLS
       auth: {
         user: this.configService.get<string>('EMAIL_USERNAME'),
         pass: this.configService.get<string>('EMAIL_PASSWORD'),
@@ -285,7 +332,7 @@ export class AuthService {
   }
 
   async resetPassword(data: ResetPasswordDto): Promise<void> {
-    console.log(']]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]', data);
+    // console.log(']]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]', data);
     const { email, token, newPassword } = data;
 
     const emailVerification = await this.prisma.emailVerification.findUnique({

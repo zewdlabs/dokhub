@@ -584,11 +584,20 @@
         ]
       }
     },
-    "/api/user/upload-profile-picture": {
+    "/api/user/upload-profile-picture/{id}": {
       "post": {
         "operationId": "UserController_uploadProfilePicture",
         "summary": "Upload profile picture",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -609,7 +618,28 @@
           "201": {
             "description": "The URL of the uploaded file."
           }
-        }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/user/follow": {
+      "post": {
+        "operationId": "UserController_followUser",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/organization": {
