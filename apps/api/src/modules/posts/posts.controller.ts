@@ -82,4 +82,9 @@ export class PostsController {
   ) {
     return this.postsService.replyToPost(postId, replyPostDto);
   }
+
+  @Get(':postId/reply')
+  async getReplies(@Param('postId') postId: string) {
+    return this.postsService.getReplies(postId);
+  }
 }

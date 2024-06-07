@@ -16,6 +16,13 @@ export class PostsService {
     private eventEmitter: EventEmitter2,
   ) {}
 
+  async getReplies(postId: string): Promise<Post[]> {
+    return await this.prisma.post.findMany({
+      where: { replyToPostId: postId },
+      include: { author: true },
+    });
+  }
+
   async create(createPostDto: CreatePostDto): Promise<Post> {
     const user = await this.usersService.findOne(createPostDto.authorId);
 

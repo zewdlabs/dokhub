@@ -15,6 +15,7 @@ import { AppHeader } from "@/components/custom/app-header";
 import PostAction from "@/components/custom/post-actions";
 import PostInfo from "@/components/custom/post-info";
 import { AppFooter } from "@/components/custom/footer";
+import ReplyList from "@/components/custom/reply-list";
 
 export default function Page({ params }: { params: { postId: string } }) {
   const { data: postDetails, isLoading: isPostsLoading } = useQuery({
@@ -81,6 +82,7 @@ export default function Page({ params }: { params: { postId: string } }) {
           likes={postDetails?.postLikeCount}
           replies={postDetails?.replies.length}
         />
+        <ReplyList postId={params.postId} />
       </div>
       <AppFooter />
     </>
