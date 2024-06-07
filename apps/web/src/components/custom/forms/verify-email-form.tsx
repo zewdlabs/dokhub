@@ -53,7 +53,7 @@ export default function VerifyEmailForm() {
         throw new Error(error.message);
       }
 
-      return router.push("/auth/signin");
+      return router.push("/auth/onboarding/personal");
     }
   );
 

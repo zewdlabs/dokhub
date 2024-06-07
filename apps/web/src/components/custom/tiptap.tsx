@@ -33,11 +33,9 @@ export default function Tiptap({
 
   const [titleState, setTitleState] = useState(title);
 
-  const { complete, completion } =
-    useCompletion({
-      api: "/api/completion",
-    });
-
+  const { complete, completion } = useCompletion({
+    api: "/api/completion",
+  });
 
   const editor = useEditor({
     extensions: [
@@ -46,8 +44,7 @@ export default function Tiptap({
         addKeyboardShortcuts() {
           return {
             "Mod-Enter": () => {
-              const prompt = this.editor
-                .getText()
+              const prompt = this.editor.getText();
 
               console.log(this.editor.getJSON());
 
@@ -74,7 +71,7 @@ export default function Tiptap({
         openOnClick: "whenNotEditable",
         HTMLAttributes: {
           class: cn(
-            buttonVariants({ variant: "link", className: "px-0 py-0" }),
+            buttonVariants({ variant: "link", className: "px-0 py-0" })
           ),
         },
       }),
@@ -142,33 +139,6 @@ export default function Tiptap({
       {editor && <EditorToolbar editor={editor} />}
       {editor && (
         <BubbleMenu editor={editor}>
-          <ToggleGroup type="multiple">
-            <ToggleGroupItem
-              value="bold"
-              aria-label="Toggle bold"
-              onClick={() => editor.chain().focus().toggleBold().run()}
-              disabled={!editor.can().chain().focus().toggleBold().run()}
-            >
-              <Icons.bold className="h-5 w-5" />
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              value="italic"
-              aria-label="Toggle italic"
-              onClick={() => editor.chain().focus().toggleItalic().run()}
-              disabled={!editor.can().chain().focus().toggleItalic().run()}
-            >
-              <Icons.italic className="h-5 w-5" />
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              value="underline"
-              aria-label="Toggle underline"
-              onClick={() => editor.chain().focus().toggleUnderline().run()}
-              disabled={!editor.can().chain().focus().toggleStrike().run()}
-            >
-              <Icons.underline className="h-5 w-5" />
-            </ToggleGroupItem>
-          </ToggleGroup>
-
           <ToggleGroup type="multiple">
             <ToggleGroupItem
               value="bold"

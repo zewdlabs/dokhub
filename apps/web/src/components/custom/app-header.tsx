@@ -97,7 +97,7 @@ export function EditorHeader({ id }: { id: string }) {
     <header className="sticky top-0 left-0 backdrop-blur-3xl border-b-[1px] border-border z-50 items-center">
       <div className="container px-4 flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <Link href="/">
+          <Link href="/app">
             <Icons.logo className="w-28 h-20" />
           </Link>
           <Separator orientation="vertical" className="h-8" />
@@ -204,7 +204,7 @@ export function AppHeader() {
     <header className="sticky top-0 left-0 backdrop-blur-3xl gap-4 px-4 md:px-6 border-b-[1px] border-border z-50 items-center">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <Link href="/">
+          <Link href="/app">
             {pathname.startsWith("/app/c") ? (
               <Icons.dokbot fill="none" className="w-28" />
             ) : (

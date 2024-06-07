@@ -40,14 +40,14 @@ export default async function ChatLayout({
       <div className="hidden border-r bg-muted/40 md:block">
         <div className="flex h-full max-h-screen flex-col gap-2">
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-            <Link href="/" className="flex items-center gap-2 font-semibold">
+            <Link href="/app" className="flex items-center gap-2 font-semibold">
               <Icons.dokbot fill="none" className="w-24" />
             </Link>
             <Link
               href="/app/c"
               className={cn(
                 buttonVariants({ variant: "outline", size: "icon" }),
-                "ml-auto h-8 w-8",
+                "ml-auto h-8 w-8"
               )}
             >
               <Icons.add className="h-4 w-4" />
@@ -64,7 +64,7 @@ export default async function ChatLayout({
                       href={`/app/c/${id}`}
                       className={cn(
                         buttonVariants({ variant: "ghost" }),
-                        "w-full justify-start",
+                        "w-full justify-start"
                       )}
                     >
                       <span className="max-w-48 flex-nowrap text-nowrap overflow-hidden">
@@ -108,7 +108,7 @@ export default async function ChatLayout({
                       className={cn(
                         params.id === id
                           ? "flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary"
-                          : "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
+                          : "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
                       )}
                     >
                       <span className="max-w-56 flex-nowrap text-nowrap overflow-hidden">

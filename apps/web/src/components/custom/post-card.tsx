@@ -54,7 +54,7 @@ export default function PostCard({ post, tag }: { post: Post; tag: string }) {
               {post.title}
             </CardTitle>
             <CardDescription className="max-w-lg leading-relaxed">
-              {post.description || "Lorem ipsum dolor sit amet"}
+              {post.description || "No description available"}
             </CardDescription>
           </CardHeader>
           <div className="relative mr-4 rounded-lg h-36 overflow-hidden">
