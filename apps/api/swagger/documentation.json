@@ -667,6 +667,26 @@
         ]
       }
     },
+    "/api/user/{userId}/unfollow": {
+      "delete": {
+        "operationId": "UserController_unfollowUser",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/organization": {
       "post": {
         "operationId": "OrganizationController_create",

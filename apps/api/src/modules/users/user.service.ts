@@ -169,27 +169,6 @@ export class UserService {
         followingId: userId,
       },
     });
-    // Update the following list
-    // await this.prisma.user.update({
-    //   where: { id: userId },
-    //   data: {
-    //     following: {
-    //       connect: { id: userToFollowId },
-    //     },
-    //     followingCount: user.followingCount + 1, // Increment following count
-    //   },
-    // });
-
-    // // Update the followedBy list and counts for the user being followed
-    // await this.prisma.user.update({
-    //   where: { id: userToFollowId },
-    //   data: {
-    //     followedBy: {
-    //       connect: { id: userId },
-    //     },
-    //     followedByCount: userToFollow.followingCount + 1, // Increment followedBy count
-    //   },
-    // });
   }
   async searchUsersByName(name: string): Promise<User[]> {
     console.log('Searching for users with name or email containing:', name);
@@ -220,5 +199,38 @@ export class UserService {
     }
 
     return users;
+  }
+  async unfollowUser(userId: string, userToUnfollowId: string): Promise<void> {
+    // Check if the user exists
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Check if the user to unfollow exists
+    const userToUnfollow = await this.prisma.user.findUnique({
+      where: { id: userToUnfollowId },
+    });
+    if (!userToUnfollow) {
+      throw new NotFoundException('User to unfollow not found');
+    }
+
+    // Delete the follow relationship
+    await this.prisma.follows.deleteMany({
+      where: {
+        followedById: userId,
+        followingId: userToUnfollowId,
+      },
+    });
+
+    // Optional: you might also want to delete the reciprocal follow relationship
+    await this.prisma.follows.deleteMany({
+      where: {
+        followedById: userToUnfollowId,
+        followingId: userId,
+      },
+    });
   }
 }

@@ -179,4 +179,19 @@ export class UserController {
       throw error;
     }
   }
+  @Delete(':userId/unfollow')
+  async unfollowUser(
+    @Param('userId') userId: string,
+    @Body('userToUnfollowId') userToUnfollowId: string,
+  ) {
+    try {
+      await this.userService.unfollowUser(userId, userToUnfollowId);
+      return { message: 'User unfollowed successfully' };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      }
+      throw error;
+    }
+  }
 }
