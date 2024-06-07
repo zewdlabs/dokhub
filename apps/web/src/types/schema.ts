@@ -8,6 +8,10 @@ export const deletePostSchema = z.object({
   id: z.string(),
 });
 
+export const deleteChatSchema = z.object({
+  id: z.string(),
+});
+
 export const deleteUserSchema = z.object({
   id: z.string(),
 });

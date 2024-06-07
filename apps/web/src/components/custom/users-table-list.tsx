@@ -71,8 +71,6 @@ export default function UserTableList({ tag }: { tag?: string }) {
 
       const data = await res.json();
 
-      console.log("from posts of specific user", data);
-
       return data as User[];
     },
   });

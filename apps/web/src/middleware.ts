@@ -49,9 +49,28 @@ export const middleware = auth(async (req) => {
     }
 
     if (pathname.endsWith("/c")) {
-      return Response.redirect(
-        new URL(`/app/c/${crypto.randomUUID()}`, req.url),
+      const res = await fetch(
+        `http://localhost:4231/api/chat/user/${req.auth.user.id}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${req.auth.tokens.accessToken}`,
+          },
+        },
       );
+
+      if (!res.ok) {
+        console.error(res.statusText);
+        return Response.error();
+      }
+
+      const chat = (await res.json()) as {
+        id: string;
+        userId: string;
+        createdAt: string;
+      };
+
+      return Response.redirect(new URL(`/app/c/${chat.id}`, req.url));
     }
 
     if (pathname.endsWith("/admin/posts")) {

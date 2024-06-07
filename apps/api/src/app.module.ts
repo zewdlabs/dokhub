@@ -9,6 +9,7 @@ import { AuthModule } from '@/modules/auth/auth.module';
 import { UserModule } from '@/modules/users/user.module';
 import { PostsModule } from '@/modules/posts/posts.module';
 import { MinioModule } from '@/modules/minio/minio.module';
+import { ChatModule } from '@/modules/chat/chat.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { EmailService } from '@/modules/email/email.service';
 
@@ -23,6 +24,7 @@ import { EmailService } from '@/modules/email/email.service';
     PostsModule,
     MinioModule,
     EventEmitterModule.forRoot(),
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [EmailService],

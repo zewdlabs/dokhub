@@ -5,7 +5,6 @@ import type { DefaultSession } from "next-auth";
 import { JWT } from "next-auth/jwt";
 
 async function refreshToken(token: JWT): Promise<JWT> {
-  console.log(token.tokens.refreshToken);
   const res = await fetch("http://localhost:4231" + "/api/auth/refresh", {
     cache: "no-store",
     method: "POST",
@@ -14,10 +13,9 @@ async function refreshToken(token: JWT): Promise<JWT> {
     },
     // body: JSON.stringify(token.user)
   });
-  console.log("refreshed");
 
   const response = await res.json();
-  console.log("===============", response);
+
   return {
     ...token,
     backendTokens: response,

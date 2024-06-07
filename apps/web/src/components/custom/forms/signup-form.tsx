@@ -24,7 +24,7 @@ import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { z } from "zod";
 import { signUpSchema } from "@/types/schema";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function SignupForm() {
   const router = useRouter();
@@ -41,7 +41,6 @@ export default function SignupForm() {
 
   const onSubmit = form.handleSubmit(
     async (values: z.infer<typeof signUpSchema>) => {
-      // TODO: call the backend api to create a new user. Then it should send an email to the user for confirmation
       console.log(values);
       const res = await fetch("http://localhost:4231/api/auth/signup", {
         method: "POST",
@@ -63,7 +62,7 @@ export default function SignupForm() {
       console.log("----------------", response);
       router.push(`/auth/verify-email?email=${values.email}`);
       console.log({ response });
-    }
+    },
   );
 
   return (

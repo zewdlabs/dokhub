@@ -16,6 +16,30 @@ CREATE TYPE "PostStatus" AS ENUM ('DRAFT', 'PUBLISHED', 'SUSPENDED');
 -- CreateEnum
 CREATE TYPE "Role" AS ENUM ('SUADMIN', 'CREATOR', 'ADMIN', 'USER');
 
+-- CreateEnum
+CREATE TYPE "MessageRole" AS ENUM ('user', 'assistant', 'system');
+
+-- CreateTable
+CREATE TABLE "messages" (
+    "id" TEXT NOT NULL,
+    "chatId" TEXT NOT NULL,
+    "content" TEXT NOT NULL,
+    "role" "MessageRole" NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "messages_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "chats" (
+    "id" TEXT NOT NULL,
+    "title" TEXT,
+    "userId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "chats_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateTable
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
@@ -35,7 +59,7 @@ CREATE TABLE "users" (
     "followedByCount" INTEGER NOT NULL DEFAULT 0,
     "followingCount" INTEGER NOT NULL DEFAULT 0,
     "profileUrl" TEXT,
-    "emailVerified" BOOLEAN NOT NULL DEFAULT false,
+    "emailVerified" TIMESTAMP(3),
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -283,6 +307,12 @@ CREATE UNIQUE INDEX "_OrganizationToPost_AB_unique" ON "_OrganizationToPost"("A"
 
 -- CreateIndex
 CREATE INDEX "_OrganizationToPost_B_index" ON "_OrganizationToPost"("B");
+
+-- AddForeignKey
+ALTER TABLE "messages" ADD CONSTRAINT "messages_chatId_fkey" FOREIGN KEY ("chatId") REFERENCES "chats"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "chats" ADD CONSTRAINT "chats_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "memberships" ADD CONSTRAINT "memberships_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

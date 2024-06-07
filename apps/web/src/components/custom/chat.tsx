@@ -1,7 +1,7 @@
 "use client";
 
 import { scrollToBottom } from "@/lib/utils";
-import { useChat } from "ai/react";
+import { useChat, useCompletion } from "ai/react";
 import { useEffect, useRef } from "react";
 import { ChatLine } from "./chat-bubble";
 import { Message } from "ai";
@@ -12,10 +12,87 @@ import { CornerDownLeft } from "lucide-react";
 
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "next-auth/react";
+import { useQuery } from "@tanstack/react-query";
 
-export default function ChatWebUI() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } =
-    useChat({});
+export default function ChatWebUI({ chatId }: { chatId: string }) {
+  const session = useSession();
+
+  const { complete, completion: cmp } = useCompletion({
+    api: "/api/generate",
+    onFinish: async (_, completion) => {
+      console.log("received in completion", completion);
+      console.log("from the top", cmp);
+      const res = await fetch(
+        `http://localhost:4231/api/chat/user/${session.data?.user.id}/${chatId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.data?.tokens.accessToken}`,
+          },
+          body: JSON.stringify({
+            title: completion,
+          }),
+        },
+      );
+      console.log("response", await res.json());
+
+      if (!res.ok) {
+        console.error("An error occurred while saving the note");
+        throw new Error("Network response was not ok");
+      }
+    },
+  });
+
+  const {
+    messages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    isLoading,
+    setMessages,
+  } = useChat({
+    body: { chatId, userId: session.data?.user?.id },
+    onFinish: async (message) => {
+      console.log("received in chat", message);
+
+      console.log(messages.length);
+
+      console.log(messages.length == 2);
+
+      if (messages.length == 2) {
+        console.log("completing and generating title", messages);
+
+        await complete(messages[0].content);
+      }
+    },
+  });
+
+  const messagesFromDb = useQuery({
+    queryKey: ["messages", chatId],
+    queryFn: async () => {
+      const res = await fetch(
+        `http://localhost:4231/api/chat/user/${session.data?.user.id}/${chatId}`,
+      );
+
+      if (!res.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await res.json();
+
+      console.log("where are the messages", data);
+
+      return data as Message[];
+    },
+  });
+
+  useEffect(() => {
+    if (messagesFromDb.data) {
+      setMessages(messagesFromDb.data);
+    }
+  }, [messagesFromDb.data]);
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);

@@ -1,23 +1,16 @@
 import type { Metadata } from "next";
 import type { PropsWithChildren } from "react";
 import Link from "next/link";
-import { CircleUser, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Icons } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import AccountButton from "@/components/custom/account";
+import ChatOption from "@/components/custom/chat-option";
 
 export const metadata: Metadata = {
   title:
@@ -34,7 +27,13 @@ export default async function ChatLayout({
     redirect("/auth/signin");
   }
 
-  const chatHistoryIDs: string[] = [];
+  const chatHistory = (await (
+    await fetch(`http://localhost:4231/api/chat/user/${session.user.id}`, {
+      headers: {
+        Authorization: `Bearer ${session.tokens.accessToken}`,
+      },
+    })
+  ).json()) as { id: string; title: string }[];
 
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
@@ -44,28 +43,37 @@ export default async function ChatLayout({
             <Link href="/" className="flex items-center gap-2 font-semibold">
               <Icons.dokbot fill="none" className="w-24" />
             </Link>
-            <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
+            <Link
+              href="/app/c"
+              className={cn(
+                buttonVariants({ variant: "outline", size: "icon" }),
+                "ml-auto h-8 w-8",
+              )}
+            >
               <Icons.add className="h-4 w-4" />
               <span className="sr-only">Start a new chat</span>
-            </Button>
+            </Link>
           </div>
           <div className="flex-1">
             <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-              {session?.user?.id &&
-                chatHistoryIDs &&
-                chatHistoryIDs.map((id) => (
-                  <Link
-                    href={`/app/c/${id}`}
-                    className={cn(
-                      params.id === id
-                        ? "flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary"
-                        : "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
-                    )}
-                  >
-                    <span className="max-w-56 flex-nowrap text-nowrap overflow-hidden">
-                      Chat with AI
-                    </span>
-                  </Link>
+              {session.user?.id &&
+                chatHistory &&
+                chatHistory.map(({ id, title }) => (
+                  <div className="flex justify-between items-center">
+                    <Link
+                      key={id}
+                      href={`/app/c/${id}`}
+                      className={cn(
+                        buttonVariants({ variant: "ghost" }),
+                        "w-full justify-start",
+                      )}
+                    >
+                      <span className="max-w-56 flex-nowrap text-nowrap overflow-hidden">
+                        {title || "New chat"}
+                      </span>
+                    </Link>
+                    <ChatOption id={id} />
+                  </div>
                 ))}
             </nav>
           </div>
@@ -87,8 +95,8 @@ export default async function ChatLayout({
             <SheetContent side="left" className="flex flex-col">
               <nav className="grid gap-2 text-lg font-medium">
                 {session?.user?.id &&
-                  chatHistoryIDs &&
-                  chatHistoryIDs.map((id) => (
+                  chatHistory &&
+                  chatHistory.map(({ id }) => (
                     <Link
                       href={`/app/c/${id}`}
                       className={cn(
@@ -98,7 +106,7 @@ export default async function ChatLayout({
                       )}
                     >
                       <span className="max-w-56 flex-nowrap text-nowrap overflow-hidden">
-                        Chat with AI
+                        New chat
                       </span>
                     </Link>
                   ))}

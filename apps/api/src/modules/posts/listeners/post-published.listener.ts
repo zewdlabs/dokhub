@@ -9,19 +9,16 @@ export class PostPublishedListener {
 
   @OnEvent('post.published', { async: true, promisify: true })
   async handleOrderCreatedEvent(event: PostPublishedEvent) {
-    console.log('Post published', event);
     const following = await this.prisma.follows.findMany({
       where: { followingId: event.author.id },
     });
 
-    const data = await this.prisma.forYou.createMany({
+    await this.prisma.forYou.createMany({
       data: following.map((f) => ({
         userId: f.followedById,
         postId: event.post.id,
       })),
       skipDuplicates: true,
     });
-
-    console.log('Post notification complete', data);
   }
 }

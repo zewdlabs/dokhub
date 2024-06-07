@@ -21,6 +21,9 @@ import type { Document } from "@langchain/core/documents";
 import { ChatOllama } from "@langchain/community/chat_models/ollama";
 import { NextRequest, NextResponse } from "next/server";
 import { LangChainAdapter, Message, StreamingTextResponse } from "ai";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
+import { UpstashRatelimitHandler } from "@langchain/community/callbacks/handlers/upstash_ratelimit";
 
 export const dynamic = "force-dynamic";
 
@@ -171,27 +174,82 @@ const createChain = (llm: BaseChatModel, retriever: Runnable) => {
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages } = (await req.json()) as { messages: Message[] };
+    const { messages, userId, chatId } = (await req.json()) as {
+      messages: Message[];
+      userId: string;
+      chatId: string;
+    };
 
     const input = {
       chat_history: messages,
       question: messages[messages.length - 1].content,
     };
 
-    console.log();
+    const ratelimit = new Ratelimit({
+      redis: new Redis({
+        url: process.env.UPSTASH_REDIS_REST_URL,
+        token: process.env.UPSTASH_REDIS_REST_TOKEN,
+      }),
+      limiter: Ratelimit.fixedWindow(1, "60 s"),
+    });
+
+    const rateLimitingHandler = new UpstashRatelimitHandler(userId, {
+      requestRatelimit: ratelimit,
+    });
 
     const llm = new ChatOllama({
       baseUrl: process.env.OLLAMA_BASE_URL,
       model: "llama3:latest",
-      temperature: 0.4,
+      temperature: 0,
     });
 
     const retriever = await getRetriever();
     const answerChain = createChain(llm, retriever);
 
-    const chainStream = await answerChain.stream(input);
+    const chainStream = await answerChain.stream(input, {
+      callbacks: [rateLimitingHandler],
+    });
 
-    const stream = LangChainAdapter.toAIStream(chainStream);
+    const stream = LangChainAdapter.toAIStream(chainStream, {
+      onStart: async () => {
+        const res = await fetch(
+          `http://localhost:4231/api/chat/user/${userId}/${chatId}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              content: messages[messages.length - 1].content,
+              role: messages[messages.length - 1].role,
+            }),
+          },
+        );
+
+        if (!res.ok) {
+          console.error("Failed to send message to backend");
+        }
+      },
+      onCompletion: async (completion) => {
+        const res = await fetch(
+          `http://localhost:4231/api/chat/user/${userId}/${chatId}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              content: completion,
+              role: "assistant",
+            }),
+          },
+        );
+
+        if (!res.ok) {
+          console.error("Failed to send message to backend");
+        }
+      },
+    });
 
     return new StreamingTextResponse(stream);
   } catch (e) {

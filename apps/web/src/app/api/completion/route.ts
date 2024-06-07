@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     
     user: ${prompt}
 `,
-      temperature: 0.3,
+      temperature: 0.2,
     });
 
     return new StreamingTextResponse(result.toAIStream());
