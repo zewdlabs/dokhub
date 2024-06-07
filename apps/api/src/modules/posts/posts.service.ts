@@ -37,6 +37,26 @@ export class PostsService {
     return post;
   }
 
+  async replyToPost(
+    postId: string,
+    replyPostDto: CreatePostDto,
+  ): Promise<Post> {
+    const post = await this.prisma.post.findUnique({
+      where: { id: postId },
+    });
+
+    if (!post) {
+      throw new Error('Post not found');
+    }
+
+    return await this.prisma.post.create({
+      data: {
+        ...replyPostDto,
+        replyToPostId: postId,
+      },
+    });
+  }
+
   async findAll(): Promise<Post[]> {
     return await this.prisma.post.findMany({
       where: {
@@ -193,7 +213,6 @@ export class PostsService {
   }
 
   async update(id: string, updatePostDto: UpdatePostDto): Promise<Post> {
-    console.log('__________', updatePostDto);
     const post = await this.prisma.post.findUnique({
       where: { id },
     });
@@ -210,15 +229,12 @@ export class PostsService {
     });
 
     if (data.publishedAt) {
-      console.log('Post published', data);
       const postPublishedEvent = new PostPublishedEvent();
       postPublishedEvent.post = data;
       const user = await this.usersService.findOne(data.authorId);
       if (user) {
         postPublishedEvent.author = user;
       }
-
-      console.log('event payload', postPublishedEvent);
 
       this.eventEmitter.emit('post.published', postPublishedEvent);
     }

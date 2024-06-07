@@ -17,7 +17,6 @@ export class RefreshJwtGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
-    console.log('---------------------', token);
     if (!token) throw new UnauthorizedException();
 
     try {
@@ -25,7 +24,6 @@ export class RefreshJwtGuard implements CanActivate {
         secret:
           this.configService.get<string>('JWT_REFRESH_SECRET') || 'secrtuteiw',
       });
-      //   console.log('2222222222222222222222', payload);
       request['user'] = payload;
     } catch {
       throw new UnauthorizedException();
@@ -35,9 +33,7 @@ export class RefreshJwtGuard implements CanActivate {
   }
 
   private extractTokenFromHeader(request: Request) {
-    // console.log('12312321321321', request.headers.authorization);
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    // console.log(type, token);
     return type === 'Refresh' ? token : undefined;
   }
 }

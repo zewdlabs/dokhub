@@ -27,14 +27,11 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { profileFormSchema } from "@/types/schema";
 import { useQuery } from "@tanstack/react-query";
-import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export function ProfileForm() {
-  const session = useSession();
-
   const { data: userData } = useQuery({
     queryKey: ["user", "profile"],
     queryFn: async () => {
@@ -47,7 +44,6 @@ export function ProfileForm() {
 
       const data = await res.json();
 
-      console.log({ data });
       return data;
     },
   });
@@ -68,6 +64,7 @@ export function ProfileForm() {
   });
 
   function onSubmit(data: ProfileFormValues) {
+    console.info(data);
     toast("You submitted the following values");
   }
 
@@ -160,7 +157,7 @@ export function ProfileForm() {
             variant="outline"
             size="sm"
             className="mt-2"
-            onClick={() => append({ value: "" })}
+            onClick={() => append({ value: "", name: "" })}
           >
             Add URL
           </Button>

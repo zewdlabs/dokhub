@@ -40,17 +40,15 @@ export default function SigninForm() {
       const response = await signIn("credentials", {
         ...values,
         redirect: true, // Use redirect: false to handle errors in the front-end
-        callbackUrl: 'http://localhost:3000',
+        callbackUrl: "http://localhost:3000",
       });
-  
+
       if (response?.error) {
         // Handle the error here
         console.error("Sign-in error:", response.error);
         // You can display the error message to the user
-       
       } else {
         // If there is no error, redirect to the callback URL
-        console.log(response);
         if (response?.url) {
           // window.location.href = response.url;
         }

@@ -26,8 +26,11 @@ import { z } from "zod";
 import { cn } from "@/lib/utils";
 import { onboardingPersonalInfoSchema } from "@/types/schema";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export default function OnboardingPersonalInfoForm() {
+  const session = useSession();
+
   const router = useRouter();
   const form = useForm<z.infer<typeof onboardingPersonalInfoSchema>>({
     resolver: zodResolver(onboardingPersonalInfoSchema),
@@ -42,9 +45,28 @@ export default function OnboardingPersonalInfoForm() {
   const onSubmit = form.handleSubmit(
     async (values: z.infer<typeof onboardingPersonalInfoSchema>) => {
       // NOTE: You can send the form data to the server here some api call
-      console.log(values);
+      const res = await fetch(
+        `http://localhost:4231/api/user/${session.data?.user.id}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.data?.tokens.accessToken}`,
+          },
+          body: JSON.stringify({
+            speciality: values.speciality,
+            occupation: values.occupation,
+            medicalLicense: values.medicalLicense,
+            yearsOfExperience: values.yearsOfExperience,
+          }),
+        },
+      );
 
-      router.push("/auth/onboarding/socials");
+      if (!res.ok) {
+        throw new Error("This isn't supposed to happen");
+      }
+
+      // TODO: Add socials after everything else
+      router.push("/auth/login");
     },
   );
 

@@ -41,7 +41,6 @@ export default function SignupForm() {
 
   const onSubmit = form.handleSubmit(
     async (values: z.infer<typeof signUpSchema>) => {
-      console.log(values);
       const res = await fetch("http://localhost:4231/api/auth/signup", {
         method: "POST",
         headers: {
@@ -58,10 +57,7 @@ export default function SignupForm() {
         alert(res.statusText);
         return;
       }
-      const response = await res.json();
-      console.log("----------------", response);
       router.push(`/auth/verify-email?email=${values.email}`);
-      console.log({ response });
     },
   );
 

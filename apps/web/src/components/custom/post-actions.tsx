@@ -6,21 +6,60 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Ban, Check, Flag, Heart, Reply, Share } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
-import { object } from "zod";
 
 export default function PostAction({
+  postId,
   likes,
   replies,
 }: {
+  postId: string;
   likes?: number;
   replies?: number;
 }) {
+  const router = useRouter();
+
   const pathname = usePathname();
   const base = "http://localhost:3000";
+
+  const session = useSession();
+
+  const createReply = useMutation({
+    mutationKey: ["createReply"],
+    mutationFn: async ({ postId }: { postId: string }) => {
+      const res = await fetch(
+        `http://localhost:4231/api/posts/${postId}/reply`,
+        {
+          method: "POST",
+          body: JSON.stringify({
+            title: "Reply post",
+            content: "<h1>Reply to the post</h1>",
+            public: false,
+            authorId: session.data?.user.id,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to create reply");
+      }
+
+      return await res.json();
+    },
+    onSuccess: (data: any) => {
+      router.push(`/app/new/${data.id}`);
+    },
+  });
+
   return (
     <div className="container max-w-screen-lg px-24">
       <Separator orientation="horizontal" className="my-4" />
@@ -37,7 +76,11 @@ export default function PostAction({
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button
+                variant={"ghost"}
+                size={"icon"}
+                onClick={() => createReply.mutate({ postId })}
+              >
                 <Reply className="h-5 w-5" />
                 <span className="sr-only">Reply</span>
               </Button>

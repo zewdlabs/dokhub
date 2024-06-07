@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -19,8 +19,6 @@ import {
 } from "@/components/ui/form";
 import { useRouter } from "next/navigation";
 import { onboardingSocialInfoSchema } from "@/types/schema";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -42,8 +40,8 @@ export default function OnboardingSocialInfoForm() {
   const onSubmit = form.handleSubmit(
     async (values: z.infer<typeof onboardingSocialInfoSchema>) => {
       // NOTE: You can send the form data to the server here some api call
-      console.log(values);
 
+      console.log(values)
       router.push("/app");
     },
   );

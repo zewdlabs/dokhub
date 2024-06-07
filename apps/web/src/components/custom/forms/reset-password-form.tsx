@@ -15,22 +15,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
 import { useForm } from "react-hook-form";
 import { useRouter, useSearchParams } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { resetPasswordSchema } from "@/types/schema";
 import { z } from "zod";
-import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { Icons } from "@/components/icons";
 
 export default function ResetPasswordForm() {
   const router = useRouter();
@@ -38,9 +31,7 @@ export default function ResetPasswordForm() {
   const searchParams = useSearchParams();
 
   const email = searchParams.get("email");
-  console.log(email);
   const token = searchParams.get("token");
-  console.log(token)
   const form = useForm<z.infer<typeof resetPasswordSchema>>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
@@ -59,7 +50,7 @@ export default function ResetPasswordForm() {
         email: email,
         newPassword: values.password,
         token,
-      }
+      };
       const response = await fetch(
         `http://localhost:4231/api/auth/reset-password`,
         {
@@ -68,7 +59,7 @@ export default function ResetPasswordForm() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(data),
-        }
+        },
       );
       if (!response.ok) {
         const error = await response.json();
@@ -77,7 +68,7 @@ export default function ResetPasswordForm() {
 
       toast.success("Account has been recovered successfully!");
       return router.push("/auth/signin");
-    }
+    },
   );
 
   return (

@@ -58,7 +58,6 @@ export class AuthService {
 
       // Generate verification code
       const verificationCode = this.generateVerificationCode().toString();
-      console.log(verificationCode);
 
       // Save verification code in database
       await this.prisma.emailVerification.create({
@@ -112,7 +111,6 @@ export class AuthService {
       password,
       user.password as string,
     );
-    // console.log(hashedPassword);
     // Step 2: Check if the password is correct
     // const isPasswordValid = user.password === hashedPassword;
 
@@ -124,8 +122,6 @@ export class AuthService {
     // Step 3: Generate a JWT containing the user's ID and return it
     const tokens = await this.getTokens(user.id, user.email, user.role); //user.role
     await this.updateRefreshToken(user, tokens.refreshToken);
-    console.log('IT IS IN THE LOGIN');
-    console.log(tokens);
     const userDto: UserDto = {
       id: user.id,
       email: user.email,
@@ -188,7 +184,6 @@ export class AuthService {
     });
   }
   async getTokens(userId: string, email: string, role: string) {
-    console.log('IT IS IN THE GET TOKENS');
     //, role: string
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(
@@ -234,7 +229,6 @@ export class AuthService {
     }
   }
   async refreshToken(user: any) {
-    console.log('123213213231231231=================', user);
     const tokens = await this.getTokens(user.sub, user.email, user.role);
     const userUpdate = await this.usersService.findOne(user.sub);
     await this.updateRefreshToken(userUpdate as User, tokens.refreshToken);
@@ -332,7 +326,6 @@ export class AuthService {
   }
 
   async resetPassword(data: ResetPasswordDto): Promise<void> {
-    // console.log(']]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]', data);
     const { email, token, newPassword } = data;
 
     const emailVerification = await this.prisma.emailVerification.findUnique({
@@ -354,9 +347,8 @@ export class AuthService {
       data: { password: hashedPassword },
     });
 
-    const deleted = await this.prisma.emailVerification.delete({
+    await this.prisma.emailVerification.delete({
       where: { email },
     });
-    console.log(await deleted);
   }
 }

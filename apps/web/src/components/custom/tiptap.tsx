@@ -11,7 +11,7 @@ import TextAlign from "@tiptap/extension-text-align";
 import Link from "@tiptap/extension-link";
 import { BubbleMenu as BubbleMenuConfig } from "@tiptap/extension-bubble-menu";
 import EditorToolbar from "./editor/toolbar";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useDebounce } from "@/hooks/use-debounce";
 import { buttonVariants } from "../ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
@@ -27,8 +27,6 @@ export default function Tiptap({
   title: string;
   content: string;
 }) {
-  console.log("state received", title, content);
-
   const [editorState, setEditorState] = useState(content);
 
   const [titleState, setTitleState] = useState(title);
@@ -45,9 +43,6 @@ export default function Tiptap({
           return {
             "Mod-Enter": () => {
               const prompt = this.editor.getText();
-
-              console.log(this.editor.getJSON());
-
               complete(prompt);
               return true;
             },

@@ -27,10 +27,6 @@ import path from "path";
 
   const chunkedDocs = await textSplitter.splitDocuments(docs);
 
-  console.log("Loaded", chunkedDocs.length, "documents");
-  console.info("Collection exists");
-  console.log("Uploading documents to Qdrant");
-
   const vectorStore = await QdrantVectorStore.fromDocuments(
     chunkedDocs,
     embeddings,

@@ -2,6 +2,7 @@ import { cn, genFallback } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import AccountButton from "./account";
 import { Post } from "./post-list";
+import Link from "next/link";
 
 export default function PostInfo({
   postDetails,
@@ -20,20 +21,28 @@ export default function PostInfo({
       >
         {postDetails.title}
       </h1>
-      <div className="flex items-center">
-        <Avatar className="h-14 w-14">
-          <AvatarImage src={undefined} alt={postDetails.author.name} />
-          <AvatarFallback>
-            {genFallback(postDetails.author.name)}
-          </AvatarFallback>
-        </Avatar>
-        <div className="flex flex-col ml-4">
-          <p className="font-medium text-lg">{postDetails.author.name}</p>
-          <p className="text-muted-foreground text-sm">
-            {postDetails.minToRead} min read &middot;{" "}
-            {new Date(postDetails.publishedAt).toLocaleDateString()}
-          </p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+          <Avatar className="h-14 w-14">
+            <AvatarImage src={undefined} alt={postDetails.author.name} />
+            <AvatarFallback>
+              {genFallback(postDetails.author.name)}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col ml-4">
+            <p className="font-medium text-lg">{postDetails.author.name}</p>
+            <p className="text-muted-foreground text-sm">
+              {postDetails.minToRead} min read &middot;{" "}
+              {new Date(postDetails.publishedAt).toLocaleDateString()}
+            </p>
+          </div>
         </div>
+
+        {postDetails.replyToPostId && (
+          <Link href={`/app/posts/${postDetails.replyToPostId}`}>
+            Show previous post
+          </Link>
+        )}
       </div>
     </div>
   );

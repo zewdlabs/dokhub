@@ -100,14 +100,13 @@ export class UserController {
   ): Promise<any> {
     console.log(verificationStatus);
     return { message: 'hello' };
-    return await this.userService.findAll(verificationStatus);
+    // return await this.userService.findAll(verificationStatus);
   }
   // @Get('getAll')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
   @Get('filter-by-status/:status')
   async filterByStatus(@Query('status') status?: VerificationStatus) {
-    // console.log('12323343432432432432423432423432');
     return this.userService.getUsersByVerificationStatus(status);
   }
 
@@ -150,7 +149,6 @@ export class UserController {
     const fileName = await this.minioService.uploadFile(file);
     const fileUrl = await this.minioService.getFileUrl(fileName);
     await this.userService.updateProfilePath(id, fileUrl);
-    console.log('================================', fileUrl);
     return { url: fileUrl };
   }
 

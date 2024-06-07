@@ -28,7 +28,7 @@ export interface Post {
 }
 
 export default function PostList({ tag }: { tag?: string }) {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
 
   const { data: posts, isLoading: isPostsLoading } = useQuery({
     queryKey: ["posts", tag, session?.user.id],
@@ -60,8 +60,6 @@ export default function PostList({ tag }: { tag?: string }) {
 
       const data = await res.json();
 
-      console.log("from posts of specific user", data);
-
       return data as Post[];
     },
   });
@@ -73,7 +71,10 @@ export default function PostList({ tag }: { tag?: string }) {
     >
       {isPostsLoading
         ? "loading"
-        : posts && posts.map((post) => <PostCard post={post} key={post.id} />)}
+        : posts &&
+          posts.map((post) => (
+            <PostCard tag={tag || "foryou"} post={post} key={post.id} />
+          ))}
     </TabsContent>
   );
 }

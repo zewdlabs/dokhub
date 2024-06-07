@@ -6,8 +6,6 @@ export const dynamic = "force-dynamic";
 export async function POST(req: Request) {
   const { prompt } = await req.json();
 
-  console.log("received prompt", prompt);
-
   try {
     const result = await streamText({
       maxTokens: 64,

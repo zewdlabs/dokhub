@@ -24,8 +24,7 @@ export class EmailService {
       text: `Please verify your email using this code: ${code}`,
     };
     try {
-      const info = await this.transporter.sendMail(mailOptions);
-      console.log('Email sent: ' + info.response);
+      await this.transporter.sendMail(mailOptions);
     } catch (error) {
       console.error('Error sending email:', error);
     }
@@ -40,7 +39,6 @@ export class EmailService {
         subject: 'Password Reset Request',
         text: `You requested a password reset. Click here to reset your password: ${resetLink}`,
       });
-      console.log('Password reset email sent');
     } catch (error) {
       console.error('Error sending password reset email:', error);
     }

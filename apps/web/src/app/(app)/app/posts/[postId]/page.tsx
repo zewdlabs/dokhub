@@ -14,7 +14,7 @@ import { useEffect } from "react";
 import { AppHeader } from "@/components/custom/app-header";
 import PostAction from "@/components/custom/post-actions";
 import PostInfo from "@/components/custom/post-info";
-import { AppFooter, MarketingFooter } from "@/components/custom/footer";
+import { AppFooter } from "@/components/custom/footer";
 
 export default function Page({ params }: { params: { postId: string } }) {
   const { data: postDetails, isLoading: isPostsLoading } = useQuery({
@@ -27,8 +27,6 @@ export default function Page({ params }: { params: { postId: string } }) {
       if (!req.ok) throw new Error("Failed to fetch posts");
 
       const data = await req.json();
-
-      console.log(data);
 
       return data as Post;
     },
@@ -68,6 +66,7 @@ export default function Page({ params }: { params: { postId: string } }) {
         <AppHeader />
         <PostInfo postDetails={postDetails} />
         <PostAction
+          postId={params.postId}
           likes={postDetails?.postLikeCount}
           replies={postDetails?.replies.length}
         />
@@ -78,6 +77,7 @@ export default function Page({ params }: { params: { postId: string } }) {
           />
         )}
         <PostAction
+          postId={params.postId}
           likes={postDetails?.postLikeCount}
           replies={postDetails?.replies.length}
         />

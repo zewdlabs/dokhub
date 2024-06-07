@@ -35,7 +35,6 @@ export class AuthController {
   // @ApiBody({ type: Prisma.UserCreateInput })
   @ApiBody({ type: CreateUserDto })
   signup(@Body() user: CreateUserDto) {
-    // console.log('IN THE CONTROLER', user);
     return this.authService.signUp(user);
   }
 
@@ -54,7 +53,6 @@ export class AuthController {
   @Post('refresh')
   @UseGuards(RefreshJwtGuard)
   async refreshToken(@Req() req: Request) {
-    console.log('refreshed');
     return await this.authService.refreshToken(req.user);
   }
 
@@ -63,7 +61,6 @@ export class AuthController {
     @Query('code') code: string,
     @Query('email') email: string,
   ) {
-    console.log(email, code);
     const verification = await this.authService.verifyEmailCode(code, email);
     if (!verification) {
       throw new BadRequestException('Invalid verification code');
@@ -79,7 +76,6 @@ export class AuthController {
   async resetPassword(
     @Body() data: { email: string; token: string; newPassword: string },
   ) {
-    console.log('=====================================', data);
     await this.authService.resetPassword(data);
   }
 }

@@ -74,4 +74,12 @@ export class PostsController {
   ) {
     return this.postsService.likePost(postId, userId);
   }
+
+  @Post(':postId/reply')
+  async replyPost(
+    @Param('postId') postId: string,
+    @Body() replyPostDto: CreatePostDto,
+  ) {
+    return this.postsService.replyToPost(postId, replyPostDto);
+  }
 }

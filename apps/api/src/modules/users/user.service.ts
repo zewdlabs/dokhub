@@ -171,8 +171,6 @@ export class UserService {
     });
   }
   async searchUsersByName(name: string): Promise<User[]> {
-    console.log('Searching for users with name or email containing:', name);
-
     const users = await this.prisma.user.findMany({
       where: {
         OR: [

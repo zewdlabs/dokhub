@@ -6,7 +6,6 @@ import { useEffect, useRef } from "react";
 import { ChatLine } from "./chat-bubble";
 import { Message } from "ai";
 import { Button } from "../ui/button";
-import { Icons } from "../icons";
 
 import { CornerDownLeft } from "lucide-react";
 
@@ -15,7 +14,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { Spinner } from "./spinner";
 
 export default function ChatWebUI({ chatId }: { chatId: string }) {
   const session = useSession();
@@ -57,8 +55,14 @@ export default function ChatWebUI({ chatId }: { chatId: string }) {
   } = useChat({
     body: { chatId, userId: session.data?.user?.id },
     onFinish: async () => {
-      if (messages.length == 2) {
-        await complete(messages[0].content);
+      if (messages.length == 4) {
+        await complete(
+          messages[0].content +
+            "\n" +
+            messages[1].content +
+            "\n" +
+            messages[2].content,
+        );
       }
     },
   });

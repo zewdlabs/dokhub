@@ -140,7 +140,6 @@ const createChain = (llm: BaseChatModel, retriever: Runnable) => {
   }).withConfig({ tags: ["RetrieveDocs"] });
 
   // return 2 of the sources
-  console.log("context", context);
 
   const prompt = ChatPromptTemplate.fromMessages([
     ["system", RESPONSE_TEMPLATE],

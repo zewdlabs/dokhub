@@ -15,7 +15,6 @@ export class VerificationGuard implements CanActivate {
       'verification',
       context.getHandler(),
     );
-    console.log('9999999999999999999999999999999999999999', requiredStatus);
     if (requiredStatus === undefined) {
       // If no verification status is set on the handler, allow access
       return true;
@@ -29,7 +28,6 @@ export class VerificationGuard implements CanActivate {
       return false;
     }
     const user1 = await this.usersService.findOne(user.sub);
-    console.log('9999999999999999999999999999999999999999', user1);
 
     return user1?.verificationStatus === VerificationStatus.VERIFIED;
   }

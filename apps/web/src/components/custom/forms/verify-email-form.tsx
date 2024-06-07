@@ -33,7 +33,6 @@ export default function VerifyEmailForm() {
   const searchParams = useSearchParams();
 
   const email = searchParams.get("email");
-  console.log(email);
 
   const form = useForm<z.infer<typeof verifyEmailSchema>>({
     resolver: zodResolver(verifyEmailSchema),
@@ -45,7 +44,7 @@ export default function VerifyEmailForm() {
   const onSubmit = form.handleSubmit(
     async (values: z.infer<typeof verifyEmailSchema>) => {
       const res = await fetch(
-        `http://localhost:4231/api/auth/verify-email?code=${values.code}&email=${email}`
+        `http://localhost:4231/api/auth/verify-email?code=${values.code}&email=${email}`,
       );
 
       if (!res.ok) {
@@ -54,7 +53,7 @@ export default function VerifyEmailForm() {
       }
 
       return router.push("/auth/signin");
-    }
+    },
   );
 
   return (

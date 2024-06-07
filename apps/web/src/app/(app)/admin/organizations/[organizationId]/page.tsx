@@ -73,8 +73,6 @@ export default function Dashboard({
     return <div>Loading...</div>;
   }
 
-  console.log(orgData);
-
   return (
     <div>
       <Card className="overflow-hidden" x-chunk="dashboard-05-chunk-4">

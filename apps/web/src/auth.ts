@@ -37,7 +37,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
       async authorize(credentials) {
         if (credentials.email && credentials.password) {
-          // console.log("Entered the credentials:", credentials);
           try {
             const res = await fetch(
               `${process.env.BACKEND_URL}/api/auth/login`,
@@ -50,7 +49,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
             if (res.ok) {
               const data = await res.json();
-              console.log(data);
               return data;
             } else if (res.status === 401) {
               // Unauthorized
@@ -82,33 +80,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile, credentials, email }) {
-      if (account?.provider === "google") {
-        // Perform nest backend call to check if the user is in the database
-        // if the user exists in the database, return the user object
-        // if not, create the user on the backend with the information from the google account and return the user object
-        console.log("google triggered");
-
-        console.log(account);
-      }
-
-      if (credentials) {
-      }
-
-      console.log(">>> signIn callback called");
-
-      console.log({ user });
-      profile && console.log({ profile });
-      account && console.log({ account });
-      credentials && console.log({ credentials });
-      email && console.log({ email });
-
-      return true;
-    },
     async jwt({ token, user }) {
       if (user) return { ...token, ...user };
-      // console.log("---------------------------");
-      console.log("---------------------------", token);
       if (new Date().getTime() < token.tokens.expiresIn) return token;
 
       return await refreshToken(token);

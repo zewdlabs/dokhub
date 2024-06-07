@@ -81,7 +81,6 @@ export function EditorHeader({ id }: { id: string }) {
   });
 
   function onSubmit(values: z.infer<typeof publishFormSchema>) {
-    console.log(values);
     publishPost.mutate(values, {
       onSuccess: () => {
         toast.success("Post published successfully");

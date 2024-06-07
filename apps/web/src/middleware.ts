@@ -5,6 +5,7 @@ import { User } from "next-auth";
 
 export const middleware = auth(async (req) => {
   const pathname = req.nextUrl.pathname;
+  const searchParams = req.nextUrl.searchParams;
 
   if (
     pathname === "/" ||

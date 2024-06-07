@@ -21,11 +21,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { forgotPasswordSchema } from "@/types/schema";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 export default function ForgotPasswordForm() {
-  const router = useRouter();
   const form = useForm<z.infer<typeof forgotPasswordSchema>>({
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
@@ -37,7 +35,6 @@ export default function ForgotPasswordForm() {
     async (values: z.infer<typeof forgotPasswordSchema>) => {
       // NOTE: Do some api calls which send verification code to the email
       // Redirect the user to the reset password page
-      console.log(values);
       const res = await fetch(
         `http://localhost:4231/api/auth/request-password-reset`,
         {
@@ -46,7 +43,7 @@ export default function ForgotPasswordForm() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(values),
-        }
+        },
       );
 
       if (!res.ok) {
@@ -54,7 +51,7 @@ export default function ForgotPasswordForm() {
       }
       toast("Verification code sent to your email");
       // router.push("reset-password");
-    }
+    },
   );
 
   return (
