@@ -61,4 +61,17 @@ export class PostsController {
   remove(@Param('id') id: string) {
     return this.postsService.remove(id);
   }
+
+  @Get('search/:name')
+  async searchPosts(@Param('name') name: string) {
+    return this.postsService.searchPostsByName(name);
+  }
+
+  @Post(':postId/like')
+  async likePost(
+    @Param('postId') postId: string,
+    @Body('userId') userId: string,
+  ) {
+    return this.postsService.likePost(postId, userId);
+  }
 }

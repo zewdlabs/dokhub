@@ -8,6 +8,7 @@ import {
   Patch,
   UseGuards,
   Query,
+  NotFoundException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Role, User as UserModel, VerificationStatus } from '@prisma/client';
@@ -161,5 +162,21 @@ export class UserController {
   ): Promise<void> {
     const { userId, userToFollowId } = followData;
     await this.userService.updateUserFollowing(userId, userToFollowId);
+  }
+
+  @Get('search/:name')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  async searchUsers(@Param('name') name: string) {
+    try {
+      return await this.userService.searchUsersByName(name);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(
+          'No users found with the given name or email',
+        );
+      }
+      throw error;
+    }
   }
 }

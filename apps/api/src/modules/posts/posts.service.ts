@@ -3,7 +3,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from '../users/user.service';
-import { Post } from '@prisma/client';
+import { Post, PostLike } from '@prisma/client';
 import readingDuration from 'reading-duration';
 import { PostPublishedEvent } from './events/post-published.event';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -68,6 +68,69 @@ export class PostsService {
     return posts;
   }
 
+  async searchPostsByName(name: string): Promise<Post[]> {
+    return await this.prisma.post.findMany({
+      where: {
+        title: {
+          contains: name,
+          mode: 'insensitive',
+        },
+      },
+      include: {
+        author: true,
+      },
+    });
+  }
+
+  async likePost(postId: string, userId: string): Promise<PostLike> {
+    const post = await this.prisma.post.findUnique({
+      where: { id: postId },
+      include: { postLikes: true },
+    });
+
+    if (!post) {
+      throw new Error('Post not found');
+    }
+
+    // Check if the user has already liked the post
+
+    if (post.postLikes.filter((postlike) => postlike.userId == userId)) {
+      throw new Error('User has already liked this post');
+      // await this.prisma.postLike.deleteMany({
+      //   where: {
+      //     userId: userId,
+      //     postId: postId,
+      //   },
+      // });
+      // await this.prisma.post.update({
+      //   where: { id: postId },
+      //   data: {
+      //     postLikeCount: {
+      //       increment: -1,
+      //     },
+      //   },
+      // });
+    }
+
+    // Create a new like
+    const postLike = await this.prisma.postLike.create({
+      data: {
+        postId,
+        userId,
+      },
+    });
+
+    // Update the like count on the post
+    await this.prisma.post.update({
+      where: { id: postId },
+      data: {
+        postLikeCount: {
+          increment: 1,
+        },
+      },
+    });
+    return postLike;
+  }
   async findUserForyouPosts(userId: string): Promise<Partial<Post>[]> {
     const posts = await this.prisma.forYou.findMany({
       where: { userId: userId },
@@ -139,7 +202,7 @@ export class PostsService {
       where: { id },
       data: {
         ...updatePostDto,
-        minToRead: readingDuration(updatePostDto.content || post?.content!, {
+        minToRead: readingDuration(updatePostDto.content || post!.content!, {
           emoji: false,
           wordsPerMinute: 200,
         }),

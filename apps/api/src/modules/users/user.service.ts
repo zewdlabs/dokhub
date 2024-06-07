@@ -1,5 +1,5 @@
 import { PrismaService } from '@/modules/prisma/prisma.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, Role, User, VerificationStatus } from '@prisma/client'; // Import your Prisma user model
 import { Logger } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
@@ -190,5 +190,35 @@ export class UserService {
     //     followedByCount: userToFollow.followingCount + 1, // Increment followedBy count
     //   },
     // });
+  }
+  async searchUsersByName(name: string): Promise<User[]> {
+    console.log('Searching for users with name or email containing:', name);
+
+    const users = await this.prisma.user.findMany({
+      where: {
+        OR: [
+          {
+            name: {
+              contains: name,
+              mode: 'insensitive',
+            },
+          },
+          {
+            email: {
+              contains: name,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      },
+    });
+
+    if (users.length === 0) {
+      throw new NotFoundException(
+        'No users found with the given name or email',
+      );
+    }
+
+    return users;
   }
 }
