@@ -54,10 +54,9 @@ export default async function ChatLayout({
               <span className="sr-only">Start a new chat</span>
             </Link>
           </div>
-          <div className="flex-1">
+          <div className="flex-1 overflow-y-scroll">
             <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-              {session.user?.id &&
-                chatHistory &&
+              {session.user?.id && chatHistory ? (
                 chatHistory.map(({ id, title }) => (
                   <div className="flex justify-between items-center">
                     <Link
@@ -68,13 +67,20 @@ export default async function ChatLayout({
                         "w-full justify-start",
                       )}
                     >
-                      <span className="max-w-56 flex-nowrap text-nowrap overflow-hidden">
+                      <span className="max-w-48 flex-nowrap text-nowrap overflow-hidden">
                         {title || "New chat"}
                       </span>
                     </Link>
                     <ChatOption id={id} />
                   </div>
-                ))}
+                ))
+              ) : (
+                <div className="flex justify-between items-center">
+                  <span className="max-w-48 flex-nowrap text-nowrap overflow-hidden">
+                    No previous chats
+                  </span>
+                </div>
+              )}
             </nav>
           </div>
         </div>

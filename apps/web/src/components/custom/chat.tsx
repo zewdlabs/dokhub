@@ -14,15 +14,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { Spinner } from "./spinner";
 
 export default function ChatWebUI({ chatId }: { chatId: string }) {
   const session = useSession();
+  const router = useRouter();
 
-  const { complete, completion: cmp } = useCompletion({
+  const { complete } = useCompletion({
     api: "/api/generate",
     onFinish: async (_, completion) => {
-      console.log("received in completion", completion);
-      console.log("from the top", cmp);
       const res = await fetch(
         `http://localhost:4231/api/chat/user/${session.data?.user.id}/${chatId}`,
         {
@@ -36,12 +37,13 @@ export default function ChatWebUI({ chatId }: { chatId: string }) {
           }),
         },
       );
-      console.log("response", await res.json());
 
       if (!res.ok) {
         console.error("An error occurred while saving the note");
         throw new Error("Network response was not ok");
       }
+
+      router.refresh();
     },
   });
 
@@ -54,16 +56,8 @@ export default function ChatWebUI({ chatId }: { chatId: string }) {
     setMessages,
   } = useChat({
     body: { chatId, userId: session.data?.user?.id },
-    onFinish: async (message) => {
-      console.log("received in chat", message);
-
-      console.log(messages.length);
-
-      console.log(messages.length == 2);
-
+    onFinish: async () => {
       if (messages.length == 2) {
-        console.log("completing and generating title", messages);
-
         await complete(messages[0].content);
       }
     },
@@ -81,8 +75,6 @@ export default function ChatWebUI({ chatId }: { chatId: string }) {
       }
 
       const data = await res.json();
-
-      console.log("where are the messages", data);
 
       return data as Message[];
     },
@@ -104,11 +96,13 @@ export default function ChatWebUI({ chatId }: { chatId: string }) {
   return (
     <div className="h-[85vh] flex flex-col justify-between relative">
       <div className="p-6 h-[85%] overflow-auto" ref={containerRef}>
-        {messages.length !== 0
-          ? messages.map(({ id, role, content }: Message) => (
-              <ChatLine key={id} role={role} content={content} sources={[]} />
-            ))
-          : null}
+        {messages.length !== 0 ? (
+          messages.map(({ id, role, content }: Message) => (
+            <ChatLine key={id} role={role} content={content} sources={[]} />
+          ))
+        ) : (
+          <ChatLine role="assistant" sources={[]} />
+        )}
       </div>
 
       <form
@@ -132,9 +126,24 @@ export default function ChatWebUI({ chatId }: { chatId: string }) {
           }}
         />
         <div className="flex items-center p-3 pt-0">
-          <Button type="submit" className="ml-auto gap-1.5">
+          <Button
+            type="submit"
+            className="ml-auto gap-1.5"
+            disabled={isLoading}
+          >
             {isLoading ? (
-              <Icons.spinner />
+              <svg
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                viewBox="0 0 24 24"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                xmlns="http://www.w3.org/2000/svg"
+                className="size-5 animate-spin"
+              >
+                <path d="M12 3v3m6.366-.366-2.12 2.12M21 12h-3m.366 6.366-2.12-2.12M12 21v-3m-6.366.366 2.12-2.12M3 12h3m-.366-6.366 2.12 2.12"></path>
+              </svg>
             ) : (
               <div className="flex items-center justify-center gap-2">
                 Send Message

@@ -18,14 +18,9 @@ import { Message } from "ai/react";
 import ReactMarkdown from "react-markdown";
 import { formattedText } from "@/lib/utils";
 import { useSession } from "next-auth/react";
-
-const convertNewLines = (text: string) =>
-  text.split("\n").map((line, i) => (
-    <span key={i}>
-      {line}
-      <br />
-    </span>
-  ));
+import { MemoizedReactMarkdown } from "./markdown";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
 
 interface ChatLineProps extends Partial<Message> {
   sources: string[];
@@ -39,8 +34,6 @@ export function ChatLine({
   if (!content) {
     return null;
   }
-  const formattedMessage = convertNewLines(content);
-
   const session = useSession();
 
   return (
@@ -58,7 +51,29 @@ export function ChatLine({
           </CardTitle>
         </CardHeader>
         <CardContent className="text-sm">
-          <Balancer>{formattedMessage}</Balancer>
+          <Balancer>
+            <MemoizedReactMarkdown
+              className="prose break-words dark:prose-invert prose-p:leading-relaxed prose-pre:p-0 max-w-full"
+              remarkPlugins={[remarkGfm, remarkMath]}
+              components={{
+                p({ children }) {
+                  return <p className="mb-2 last:mb-0">{children}</p>;
+                },
+                ol({ children }) {
+                  return (
+                    <>
+                      <ol className="list-decimal list-inside">{children}</ol>
+                      <br />
+                    </>
+                  );
+                },
+              }}
+            >
+              {content ?? (
+                <span className="mt-1 cursor-default animate-pulse">▍</span>
+              )}
+            </MemoizedReactMarkdown>
+          </Balancer>
         </CardContent>
         <CardFooter>
           {sources && sources.length ? (

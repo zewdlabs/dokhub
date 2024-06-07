@@ -28,7 +28,7 @@ export default function ChatOption({ id }: { id: string }) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-md">
-          B
+          <p className="text-lg">&middot;&middot;&middot;</p>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
