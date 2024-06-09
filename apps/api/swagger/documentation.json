@@ -728,6 +728,26 @@
         }
       }
     },
+    "/api/organization/ofuser/{userId}": {
+      "get": {
+        "operationId": "OrganizationController_findAllOfUser",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/organization/{id}": {
       "get": {
         "operationId": "OrganizationController_findOneWithUsers",
@@ -861,6 +881,91 @@
         ]
       }
     },
+    "/api/posts/library/{userId}": {
+      "get": {
+        "operationId": "PostsController_findUserLibrary",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Posts"
+        ]
+      }
+    },
+    "/api/posts/{postId}/removefromlibrary/{userId}": {
+      "delete": {
+        "operationId": "PostsController_removeFromLibrary",
+        "parameters": [
+          {
+            "name": "postId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Posts"
+        ]
+      }
+    },
+    "/api/posts/{postId}/addtolibrary/{userId}": {
+      "post": {
+        "operationId": "PostsController_addToUserLibrary",
+        "parameters": [
+          {
+            "name": "postId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Posts"
+        ]
+      }
+    },
     "/api/posts/published/{userId}": {
       "get": {
         "operationId": "PostsController_findUserPublishedPosts",
@@ -910,7 +1015,16 @@
     "/api/posts/following/{userId}": {
       "get": {
         "operationId": "PostsController_findUserFollowingPosts",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": ""

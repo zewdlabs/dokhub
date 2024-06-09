@@ -35,12 +35,7 @@ import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
-
-const publishFormSchema = z.object({
-  publishPublic: z.boolean().default(false),
-  previewTitle: z.string().min(5).max(50),
-  previewSubtitle: z.string().min(5).max(200),
-});
+import { publishFormSchema } from "@/types/schema";
 
 export function EditorHeader({ id }: { id: string }) {
   const { data: session, status } = useSession();

@@ -49,6 +49,11 @@ export default function PostList({ tag }: { tag?: string }) {
           `http://localhost:4231/api/posts/following/${session?.user.id}`,
           // `${process.env.BACKEND_URL}/api/posts/following/${userId}`,
         );
+      } else if (tag === "library") {
+        res = await fetch(
+          `http://localhost:4231/api/posts/library/${session?.user.id}`,
+          // `${process.env.BACKEND_URL}/api/posts/library/${userId}`,
+        );
       } else {
         res = await fetch(
           `http://localhost:4231/api/posts/foryou/${session?.user.id}`,
@@ -69,12 +74,15 @@ export default function PostList({ tag }: { tag?: string }) {
       value={tag || "foryou"}
       className="space-y-2 md:space-y-4 w-full"
     >
-      {isPostsLoading
-        ? "loading"
-        : posts &&
-          posts.map((post) => (
-            <PostCard tag={tag || "foryou"} post={post} key={post.id} />
-          ))}
+      {isPostsLoading ? (
+        "loading"
+      ) : posts?.length ? (
+        posts.map((post) => (
+          <PostCard tag={tag || "foryou"} post={post} key={post.id} />
+        ))
+      ) : (
+        <div className="px-4 text-base">No posts found in {tag}</div>
+      )}
     </TabsContent>
   );
 }

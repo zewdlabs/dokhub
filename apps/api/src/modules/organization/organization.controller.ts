@@ -26,6 +26,11 @@ export class OrganizationController {
     return this.organizationService.findAll();
   }
 
+  @Get('ofuser/:userId')
+  findAllOfUser(@Param('userId') userId: string) {
+    return this.organizationService.findAllOfUser(userId);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.organizationService.findOne(id);

@@ -120,16 +120,6 @@ export default function SigninForm() {
               <Button type="submit" className="w-full">
                 Continue
               </Button>
-              <Button
-                onClick={async () => {
-                  await signIn("google");
-                }}
-                variant="outline"
-                className="w-full"
-              >
-                <Icons.google className="w-5 h-5 mr-2" />
-                Continue with Google
-              </Button>
             </div>
             <div className="mt-4 text-center text-sm">
               Don&apos;t have an account?{" "}

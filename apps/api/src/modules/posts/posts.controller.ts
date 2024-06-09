@@ -32,6 +32,27 @@ export class PostsController {
     return this.postsService.findUserDrafts(userId);
   }
 
+  @Get('library/:userId')
+  findUserLibrary(@Param('userId') userId: string) {
+    return this.postsService.findUserLibrary(userId);
+  }
+
+  @Delete(':postId/removefromlibrary/:userId')
+  removeFromLibrary(
+    @Param('postId') postId: string,
+    @Param('userId') userId: string,
+  ) {
+    return this.postsService.removeFromLibrary(userId, postId);
+  }
+
+  @Post(':postId/addtolibrary/:userId')
+  addToUserLibrary(
+    @Param('postId') postId: string,
+    @Param('userId') userId: string,
+  ) {
+    return this.postsService.addToUsersLibrary(userId, postId);
+  }
+
   @Get('published/:userId')
   findUserPublishedPosts(@Param('userId') userId: string) {
     return this.postsService.findUserPublishedPosts(userId);
@@ -43,7 +64,7 @@ export class PostsController {
   }
 
   @Get('following/:userId')
-  findUserFollowingPosts(userId: string) {
+  findUserFollowingPosts(@Param('userId') userId: string) {
     return this.postsService.findUserFollowingPosts(userId);
   }
 

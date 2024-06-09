@@ -8,6 +8,11 @@ export const deletePostSchema = z.object({
   id: z.string(),
 });
 
+export const addToLibrarySchema = z.object({
+  userId: z.string(),
+  postId: z.string(),
+});
+
 export const deleteChatSchema = z.object({
   id: z.string(),
 });
@@ -79,4 +84,10 @@ export const profileFormSchema = z.object({
     )
     .optional(),
   //TODO: add profile iamge
+});
+
+export const publishFormSchema = z.object({
+  publishPublic: z.boolean().default(false),
+  previewTitle: z.string().min(5).max(100),
+  previewSubtitle: z.string().min(5).max(300),
 });

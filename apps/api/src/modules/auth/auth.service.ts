@@ -122,6 +122,7 @@ export class AuthService {
     // Step 3: Generate a JWT containing the user's ID and return it
     const tokens = await this.getTokens(user.id, user.email, user.role); //user.role
     await this.updateRefreshToken(user, tokens.refreshToken);
+
     const userDto: UserDto = {
       id: user.id,
       email: user.email,

@@ -25,14 +25,16 @@ import Link from "next/link";
 import { Post } from "./post-list";
 import { useSession } from "next-auth/react";
 import { useMutation } from "@tanstack/react-query";
-import { deletePostSchema } from "@/types/schema";
+import { addToLibrarySchema, deletePostSchema } from "@/types/schema";
 import { z } from "zod";
 import { genFallback } from "@/lib/utils";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function PostCard({ post, tag }: { post: Post; tag: string }) {
   const session = useSession();
   const removePost = useMutation({
-    mutationKey: ["post", post.id],
+    mutationKey: ["post", post.id, "remove"],
     mutationFn: async (values: z.infer<typeof deletePostSchema>) => {
       const req = await fetch(`http://localhost:4231/api/posts/${values.id}`, {
         method: "DELETE",
@@ -41,13 +43,46 @@ export default function PostCard({ post, tag }: { post: Post; tag: string }) {
       return await req.json();
     },
   });
+
+  const addToLibrary = useMutation({
+    mutationKey: ["post", post.id, "add"],
+    mutationFn: async (values: z.infer<typeof addToLibrarySchema>) => {
+      const req = await fetch(
+        `http://localhost:4231/api/posts/${values.postId}/addtolibrary/${values.userId}`,
+        {
+          method: "POST",
+        },
+      );
+      if (!req.ok) throw new Error("Failed to publish post");
+      return await req.json();
+    },
+    onSuccess: () => {
+      toast.success("Post added to library");
+    },
+  });
+
+  const removePostFromLibrary = useMutation({
+    mutationKey: ["post", post.id, "remove"],
+    mutationFn: async (values: z.infer<typeof addToLibrarySchema>) => {
+      const req = await fetch(
+        `http://localhost:4231/api/posts/${values.postId}/removefromlibrary/${values.userId}`,
+        {
+          method: "DELETE",
+        },
+      );
+
+      if (!req.ok) throw new Error("Failed to publish post");
+      return await req.json();
+    },
+    onSuccess: () => {
+      toast.success("Post removed from library");
+    },
+  });
+
+  console.log(tag);
   return (
     <Card className="w-full p-4 md:pt-6">
-      <Link
-        href={`/app/${
-          tag !== "published" && tag !== "drafts" ? "posts" : "new"
-        }/${post.id}`}
-      >
+      <Link href={`/app/${tag !== "drafts" ? "posts" : "new"}/${post.id}`}>
         <div className="grid grid-cols-4">
           <CardHeader className="p-2 pb-3 col-span-3 w-full space-y-3">
             <CardTitle className="font-cal tracking-normal">
@@ -87,12 +122,29 @@ export default function PostCard({ post, tag }: { post: Post; tag: string }) {
           </span>
         </div>
         <div>
-          <Button
-            variant="ghost"
-            className="px-3 hover:bg-transparent hover:text-muted-foreground"
-          >
-            <Icons.bookmarkplus className="w-5 h-5 hover:fill-muted-foreground" />
-          </Button>
+          {post.authorId != session.data?.user.id && (
+            <Button
+              variant="ghost"
+              className="px-3 hover:bg-transparent hover:text-muted-foreground"
+              onClick={() =>
+                tag === "library"
+                  ? removePostFromLibrary.mutate({
+                      postId: post.id,
+                      userId: session.data?.user.id!,
+                    })
+                  : addToLibrary.mutate({
+                      postId: post.id,
+                      userId: session.data?.user.id!,
+                    })
+              }
+            >
+              {tag === "library" ? (
+                <Icons.bookmarkminus className="w-5 h-5 hover:fill-muted-foreground" />
+              ) : (
+                <Icons.bookmarkplus className="w-5 h-5 hover:fill-muted-foreground" />
+              )}
+            </Button>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
