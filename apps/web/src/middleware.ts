@@ -5,7 +5,8 @@ import { User } from "next-auth";
 
 export const middleware = auth(async (req) => {
   const pathname = req.nextUrl.pathname;
-  const searchParams = req.nextUrl.searchParams;
+
+  console.log(`pathname: ${pathname}`);
 
   if (
     pathname === "/" ||
@@ -21,6 +22,14 @@ export const middleware = auth(async (req) => {
       pathname.startsWith("/auth") &&
       !pathname.startsWith("/auth/onboarding")
     ) {
+      return Response.redirect(new URL("/app", req.url));
+    }
+
+    if (
+      pathname.endsWith("/onboarding/personal") &&
+      req.auth.user.onboardingStatus
+    ) {
+      console.log("did it get here");
       return Response.redirect(new URL("/app", req.url));
     }
 

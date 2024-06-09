@@ -119,6 +119,7 @@ declare module "next-auth" {
       id: string;
       email: string;
       name: string;
+      onboardingStatus: boolean;
     } & DefaultSession["user"];
 
     tokens: {
@@ -138,6 +139,7 @@ declare module "next-auth/jwt" {
       id: string;
       email: string;
       name: string;
+      onboardingStatus: boolean;
     } & DefaultSession["user"];
 
     tokens: {

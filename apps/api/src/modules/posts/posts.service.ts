@@ -3,7 +3,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserService } from '../users/user.service';
-import { Post, PostLike } from '@prisma/client';
+import { Library, Post, PostLike } from '@prisma/client';
 import readingDuration from 'reading-duration';
 import { PostPublishedEvent } from './events/post-published.event';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -20,6 +20,46 @@ export class PostsService {
     return await this.prisma.post.findMany({
       where: { replyToPostId: postId },
       include: { author: true },
+    });
+  }
+
+  async addToUsersLibrary(userId: string, postId: string): Promise<Library> {
+    if (
+      await this.prisma.library.findUnique({
+        where: {
+          unique_library: {
+            userId: userId,
+            postId: postId,
+          },
+        },
+      })
+    ) {
+      return this.prisma.library.findUniqueOrThrow({
+        where: {
+          unique_library: {
+            userId: userId,
+            postId: postId,
+          },
+        },
+      });
+    }
+
+    return this.prisma.library.create({
+      data: {
+        userId: userId,
+        postId: postId,
+      },
+    });
+  }
+
+  async removeFromLibrary(userId: string, postId: string): Promise<Library> {
+    return this.prisma.library.delete({
+      where: {
+        unique_library: {
+          userId: userId,
+          postId: postId,
+        },
+      },
     });
   }
 
@@ -56,6 +96,15 @@ export class PostsService {
       throw new Error('Post not found');
     }
 
+    await this.prisma.post.update({
+      where: { id: postId },
+      data: {
+        postRepliesCount: {
+          increment: 1,
+        },
+      },
+    });
+
     return await this.prisma.post.create({
       data: {
         ...replyPostDto,
@@ -74,25 +123,21 @@ export class PostsService {
   }
 
   async findUserFollowingPosts(userId: string): Promise<Partial<Post>[]> {
-    const following = await this.prisma.follows.findMany({
-      where: { followedById: userId },
-      select: { followingId: true },
+    const follows = await this.prisma.follows.findMany({
+      where: { followingId: userId },
     });
 
     const posts = await this.prisma.post.findMany({
-      where: { authorId: { in: following.map((f) => f.followingId) } },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        publishedAt: true,
-        authorId: true,
-        minToRead: true,
-        author: true,
+      where: {
+        authorId: {
+          in: follows.map((follow) => follow.followedById),
+        },
+        publishedAt: { not: null },
       },
+      include: { author: true },
     });
 
-    return posts;
+    return posts.filter((post) => post.authorId !== userId);
   }
 
   async searchPostsByName(name: string): Promise<Post[]> {
@@ -163,20 +208,41 @@ export class PostsService {
       where: { userId: userId },
       select: {
         post: {
-          select: {
-            id: true,
-            title: true,
-            description: true,
-            publishedAt: true,
-            authorId: true,
-            minToRead: true,
+          include: {
             author: true,
           },
         },
       },
     });
 
-    return posts.map((post) => post.post);
+    const bestPosts = await this.prisma.post.findMany({
+      where: {
+        publishedAt: { not: null },
+      },
+      orderBy: {
+        postLikes: {
+          _count: 'desc',
+        },
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        publishedAt: true,
+        authorId: true,
+        minToRead: true,
+        author: true,
+      },
+      take: 10,
+    });
+
+    return [
+      ...posts.map((item) => item.post),
+      ...bestPosts.filter(
+        (post) =>
+          !posts.find((p) => p.post.id === post.id) && post.authorId !== userId,
+      ),
+    ];
   }
 
   async findUserDrafts(userId: string): Promise<Partial<Post>[]> {
@@ -192,6 +258,21 @@ export class PostsService {
         author: true,
       },
     });
+  }
+
+  async findUserLibrary(userId: string): Promise<Partial<Post>[]> {
+    const library = await this.prisma.library.findMany({
+      where: { userId: userId },
+      select: {
+        post: {
+          include: {
+            author: true,
+          },
+        },
+      },
+    });
+
+    return library.map((item) => item.post);
   }
 
   async findUserPublishedPosts(userId: string): Promise<Partial<Post>[]> {

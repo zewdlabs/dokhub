@@ -185,16 +185,6 @@ export default function SignupForm() {
               <Button type="submit" className="w-full">
                 Create an account
               </Button>
-              <Button
-                onClick={async () => {
-                  await signIn("google");
-                }}
-                variant="outline"
-                className="w-full"
-              >
-                <Icons.google className="w-5 h-5 mr-2" />
-                Sign up with Google
-              </Button>
             </div>
             <div className="mt-4 text-center text-sm">
               Already have an account?{" "}

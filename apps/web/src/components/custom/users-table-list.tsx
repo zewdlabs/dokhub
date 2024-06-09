@@ -33,7 +33,9 @@ import { deleteUserSchema } from "@/types/schema";
 
 export interface User {
   id: string;
+  bio: string;
   prefix?: string;
+  yearsOfExperience: number;
   name: string;
   email: string;
   followingCount: number;

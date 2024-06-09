@@ -3,6 +3,7 @@ import { Role, User, VerificationStatus } from '@prisma/client';
 export class UserDto implements Omit<User, 'password' | 'refreshToken'> {
   profileUrl: string | null;
   emailVerified: Date | null;
+  onboardingStatus: boolean;
   //   refreshToken: string | null;
   id: string;
   email: string;

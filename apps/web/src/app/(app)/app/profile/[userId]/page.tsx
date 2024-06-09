@@ -32,17 +32,16 @@ export default function Page() {
   return (
     <>
       <Tabs
-        defaultValue="about"
+        defaultValue="library"
         className="flex flex-col items-start gap-4 w-full"
       >
         <TabsList className="z-40 bg-transparent w-full flex justify-start">
           <TabsTrigger
-            value="about"
+            value="library"
             className="px-3 text-base py-2 bg-transparent"
           >
-            About
+            Library
           </TabsTrigger>
-          <Separator orientation="vertical" />
           <TabsTrigger
             value="published"
             className="px-3 text-base py-2 bg-transparent"
@@ -56,10 +55,11 @@ export default function Page() {
           >
             Drafts
           </TabsTrigger>
+          <Separator orientation="vertical" />
         </TabsList>
-        <AboutCard />
         <PostList tag="published" />
         <PostList tag="drafts" />
+        <PostList tag="library" />
       </Tabs>
     </>
   );

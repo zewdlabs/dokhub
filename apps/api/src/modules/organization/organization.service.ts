@@ -8,6 +8,18 @@ import type { Role } from '@prisma/client';
 export class OrganizationService {
   constructor(private db: PrismaService) {}
 
+  findAllOfUser(userId: string) {
+    return this.db.organization.findMany({
+      where: {
+        memberships: {
+          some: {
+            userId,
+          },
+        },
+      },
+    });
+  }
+
   create(createOrganizationDto: CreateOrganizationDto) {
     return this.db.organization.create({
       data: createOrganizationDto,

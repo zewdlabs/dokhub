@@ -18,15 +18,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import Link from "next/link";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { cn } from "@/lib/utils";
 import { onboardingPersonalInfoSchema } from "@/types/schema";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export default function OnboardingPersonalInfoForm() {
   const session = useSession();
@@ -42,21 +42,55 @@ export default function OnboardingPersonalInfoForm() {
     },
   });
 
-  const onSubmit = form.handleSubmit(
-    async (values: z.infer<typeof onboardingPersonalInfoSchema>) => {
-      // NOTE: You can send the form data to the server here some api call
+  const disableOnboarding = useMutation({
+    mutationKey: ["disableOnboarding"],
+    mutationFn: async ({ onboardingStatus }: { onboardingStatus: boolean }) => {
       const res = await fetch(
-        `http://localhost:4231/api/user/${session.data?.user.id}`,
+        `http://localhost:4231/api/user/profile/${session.data?.user.id}`,
         {
+          method: "PATCH",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${session.data?.tokens.accessToken}`,
           },
           body: JSON.stringify({
-            speciality: values.speciality,
-            occupation: values.occupation,
-            medicalLicense: values.medicalLicense,
+            onboardingStatus,
+          }),
+        },
+      );
+
+      if (!res.ok) {
+        throw new Error("can't disable onboarding");
+      }
+
+      return await res.json();
+    },
+    onSuccess: () => {
+      toast.info(
+        "You can always modify the information in your profile settings",
+      );
+
+      router.push("/app");
+    },
+  });
+
+  const onSubmit = form.handleSubmit(
+    async (values: z.infer<typeof onboardingPersonalInfoSchema>) => {
+      // NOTE: You can send the form data to the server here some api call
+      const res = await fetch(
+        `http://localhost:4231/api/user/profile/${session.data?.user.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.data?.tokens.accessToken}`,
+          },
+          body: JSON.stringify({
             yearsOfExperience: values.yearsOfExperience,
+            medicalLicenseNumber: values.medicalLicense,
+            specialty: values.speciality,
+            occupation: values.occupation,
+            onboardingStatus: true,
           }),
         },
       );
@@ -65,8 +99,7 @@ export default function OnboardingPersonalInfoForm() {
         throw new Error("This isn't supposed to happen");
       }
 
-      // TODO: Add socials after everything else
-      router.push("/auth/login");
+      router.push("/app");
     },
   );
 
@@ -180,15 +213,15 @@ export default function OnboardingPersonalInfoForm() {
                 />
               </div>
               <div className="flex items-center justify-between gap-4">
-                <Link
-                  href="/auth/onboarding/socials"
-                  className={cn(
-                    buttonVariants({ variant: "outline" }),
-                    "w-full",
-                  )}
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    disableOnboarding.mutate({ onboardingStatus: true })
+                  }
+                  className="w-full"
                 >
                   Skip for now
-                </Link>
+                </Button>
                 <Button variant="default" className="w-full" type="submit">
                   Continue
                 </Button>

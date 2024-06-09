@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsInt } from 'class-validator';
+import { IsOptional, IsString, IsInt, IsBoolean } from 'class-validator';
 // import { VerificationStatus, Role } from '@prisma/client';
 
 export class UpdateUserDto {
@@ -33,4 +33,8 @@ export class UpdateUserDto {
   @IsOptional()
   @IsInt()
   yearsOfExperience?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  onboardingStatus?: boolean;
 }

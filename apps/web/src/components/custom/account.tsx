@@ -46,12 +46,12 @@ export default function AccountButton({ session }: { session: Session }) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
-            <Link href={`/app/profile/${session.user.id}`}>Profile</Link>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Link href={`/app/settings/account`}>Settings</Link>
-          </DropdownMenuItem>
+          <Link href={`/app/profile/${session.user.id}`}>
+            <DropdownMenuItem>Profile</DropdownMenuItem>
+          </Link>
+          <Link href={`/app/settings/account`}>
+            <DropdownMenuItem>Settings</DropdownMenuItem>
+          </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup></DropdownMenuGroup>

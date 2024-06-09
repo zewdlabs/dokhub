@@ -2,10 +2,12 @@
 
 import { AppHeader } from "@/components/custom/app-header";
 import { PropsWithChildren } from "react";
-import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useQuery } from "@tanstack/react-query";
 import { Separator } from "@/components/ui/separator";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { genFallback } from "@/lib/utils";
+import { User } from "@/components/custom/users-table-list";
 
 export default function ProfileLayout({ children }: PropsWithChildren) {
   const { data: session, status } = useSession();
@@ -26,7 +28,7 @@ export default function ProfileLayout({ children }: PropsWithChildren) {
 
       if (!res.ok) return null;
 
-      return await res.json();
+      return (await res.json()) as User;
     },
   });
 
@@ -34,22 +36,52 @@ export default function ProfileLayout({ children }: PropsWithChildren) {
     <>
       <AppHeader />
       <div className="container flex gap-10">
-        <main className="flex min-h-screen w-4/6 flex-col gap-8 p-4 md:p-8">
+        <main className="flex min-h-screen md:w-4/6 flex-col gap-8 p-4 md:p-8">
           <h1 className="text-4xl font-bold">{userData?.name}</h1>
           <Separator orientation="horizontal" />
           {children}
         </main>
         <Separator orientation="vertical" className="h-screen" />
-        <aside className="min-h-screen w-2/6 flex flex-col gap-4 md:p-8">
-          {/*
-          <Image
-            width={96}
-            height={96}
-            src={""}
-            alt={userData?.name}
-            className="rounded-md w-16 h-16 object-cover 2xl:w-28 2xl:h-28"
-          />
-          */}
+        <aside className="hidden md:flex min-h-screen md:w-2/6  flex-col gap-4 md:p-8">
+          {/* TODO: If you can make it a placeholder, it would be better */}
+          {status == "authenticated" ? (
+            <div className="flex flex-col gap-4">
+              <Avatar className="h-10 w-10 mb-4">
+                <AvatarImage src={undefined} alt={session?.user?.name} />
+                <AvatarFallback>
+                  {genFallback(session?.user?.name)}
+                </AvatarFallback>
+              </Avatar>
+              <h1 className="text-4xl font-bold">{userData?.name}</h1>
+              <div className="flex gap-4">
+                <p className="text-lg">Following: {userData?.followingCount}</p>
+                <p className="text-lg">
+                  Followers: {userData?.followedByCount}
+                </p>
+              </div>
+              <Separator orientation="horizontal" />
+              <p className="text-lg">{userData?.email}</p>
+              <p>{userData?.bio}</p>
+              <Separator orientation="horizontal" />
+              <p className="text-lg">
+                {userData?.yearsOfExperience} years of experience
+              </p>
+              <p className="text-lg font-semibold">
+                Occupation:{" "}
+                <span className="text-base font-normal">
+                  {userData?.occupation}
+                </span>
+              </p>
+              {userData?.verificationStatus === "VERIFIED" && (
+                <p className="text-lg font-semibold">
+                  Medical License Number:{" "}
+                  <span className="text-base font-normal">
+                    {userData?.medicalLicenseNumber}
+                  </span>
+                </p>
+              )}
+            </div>
+          ) : null}
         </aside>
       </div>
     </>
