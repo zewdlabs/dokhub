@@ -144,10 +144,14 @@ export class UserService {
     });
   }
 
-  async validateUser(userId: string): Promise<User> {
+  async validateUser(
+    userId: string,
+    verificationStatus: VerificationStatus,
+  ): Promise<User> {
+    console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', verificationStatus);
     return this.prisma.user.update({
       where: { id: userId },
-      data: { verificationStatus: VerificationStatus.VERIFIED },
+      data: { verificationStatus: verificationStatus },
     });
   }
   async updateProfilePath(userId: string, url: string) {

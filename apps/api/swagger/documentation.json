@@ -529,7 +529,7 @@
         ]
       }
     },
-    "/api/user/validate/{id}": {
+    "/api/user/validate/{id}/{verificationStatus}": {
       "patch": {
         "operationId": "UserController_validateUser",
         "parameters": [
@@ -540,6 +540,12 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "verificationStatus",
+            "required": true,
+            "in": "path",
+            "schema": {}
           }
         ],
         "responses": {

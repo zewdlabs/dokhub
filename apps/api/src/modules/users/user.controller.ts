@@ -111,13 +111,19 @@ export class UserController {
     return this.userService.getUsersByVerificationStatus(status);
   }
 
-  @Patch('validate/:id')
+  @Patch('validate/:id/:verificationStatus')
   @Roles(Role.SUADMIN)
   @UseGuards(AccessTokenGuard, RoleGuard)
   @ApiBearerAuth()
-  async validateUser(@Param('id') id: string): Promise<UserModel> {
-    return this.userService.validateUser(id);
+  // @ApiBody({ type: { status: VerificationStatus } })
+  async validateUser(
+    @Param('id') id: string,
+    @Param('verificationStatus') verificationStatus: VerificationStatus,
+  ): Promise<UserModel> {
+    console.log(id, verificationStatus);
+    return this.userService.validateUser(id, verificationStatus);
   }
+
   @Delete(':id')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
