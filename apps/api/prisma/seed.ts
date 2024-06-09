@@ -1,4 +1,4 @@
-import { PrismaClient, Role } from '@prisma/client';
+import { PrismaClient, Role, VerificationStatus } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -16,6 +16,7 @@ async function main() {
       specialty: 'Orthopedics',
       yearsOfExperience: 15,
       medicalLicenseNumber: 'GHI789JKL',
+      role: Role.USER,
     },
   });
 
@@ -31,7 +32,8 @@ async function main() {
       specialty: 'Pediatrics',
       yearsOfExperience: 8,
       medicalLicenseNumber: 'MNO012PQR',
-      role: Role.USER,
+      role: Role.CREATOR,
+      verificationStatus: VerificationStatus.VERIFIED,
     },
   });
 
@@ -47,7 +49,8 @@ async function main() {
       specialty: 'Cardiology',
       yearsOfExperience: 12,
       medicalLicenseNumber: 'STU345VWX',
-      role: Role.CREATOR,
+      role: Role.ADMIN,
+      verificationStatus: VerificationStatus.VERIFIED,
     },
   });
 
@@ -95,7 +98,8 @@ async function main() {
       specialty: 'Dermatology',
       yearsOfExperience: 14,
       medicalLicenseNumber: 'YZA678BCD',
-      role: Role.CREATOR,
+      role: Role.USER,
+      verificationStatus: VerificationStatus.REJECTED,
     },
   });
 
@@ -112,6 +116,7 @@ async function main() {
       yearsOfExperience: 9,
       medicalLicenseNumber: 'EFG901HIJ',
       role: Role.USER,
+      verificationStatus: VerificationStatus.PENDING,
     },
   });
 
@@ -128,6 +133,7 @@ async function main() {
       yearsOfExperience: 6,
       medicalLicenseNumber: null,
       role: Role.USER,
+      verificationStatus: VerificationStatus.REVIEW,
     },
   });
 
@@ -143,7 +149,8 @@ async function main() {
       specialty: 'Neurology',
       yearsOfExperience: 11,
       medicalLicenseNumber: 'KLM234NOP',
-      role: Role.USER,
+      role: Role.CREATOR,
+      verificationStatus: VerificationStatus.VERIFIED,
     },
   });
   // Create organization with members
