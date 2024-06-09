@@ -642,6 +642,26 @@
         ]
       }
     },
+    "/api/user/profile/{userId}": {
+      "patch": {
+        "operationId": "UserController_updateProfile",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/user/search/{name}": {
       "get": {
         "operationId": "UserController_searchUsers",

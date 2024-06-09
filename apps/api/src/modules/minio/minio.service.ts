@@ -58,7 +58,7 @@ export class MinioService {
     const bucketName = this.configService.get<string>('MINIO_BUCKET_NAME');
     const useSSL = this.configService.get<string>('MINIO_USE_SSL') === 'true';
     const protocol = useSSL ? 'https' : 'http';
-    return `${protocol}://${endPoint}:9001/${bucketName}/${fileName}`;
+    return `${protocol}://${endPoint}:9000/${bucketName}/${fileName}`;
     // return await this.minioClient.presignedUrl(
     //   'GET',
     //   this.bucketName,

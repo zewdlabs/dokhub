@@ -24,6 +24,7 @@ import { UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes, ApiBody, ApiOperation } from '@nestjs/swagger';
 import { UserDto } from '../auth/dto/user.dto';
+import { UpdateUserDto } from './dto/updateuser.dto';
 // import { VerificationGuard } from '../auth/guards/post.guard';
 // import { Verification } from '../auth/decorators/verificationstatus.decorate';
 @Controller('user')
@@ -124,9 +125,9 @@ export class UserController {
     return this.userService.deleteUser({ id: id });
   }
 
+  @Post('upload-profile-picture/:id')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
-  @Post('upload-profile-picture/:id')
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -146,6 +147,7 @@ export class UserController {
     @UploadedFile() file: Express.Multer.File,
     @Param('id') id: string,
   ): Promise<{ url: string }> {
+    console.log('000000000000000000000000000000000000000', id);
     const fileName = await this.minioService.uploadFile(file);
     const fileUrl = await this.minioService.getFileUrl(fileName);
     await this.userService.updateProfilePath(id, fileUrl);
@@ -162,6 +164,24 @@ export class UserController {
     await this.userService.updateUserFollowing(userId, userToFollowId);
   }
 
+  @Patch('profile/:userId')
+  async updateProfile(
+    @Param('userId') userId: string,
+    @Body() partialUpdateUserDto: Partial<UpdateUserDto>,
+  ) {
+    try {
+      const updatedUser = await this.userService.updateProfile(
+        userId,
+        partialUpdateUserDto,
+      );
+      return updatedUser;
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      }
+      throw error;
+    }
+  }
   @Get('search/:name')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()

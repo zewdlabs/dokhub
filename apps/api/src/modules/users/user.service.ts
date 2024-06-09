@@ -4,6 +4,7 @@ import { Prisma, Role, User, VerificationStatus } from '@prisma/client'; // Impo
 import { Logger } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import CreateUserDto from '@/modules/auth/dto/create-user.dto';
+import { UpdateUserDto } from './dto/updateuser.dto';
 
 export const roundsOfHashing = 10;
 @Injectable()
@@ -109,6 +110,24 @@ export class UserService {
     return updateUser;
   }
 
+  async updateProfile(
+    userId: string,
+    partialUpdateUserDto: Partial<UpdateUserDto>,
+  ): Promise<User> {
+    // Check if the user exists
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // Update the user profile with the provided data
+    return await this.prisma.user.update({
+      where: { id: userId },
+      data: { ...partialUpdateUserDto },
+    });
+  }
   async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<User> {
     this.logger.log('deleteUser');
     const deleteUser = await this.prisma.user.delete({
