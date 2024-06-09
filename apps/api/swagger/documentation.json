@@ -602,10 +602,27 @@
         ]
       }
     },
-    "/api/user/follow": {
+    "/api/user/follow/{followerId}/{followId}": {
       "post": {
         "operationId": "UserController_followUser",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "followerId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "followId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "201": {
             "description": ""

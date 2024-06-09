@@ -5,6 +5,7 @@ import { Logger } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import CreateUserDto from '@/modules/auth/dto/create-user.dto';
 import { UpdateUserDto } from './dto/updateuser.dto';
+// import { UserDto } from '../auth/dto/user.dto';
 
 export const roundsOfHashing = 10;
 @Injectable()
@@ -197,21 +198,32 @@ export class UserService {
   async searchUsersByName(name: string): Promise<User[]> {
     const users = await this.prisma.user.findMany({
       where: {
-        OR: [
+        AND: [
           {
-            name: {
-              contains: name,
-              mode: 'insensitive',
-            },
+            OR: [
+              {
+                name: {
+                  contains: name,
+                  mode: 'insensitive',
+                },
+              },
+              {
+                email: {
+                  contains: name,
+                  mode: 'insensitive',
+                },
+              },
+            ],
           },
           {
-            email: {
-              contains: name,
-              mode: 'insensitive',
+            role: {
+              not: Role.SUADMIN,
             },
           },
         ],
       },
+      //@ts-expect-error i cant fix it
+      skip: ['password', 'refreshToken'] as Array<keyof User>, // Specify properties you want to exclude
     });
 
     if (users.length === 0) {

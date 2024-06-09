@@ -26,6 +26,11 @@ import { ApiConsumes, ApiBody, ApiOperation } from '@nestjs/swagger';
 import { UserDto } from '../auth/dto/user.dto';
 import { UpdateUserDto } from './dto/updateuser.dto';
 // import { VerificationGuard } from '../auth/guards/post.guard';
+
+// interface FollowRequest {
+//   userId: string;
+//   userToFollowId: string;
+// }
 // import { Verification } from '../auth/decorators/verificationstatus.decorate';
 @Controller('user')
 export class UserController {
@@ -160,14 +165,16 @@ export class UserController {
     return { url: fileUrl };
   }
 
-  @Post('follow')
-  @UseGuards(AccessTokenGuard, RoleGuard)
+  @Post('follow/:followerId/:followId')
+  @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
+  // @ApiBody({ type: FollowRe })
   async followUser(
-    @Body() followData: { userId: string; userToFollowId: string },
+    @Param('followerId') followerId: string,
+    @Param('followId') followId: string,
   ): Promise<void> {
-    const { userId, userToFollowId } = followData;
-    await this.userService.updateUserFollowing(userId, userToFollowId);
+    // const { userId, userToFollowId } = followData;
+    await this.userService.updateUserFollowing(followerId, followId);
   }
 
   @Patch('profile/:userId')
