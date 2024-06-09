@@ -124,7 +124,7 @@ export class PostsService {
 
   async findUserFollowingPosts(userId: string): Promise<Partial<Post>[]> {
     const follows = await this.prisma.follows.findMany({
-      where: { followedById: userId },
+      where: { followingId: userId },
     });
 
     const posts = await this.prisma.post.findMany({
