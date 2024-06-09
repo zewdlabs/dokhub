@@ -178,6 +178,9 @@ export class UserController {
     @Param('userId') userId: string,
     @Body() partialUpdateUserDto: Partial<UpdateUserDto>,
   ) {
+    console.log('For updating user', partialUpdateUserDto);
+    console.log('userId', userId);
+
     try {
       const updatedUser = await this.userService.updateProfile(
         userId,
@@ -192,6 +195,7 @@ export class UserController {
       throw error;
     }
   }
+
   @Get('search/:name')
   @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()

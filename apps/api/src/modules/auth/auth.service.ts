@@ -140,6 +140,9 @@ export class AuthService {
       followingCount: user.followingCount,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
+      profileUrl: user.profileUrl,
+      emailVerified: user.emailVerified,
+      onboardingStatus: user.onboardingStatus,
     };
     // const { password, refreshToken, ...safeUser } = user;
     return { tokens, user: userDto };

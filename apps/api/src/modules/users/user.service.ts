@@ -21,8 +21,10 @@ export class UserService {
       where: userWhereUniqueInput,
       include: { posts: {} },
     });
+
     return user;
   }
+
   async findOne(id: string): Promise<User | null> {
     const user = await this.prisma.user.findUnique({
       where: { id },

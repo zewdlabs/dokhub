@@ -22,7 +22,6 @@ import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Icons } from "@/components/icons";
 import { signIn } from "next-auth/react";
 import { signInSchema } from "@/types/schema";
 
@@ -39,8 +38,7 @@ export default function SigninForm() {
     async (values: z.infer<typeof signInSchema>) => {
       const response = await signIn("credentials", {
         ...values,
-        redirect: true, // Use redirect: false to handle errors in the front-end
-        callbackUrl: "http://localhost:3000",
+        callbackUrl: "http://localhost:3000/auth/onboarding/personal",
       });
 
       if (response?.error) {
@@ -50,7 +48,6 @@ export default function SigninForm() {
       } else {
         // If there is no error, redirect to the callback URL
         if (response?.url) {
-          // window.location.href = response.url;
         }
       }
     },
