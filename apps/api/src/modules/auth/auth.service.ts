@@ -7,16 +7,16 @@ import {
 } from '@nestjs/common';
 import { LoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from '@/modules/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { AuthEntity } from './auth.entity';
 import { User } from '@prisma/client';
-import { UserService, roundsOfHashing } from '@/modules/users/user.service';
+import { UserService, roundsOfHashing } from '../users/user.service';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import CreateUserDto from './dto/create-user.dto';
 import { UserDto } from './dto/user.dto';
 import * as nodemailer from 'nodemailer';
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { EmailService } from '@/modules/email/email.service';
 // import { CLIENT_RENEG_LIMIT } from 'tls';
@@ -139,6 +139,8 @@ export class AuthService {
       followingCount: user.followingCount,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
+      profileUrl: null,
+      emailVerified: null,
     };
     // const { password, refreshToken, ...safeUser } = user;
     return { tokens, user: userDto };
