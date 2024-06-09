@@ -123,6 +123,7 @@ export class UserService {
     }
 
     // Update the user profile with the provided data
+    console.log('0000000000000000000000000000000', partialUpdateUserDto);
     return await this.prisma.user.update({
       where: { id: userId },
       data: { ...partialUpdateUserDto },

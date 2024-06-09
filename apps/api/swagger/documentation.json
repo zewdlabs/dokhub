@@ -340,7 +340,7 @@
         ]
       }
     },
-    "/api/user": {
+    "/api/user/allusers": {
       "get": {
         "operationId": "UserController_getAllUsers",
         "parameters": [],
@@ -354,25 +354,6 @@
             "bearer": []
           }
         ]
-      },
-      "post": {
-        "operationId": "UserController_signupUser",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateUserDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        }
       }
     },
     "/api/user/verified": {
@@ -488,42 +469,31 @@
         ]
       }
     },
-    "/api/user/profile/{id}": {
-      "get": {
-        "operationId": "UserController_getUserForProfile",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
+    "/api/user": {
+      "post": {
+        "operationId": "UserController_signupUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
             }
           }
-        ],
+        },
         "responses": {
-          "200": {
+          "201": {
             "description": ""
           }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ]
+        }
       }
     },
     "/api/user/getAll": {
       "get": {
         "operationId": "UserController_findAll",
-        "parameters": [
-          {
-            "name": "verificationStatus",
-            "required": true,
-            "in": "path",
-            "schema": {}
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": ""
@@ -655,11 +625,26 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PartialType"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": ""
           }
-        }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
       }
     },
     "/api/user/search/{name}": {
@@ -1311,6 +1296,10 @@
         ]
       },
       "UserDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "PartialType": {
         "type": "object",
         "properties": {}
       },

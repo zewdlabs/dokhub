@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsEmail, IsInt } from 'class-validator';
+import { IsOptional, IsString, IsInt } from 'class-validator';
 // import { VerificationStatus, Role } from '@prisma/client';
 
 export class UpdateUserDto {
@@ -9,10 +9,6 @@ export class UpdateUserDto {
   @IsOptional()
   @IsString()
   prefix?: string;
-
-  @IsOptional()
-  @IsEmail()
-  email?: string;
 
   @IsOptional()
   @IsString()
@@ -37,18 +33,4 @@ export class UpdateUserDto {
   @IsOptional()
   @IsInt()
   yearsOfExperience?: number;
-
-  @IsOptional()
-  @IsString()
-  profileUrl?: string;
-
-  //   @IsOptional()
-  //   @IsEnum(VerificationStatus)
-  //   verificationStatus?: VerificationStatus;
-
-  //   @IsOptional()
-  //   @IsEnum(Role)
-  //   role?: Role;
-
-  // Add other fields as needed
 }

@@ -13,7 +13,7 @@ import {
 import { UserService } from './user.service';
 import { Role, User as UserModel, VerificationStatus } from '@prisma/client';
 // import CreatePlatformUserInput from './inputs/create-user-dto';
-import { ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiResponse, PartialType } from '@nestjs/swagger';
 // import { JwtAuthGuard } from '@/auth/guards/jwt.guard';
 import { AccessTokenGuard } from '@/modules/auth/guards/accessToken.guard';
 import { Roles } from '@/modules/auth/decorators/role.decorate';
@@ -34,7 +34,7 @@ export class UserController {
     private minioService: MinioService,
   ) {}
 
-  @Get()
+  @Get('allusers')
   @Roles(Role.ADMIN, Role.SUADMIN)
   // @Verification(VerificationStatus.INCOMPLETE)
   @UseGuards(AccessTokenGuard, RoleGuard)
@@ -68,12 +68,12 @@ export class UserController {
     return this.userService.user({ id: id });
   }
 
-  @Get('profile/:id')
-  @UseGuards(AccessTokenGuard)
-  @ApiBearerAuth()
-  async getUserForProfile(@Param('id') id: string) {
-    return this.userService.getUserForProfile(id);
-  }
+  // @Get('profile/:id')
+  // @UseGuards(AccessTokenGuard)
+  // @ApiBearerAuth()
+  // async getUserForProfile(@Param('id') id: string) {
+  //   return this.userService.getUserForProfile(id);
+  // }
 
   @Post()
   async signupUser(@Body() userData: CreateUserDto): Promise<UserModel> {
@@ -97,7 +97,7 @@ export class UserController {
   // @UseGuards(AccessTokenGuard)
   @ApiBearerAuth()
   async findAll(
-    @Param('verificationStatus') verificationStatus?: VerificationStatus,
+    @Param('verificationStatus') verificationStatus?: VerificationStatus | null,
   ): Promise<any> {
     console.log(verificationStatus);
     return { message: 'hello' };
@@ -165,6 +165,9 @@ export class UserController {
   }
 
   @Patch('profile/:userId')
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @ApiBody({ type: PartialType<UpdateUserDto> })
   async updateProfile(
     @Param('userId') userId: string,
     @Body() partialUpdateUserDto: Partial<UpdateUserDto>,
@@ -174,6 +177,7 @@ export class UserController {
         userId,
         partialUpdateUserDto,
       );
+      console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', partialUpdateUserDto);
       return updatedUser;
     } catch (error) {
       if (error instanceof NotFoundException) {
