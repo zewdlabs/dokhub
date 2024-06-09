@@ -5,6 +5,7 @@ import {
   IsEmail,
   IsNotEmpty,
   IsInt,
+  IsDate,
   // IsAlphanumeric,
 } from 'class-validator';
 // import { Role } from '@prisma/client';
@@ -61,6 +62,13 @@ class CreateUserDto {
   // @IsOptional()
   // @IsAlphanumeric()
   // role: Role;
+  @IsOptional()
+  @IsString()
+  profileUrl?: string;
+
+  @IsOptional()
+  @IsDate()
+  emailVerified?: Date;
 }
 
 export default CreateUserDto;
