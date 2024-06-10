@@ -158,6 +158,8 @@ export class UserController {
     @UploadedFile() file: Express.Multer.File,
     @Param('id') id: string,
   ): Promise<{ url: string }> {
+    console.log('FILLLLLLEEE', file);
+
     console.log('000000000000000000000000000000000000000', id);
     const fileName = await this.minioService.uploadFile(file);
     const fileUrl = await this.minioService.getFileUrl(fileName);
@@ -175,6 +177,11 @@ export class UserController {
   ): Promise<void> {
     // const { userId, userToFollowId } = followData;
     await this.userService.updateUserFollowing(followerId, followId);
+  }
+
+  @Get('tofollow/:userId')
+  async getToFollowUsers(@Param('userId') userId: string) {
+    return this.userService.getToFollowUsers(userId);
   }
 
   @Patch('profile/:userId')

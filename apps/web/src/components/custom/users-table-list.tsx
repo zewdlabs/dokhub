@@ -44,6 +44,7 @@ export interface User {
   occupation?: string;
   createdAt: string;
   updatedAt: string;
+  profileUrl: string | null;
   medicalLicenseNumber?: string;
   verificationStatus: string;
 }

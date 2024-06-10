@@ -14,6 +14,28 @@ export class UserService {
 
   private logger = new Logger('User service');
 
+  async getToFollowUsers(userId: string): Promise<User[]> {
+    const usersFollowed = await this.prisma.follows.findMany({
+      where: {
+        followingId: userId,
+      },
+    });
+
+    return this.prisma.user.findMany({
+      orderBy: {
+        followedByCount: 'desc',
+      },
+      where: {
+        NOT: {
+          id: {
+            in: usersFollowed.map((user) => user.followedById) && [userId],
+          },
+        },
+      },
+      take: 10,
+    });
+  }
+
   async user(
     userWhereUniqueInput: Prisma.UserWhereUniqueInput,
   ): Promise<User | null> {

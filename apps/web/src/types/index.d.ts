@@ -63,3 +63,7 @@ export type UserSubscriptionPlan = SubscriptionPlan &
     stripeCurrentPeriodEnd: number;
     isPro: boolean;
   };
+
+import { type ClientUploadedFileData } from "uploadthing/types";
+
+export interface UploadedFile<T = unknown> extends ClientUploadedFileData<T> {}

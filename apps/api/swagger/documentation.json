@@ -635,6 +635,26 @@
         ]
       }
     },
+    "/api/user/tofollow/{userId}": {
+      "get": {
+        "operationId": "UserController_getToFollowUsers",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/api/user/profile/{userId}": {
       "patch": {
         "operationId": "UserController_updateProfile",
