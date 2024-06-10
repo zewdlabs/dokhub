@@ -4,15 +4,11 @@ import { TabsContent } from "@/components/ui/tabs";
 import { useSession } from "next-auth/react";
 import PostCard from "@/components/custom/post-card";
 import { useQuery } from "@tanstack/react-query";
+import { User } from "./users-table-list";
 
 export interface Post {
   postImage: string | null;
-  author: {
-    name: string;
-    email: string;
-    yearsOfExperience: string;
-    profileUrl: string | null;
-  };
+  author: User;
   id: string;
   reportedAmount: number;
   replies: any[];

@@ -29,6 +29,17 @@ import { addToLibrarySchema, deletePostSchema } from "@/types/schema";
 import { z } from "zod";
 import { genFallback } from "@/lib/utils";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+import { useState } from "react";
+import { DialogDescription } from "@radix-ui/react-dialog";
+import { User } from "./users-table-list";
 
 export default function PostCard({ post, tag }: { post: Post; tag: string }) {
   const session = useSession();
@@ -112,14 +123,7 @@ export default function PostCard({ post, tag }: { post: Post; tag: string }) {
       </Link>
       <CardFooter className="flex justify-between items-center pt-2 pb-0 px-2 w-full">
         <div className="flex items-center">
-          <Avatar>
-            <AvatarImage
-              src={post.author.profileUrl ?? undefined}
-              alt={post.author.name}
-              className="w-10 h-10 object-cover"
-            />
-            <AvatarFallback>{genFallback(post.author.name)}</AvatarFallback>
-          </Avatar>
+          <UserProfile user={post.author} />
           <Icons.dot className="w-6 h-6 text-muted-foreground/75" />
           <span className="text-muted-foreground text-sm font-medium">
             {new Date(post.publishedAt).toLocaleDateString()}
@@ -197,5 +201,48 @@ export default function PostCard({ post, tag }: { post: Post; tag: string }) {
         </div>
       </CardFooter>
     </Card>
+  );
+}
+
+function UserProfile({ user }: { user: User }) {
+  const [profileViewModalOpen, setProfileViewModalOpen] = useState(false);
+
+  return (
+    <Dialog open={profileViewModalOpen} onOpenChange={setProfileViewModalOpen}>
+      <DialogTrigger asChild className="hover:cursor-pointer ">
+        <Avatar>
+          <AvatarImage
+            src={user.profileUrl ?? undefined}
+            alt={user.name}
+            className="w-10 h-10 object-cover"
+          />
+          <AvatarFallback>{genFallback(user.name)}</AvatarFallback>
+        </Avatar>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>User profile</DialogTitle>
+          <DialogDescription>
+            See more information about the person.
+          </DialogDescription>
+        </DialogHeader>
+        <Image
+          width={80}
+          height={80}
+          className="object-cover"
+          src={user.profileUrl ?? "/placeholder.png"}
+          alt={user.name}
+        />
+        <DialogFooter>
+          <Button
+            variant="default"
+            className="hidden md:flex md:gap-2 md:items-center md:justify-center rounded-full"
+            type="submit"
+          >
+            Publish Now
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
