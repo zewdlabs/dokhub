@@ -5,6 +5,8 @@ import { Logger } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import CreateUserDto from '@/modules/auth/dto/create-user.dto';
 import { UpdateUserDto } from './dto/updateuser.dto';
+import { mapUserDto } from '../../utils/mapper.utils';
+import { UserDto } from '../auth/dto/user.dto';
 // import { UserDto } from '../auth/dto/user.dto';
 
 export const roundsOfHashing = 10;
@@ -197,7 +199,7 @@ export class UserService {
       },
     });
   }
-  async searchUsersByName(name: string): Promise<User[]> {
+  async searchUsersByName(name: string): Promise<UserDto[] | UserDto> {
     const users = await this.prisma.user.findMany({
       where: {
         AND: [
@@ -224,8 +226,7 @@ export class UserService {
           },
         ],
       },
-      //@ts-expect-error i cant fix it
-      skip: ['password', 'refreshToken'] as Array<keyof User>, // Specify properties you want to exclude
+      // omit: ['password', 'refreshToken'] as Array<keyof User>, // Specify properties you want to exclude
     });
 
     if (users.length === 0) {
@@ -234,7 +235,7 @@ export class UserService {
       );
     }
 
-    return users;
+    return mapUserDto(users);
   }
   async unfollowUser(userId: string, userToUnfollowId: string): Promise<void> {
     // Check if the user exists

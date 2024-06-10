@@ -12,7 +12,7 @@ export function mapUserDto(
   }
 }
 
-function mapSingleUserDto(user: PrismaUser): UserDto {
+export function mapSingleUserDto(user: PrismaUser): UserDto {
   return {
     profileUrl: user.profileUrl,
     emailVerified: user.emailVerified,
@@ -32,5 +32,6 @@ function mapSingleUserDto(user: PrismaUser): UserDto {
     followingCount: user.followingCount,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
+    onboardingStatus: user.onboardingStatus,
   };
 }
