@@ -24,7 +24,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { signIn } from "next-auth/react";
 import { signInSchema } from "@/types/schema";
-import { useRouter } from "next/navigation";
 
 export default function SigninForm() {
   const form = useForm<z.infer<typeof signInSchema>>({
@@ -34,8 +33,6 @@ export default function SigninForm() {
       password: "",
     },
   });
-
-  const router = useRouter();
 
   const onSubmit = form.handleSubmit(
     async (values: z.infer<typeof signInSchema>) => {
@@ -47,10 +44,9 @@ export default function SigninForm() {
       if (!response?.ok) {
         // Handle the error here
         console.error("Sign-in error:", response?.error);
+        return;
         // You can display the error message to the user
       } else {
-        // If there is no error, redirect to the callback URL
-        router.push("/app");
       }
     },
   );

@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import { EditorHeader } from "@/components/custom/app-header";
 import type { Metadata } from "next";
 import type { PropsWithChildren } from "react";
@@ -8,8 +9,19 @@ export async function generateMetadata({
   params: { id: string };
 }): Promise<Metadata> {
   const id = params.id;
+  const session = await auth();
 
-  const res = await fetch(`${process.env.BACKEND_URL}/api/posts/${id}`);
+  if (!session) {
+    return {
+      title: "Not Found",
+    };
+  }
+
+  const res = await fetch(`${process.env.BACKEND_URL}/api/posts/${id}`, {
+    headers: {
+      Authorization: `Bearer ${session.tokens.accessToken}`,
+    },
+  });
 
   if (!res.ok) {
     return {

@@ -16,14 +16,22 @@ import PostAction from "@/components/custom/post-actions";
 import PostInfo from "@/components/custom/post-info";
 import { AppFooter } from "@/components/custom/footer";
 import ReplyList from "@/components/custom/reply-list";
+import { useSession } from "next-auth/react";
 
 export default function Page({ params }: { params: { postId: string } }) {
+  const session = useSession();
+
   const { data: postDetails, isLoading: isPostsLoading } = useQuery({
     queryKey: ["post", params.postId],
     queryFn: async () => {
       const req = await fetch(
         `http://localhost:4231/api/posts/${params.postId}`,
-        { cache: "no-store" },
+        {
+          cache: "no-store",
+          headers: {
+            Authorization: `Bearer ${session.data?.tokens.accessToken}`,
+          },
+        },
       );
       if (!req.ok) throw new Error("Failed to fetch posts");
 

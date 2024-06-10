@@ -2,10 +2,21 @@ import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import type { Editor } from "@tiptap/react";
 
-export default function EditorToolbar({ editor }: { editor: Editor }) {
+export default function EditorToolbar({
+  editor,
+  complete,
+}: {
+  editor: Editor;
+  complete: (prompt: string) => void;
+}) {
   return (
     <div
       className={cn(
@@ -13,12 +24,6 @@ export default function EditorToolbar({ editor }: { editor: Editor }) {
       )}
     >
       <div className="flex gap-2 items-center">
-        {/*
-      <div className="flex gap-2 items-center"></div>
-      <Separator orientation="vertical" className="h-8" />
-      <div className="flex gap-2 items-center"></div>
-      <Separator orientation="vertical" className="h-8" />
-      */}
         <div className="flex gap-2 items-center">
           <ToggleGroup type="multiple">
             <ToggleGroupItem
@@ -206,6 +211,23 @@ export default function EditorToolbar({ editor }: { editor: Editor }) {
         >
           <Icons.redo className="h-5 w-5" />
         </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              className="px-3"
+              onClick={() => {
+                const prompt = editor.getText();
+                complete(prompt);
+                return true;
+              }}
+            >
+              <Icons.bulb className="h-5 w-5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="left">Use AI for assistance</TooltipContent>
+        </Tooltip>
+        <Tooltip></Tooltip>
       </div>
     </div>
   );

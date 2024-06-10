@@ -44,7 +44,7 @@ export default function PostList({ tag }: { tag?: string }) {
             headers: {
               Authorization: `Bearer ${session.data?.tokens.accessToken}`,
             },
-          }
+          },
         );
       } else if (tag === "drafts") {
         res = await fetch(
@@ -54,7 +54,7 @@ export default function PostList({ tag }: { tag?: string }) {
             headers: {
               Authorization: `Bearer ${session.data?.tokens.accessToken}`,
             },
-          }
+          },
         );
       } else if (tag === "following") {
         res = await fetch(
@@ -63,7 +63,7 @@ export default function PostList({ tag }: { tag?: string }) {
             headers: {
               Authorization: `Bearer ${session.data?.tokens.accessToken}`,
             },
-          }
+          },
           // `${process.env.BACKEND_URL}/api/posts/following/${userId}`,
         );
       } else if (tag === "library") {
@@ -73,13 +73,18 @@ export default function PostList({ tag }: { tag?: string }) {
             headers: {
               Authorization: `Bearer ${session.data?.tokens.accessToken}`,
             },
-          }
+          },
           // `${process.env.BACKEND_URL}/api/posts/library/${userId}`,
         );
       } else {
         res = await fetch(
-          `http://localhost:4231/api/posts/foryou/${session.data?.user.id}`
+          `http://localhost:4231/api/posts/foryou/${session.data?.user.id}`,
           // `${process.env.BACKEND_URL}/api/posts/foryou/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${session.data?.tokens.accessToken}`,
+            },
+          },
         );
       }
 
@@ -90,8 +95,6 @@ export default function PostList({ tag }: { tag?: string }) {
       return data as Post[];
     },
   });
-
-  console.log("PPPPPPPPPPPPPPPPPPPPPPPPPP", posts);
 
   return (
     <TabsContent

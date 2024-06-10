@@ -11,7 +11,6 @@ async function refreshToken(token: JWT): Promise<JWT> {
     headers: {
       authorization: `Refresh ${token.tokens.refreshToken}`,
     },
-    // body: JSON.stringify(token.user)
   });
 
   const response = await res.json();
@@ -48,9 +47,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             );
 
             if (res.ok) {
-              const data = await res.json();
-              console.log(data);
-              return data;
+              return await res.json();
             } else if (res.status === 401) {
               return { error: "Unauthorized: Incorrect email or password." };
             } else if (res.status === 400) {
@@ -63,7 +60,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               return { error: `Error: ${res.statusText}` };
             }
           } catch (error) {
-            // Network or other errors
             console.error("Network or other error:", error);
             return {
               error:
@@ -72,7 +68,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           }
         }
 
-        return { message: "wrong creds " };
+        return { message: "wrong credentials " };
       },
     }),
   ],
@@ -114,12 +110,23 @@ declare module "next-auth" {
    */
   interface Session {
     user: {
-      id: string;
-      email: string;
-      name: string;
       onboardingStatus: boolean;
-      profileUrl: string | null;
       role: string;
+      id: string;
+      bio: string;
+      prefix?: string;
+      yearsOfExperience: number;
+      name: string;
+      email: string;
+      followingCount: number;
+      followedByCount: number;
+      posts: any[];
+      occupation?: string;
+      createdAt: string;
+      updatedAt: string;
+      profileUrl: string | null;
+      medicalLicenseNumber?: string;
+      verificationStatus: string;
     } & DefaultSession["user"];
 
     tokens: {
@@ -136,12 +143,23 @@ declare module "next-auth/jwt" {
   /** Returned by the `jwt` callback and `auth`, when using JWT sessions */
   interface JWT {
     user: {
-      id: string;
-      email: string;
-      name: string;
       onboardingStatus: boolean;
-      profileUrl: string | null;
       role: string;
+      id: string;
+      bio: string;
+      prefix?: string;
+      yearsOfExperience: number;
+      name: string;
+      email: string;
+      followingCount: number;
+      followedByCount: number;
+      posts: any[];
+      occupation?: string;
+      createdAt: string;
+      updatedAt: string;
+      profileUrl: string | null;
+      medicalLicenseNumber?: string;
+      verificationStatus: string;
     } & DefaultSession["user"];
 
     tokens: {

@@ -22,6 +22,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { ProfileImage } from "./upload-profile";
 import { User } from "./users-table-list";
+import { toast } from "sonner";
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
@@ -81,6 +82,9 @@ export function ProfileForm() {
       }
 
       return await res.json();
+    },
+    onSuccess: () => {
+      toast.success("Profile updated successfully");
     },
   });
 

@@ -78,6 +78,7 @@ export function EditorHeader({ id }: { id: string }) {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.tokens.accessToken}`,
         },
         body: JSON.stringify({
           publishedAt: new Date().toJSON(),
@@ -205,7 +206,7 @@ export function EditorHeader({ id }: { id: string }) {
               </Form>
             </DialogContent>
           </Dialog>
-          {status === "authenticated" && (
+          {status === "authenticated" && !user.isLoading && (
             <AccountButton session={session} user={user.data!} />
           )}
         </div>
@@ -235,6 +236,10 @@ export function AppHeader() {
       return (await res.json()) as User;
     },
   });
+
+  if (user.isLoading || status == "loading") {
+    return <div>loading ...</div>;
+  }
 
   return (
     <header className="sticky top-0 left-0 backdrop-blur-3xl gap-4 px-4 md:px-6 border-b-[1px] border-border z-50 items-center">

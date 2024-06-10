@@ -23,7 +23,6 @@ import { useSession } from "next-auth/react";
 import { Post } from "@/components/custom/post-list";
 import { z } from "zod";
 import { deletePostSchema } from "@/types/schema";
-import { revalidateTag } from "next/cache";
 
 export default function Dashboard({ params }: { params: { postId: string } }) {
   const session = useSession();
@@ -33,6 +32,9 @@ export default function Dashboard({ params }: { params: { postId: string } }) {
     mutationFn: async (values: z.infer<typeof deletePostSchema>) => {
       const req = await fetch(`http://localhost:4231/api/posts/${values.id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${session.data?.tokens.accessToken}`,
+        },
       });
       if (!req.ok) throw new Error("Failed to publish post");
       return await req.json();
@@ -49,7 +51,7 @@ export default function Dashboard({ params }: { params: { postId: string } }) {
           headers: {
             Authorization: `Bearer ${session.data?.tokens.accessToken}`,
           },
-        }
+        },
       );
 
       if (!res.ok) {

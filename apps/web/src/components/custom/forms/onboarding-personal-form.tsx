@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -46,7 +46,7 @@ export default function OnboardingPersonalInfoForm() {
     mutationKey: ["disableOnboarding"],
     mutationFn: async ({ onboardingStatus }: { onboardingStatus: boolean }) => {
       const res = await fetch(
-        `http://localhost:4231/api/user/profile/${session.data?.user.id}`,
+        `http://localhost:4231/api/user/profile/${session?.data?.user.id}`,
         {
           method: "PATCH",
           headers: {

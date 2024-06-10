@@ -87,9 +87,8 @@ export default function PostCard({ post, tag }: { post: Post; tag: string }) {
     },
   });
 
-  console.log(tag);
   return (
-    <Card className="w-full p-4 md:pt-6">
+    <Card className="w-full p-4 md:pt-6 max-w-screen-md">
       <Link href={`/app/${tag !== "drafts" ? "posts" : "new"}/${post.id}`}>
         <div className="grid grid-cols-5">
           <CardHeader className="p-2 pb-3 col-span-3 w-full space-y-3">
@@ -100,15 +99,13 @@ export default function PostCard({ post, tag }: { post: Post; tag: string }) {
               {post.description || "No description available"}
             </CardDescription>
           </CardHeader>
-          <div className="relative mr-4 rounded-lg h-36 w-72 overflow-hidden">
+          <div className="relative mr-4 col-span-2 rounded-lg h-36 w-72 overflow-hidden">
             <Image
-              src={post.postImage ?? ""}
+              src={post.postImage ?? "/placeholder.png"}
               fill={true}
               objectFit="cover"
+              className="object-cover w-60 h-full"
               alt={post.title}
-              style={{
-                objectFit: "cover",
-              }}
             />
           </div>
         </div>

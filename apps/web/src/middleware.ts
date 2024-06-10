@@ -45,6 +45,7 @@ export const middleware = auth(async (req) => {
         cache: "no-store",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${req.auth.tokens.accessToken}`,
         },
         body: JSON.stringify({
           title: "Untitled",

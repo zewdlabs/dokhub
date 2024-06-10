@@ -49,9 +49,11 @@ import {
   Dot,
   Search,
   BookmarkMinus,
+  Lightbulb,
 } from "lucide-react";
 
 export const Icons = {
+  bulb: Lightbulb,
   chatbot: ({ className, ...otherProps }: LucideProps) => (
     <svg
       fill="#000000"

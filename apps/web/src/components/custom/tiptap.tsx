@@ -13,10 +13,11 @@ import { BubbleMenu as BubbleMenuConfig } from "@tiptap/extension-bubble-menu";
 import EditorToolbar from "./editor/toolbar";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useDebounce } from "@/hooks/use-debounce";
-import { buttonVariants } from "../ui/button";
+import { Button, buttonVariants } from "../ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Icons } from "@/components/icons";
 import { useCompletion } from "ai/react";
+import { useSession } from "next-auth/react";
 
 export default function Tiptap({
   id,
@@ -66,7 +67,7 @@ export default function Tiptap({
         openOnClick: "whenNotEditable",
         HTMLAttributes: {
           class: cn(
-            buttonVariants({ variant: "link", className: "px-0 py-0" })
+            buttonVariants({ variant: "link", className: "px-0 py-0" }),
           ),
         },
       }),
@@ -89,12 +90,15 @@ export default function Tiptap({
 
   const client = useQueryClient();
 
+  const session = useSession();
+
   const saveNote = useMutation({
     mutationFn: async () => {
       const response = await fetch(`http://localhost:4231/api/posts/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.data?.tokens.accessToken}`,
         },
         body: JSON.stringify({
           title: titleState,
@@ -131,7 +135,7 @@ export default function Tiptap({
 
   return (
     <div className={cn("relative container px-0")}>
-      {editor && <EditorToolbar editor={editor} />}
+      {editor && <EditorToolbar editor={editor} complete={complete} />}
       {editor && (
         <BubbleMenu editor={editor}>
           <ToggleGroup type="multiple">
@@ -160,6 +164,10 @@ export default function Tiptap({
               <Icons.underline className="h-5 w-5" />
             </ToggleGroupItem>
           </ToggleGroup>
+          <Button
+            variant="link"
+            onClick={() => editor.chain().focus().toggleUnderline().run()}
+          ></Button>
         </BubbleMenu>
       )}
       <EditorContent
