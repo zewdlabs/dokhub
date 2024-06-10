@@ -46,29 +46,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               },
             );
 
-            if (res.ok) {
-              return await res.json();
-            } else if (res.status === 401) {
-              return { error: "Unauthorized: Incorrect email or password." };
-            } else if (res.status === 400) {
-              return { error: "Bad Request: Missing or invalid parameters." };
-            } else if (res.status === 500) {
-              return {
-                error: "Internal Server Error: Please try again later.",
-              };
-            } else {
-              return { error: `Error: ${res.statusText}` };
+            if (res.status !== 201) {
+              return null;
             }
+
+            return await res.json();
           } catch (error) {
-            console.error("Network or other error:", error);
             return {
-              error:
-                "Network error: Please check your connection and try again.",
+              error: "something went wrong",
             };
           }
         }
-
-        return { message: "wrong credentials " };
       },
     }),
   ],
@@ -87,9 +75,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return session;
     },
   },
+  debug: true,
   pages: {
     signIn: "/auth/signin",
-    error: "/auth/error",
   },
 });
 

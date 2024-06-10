@@ -23,6 +23,7 @@ import Link from "next/link";
 import { z } from "zod";
 import { signUpSchema } from "@/types/schema";
 import { useRouter } from "next/navigation";
+import { useMutation } from "@tanstack/react-query";
 
 export default function SignupForm() {
   const router = useRouter();
@@ -37,8 +38,9 @@ export default function SignupForm() {
     },
   });
 
-  const onSubmit = form.handleSubmit(
-    async (values: z.infer<typeof signUpSchema>) => {
+  const submitSignup = useMutation({
+    mutationKey: ["signup"],
+    mutationFn: async (values: z.infer<typeof signUpSchema>) => {
       try {
         const res = await fetch("http://localhost:4231/api/auth/signup", {
           method: "POST",
@@ -66,7 +68,6 @@ export default function SignupForm() {
               message: error.message,
             });
           }
-          return;
         }
 
         router.push(`/auth/verify-email?email=${values.email}`);
@@ -93,11 +94,11 @@ export default function SignupForm() {
         });
       }
     },
-  );
+  });
 
   return (
     <Form {...form}>
-      <form onSubmit={onSubmit}>
+      <form onSubmit={form.handleSubmit((data) => submitSignup.mutate(data))}>
         <Card className="mx-auto max-w-2xl">
           <CardHeader>
             <CardTitle className="text-xl">Sign Up</CardTitle>
@@ -216,7 +217,11 @@ export default function SignupForm() {
                   />
                 </div>
               </div>
-              <Button type="submit" className="w-full">
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={submitSignup.isPending}
+              >
                 Create an account
               </Button>
             </div>

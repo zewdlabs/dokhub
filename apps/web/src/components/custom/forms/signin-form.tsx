@@ -24,8 +24,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { signIn } from "next-auth/react";
 import { signInSchema } from "@/types/schema";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 
 export default function SigninForm() {
+  const router = useRouter();
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -34,26 +37,28 @@ export default function SigninForm() {
     },
   });
 
-  const onSubmit = form.handleSubmit(
-    async (values: z.infer<typeof signInSchema>) => {
-      const response = await signIn("credentials", {
+  const signinSubmit = useMutation({
+    mutationKey: ["signin"],
+    mutationFn: async (values: z.infer<typeof signInSchema>) => {
+      const res = await signIn("credentials", {
         ...values,
-        callbackUrl: "http://localhost:3000/auth/onboarding/personal",
+        redirect: false,
       });
 
-      if (!response?.ok) {
-        // Handle the error here
-        console.error("Sign-in error:", response?.error);
-        return;
-        // You can display the error message to the user
-      } else {
+      console.log("response", res);
+
+      if (!res?.error) {
+        return router.push("/auth/onboarding/personal");
       }
+
+      form.setError("email", { message: "" });
+      form.setError("password", { message: "" });
     },
-  );
+  });
 
   return (
     <Form {...form}>
-      <form onSubmit={onSubmit}>
+      <form onSubmit={form.handleSubmit((data) => signinSubmit.mutate(data))}>
         <Card className="mx-auto max-w-sm">
           <CardHeader>
             <CardTitle className="text-2xl">Sign in</CardTitle>
@@ -112,7 +117,11 @@ export default function SigninForm() {
                   </Link>
                 </div>
               </div>
-              <Button type="submit" className="w-full">
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={signinSubmit.isPending}
+              >
                 Continue
               </Button>
             </div>

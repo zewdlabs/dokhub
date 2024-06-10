@@ -1,5 +1,62 @@
 import { z } from "zod";
 
+export const signInSchema = z.object({
+  email: z.string().email(),
+  password: z
+    .string()
+    .min(8)
+    .regex(/[a-z]/, {
+      message: "Password must contain at least one lowercase letter",
+    })
+    .regex(/[A-Z]/, {
+      message: "Password must contain at least one uppercase letter",
+    })
+    .regex(/\d/, { message: "Password must contain at least one number" })
+    .regex(/[@$!%*?&]/, {
+      message:
+        "Password must contain at least one special character (@, $, !, %, *, ?, &)",
+    }),
+});
+
+export const signUpSchema = z
+  .object({
+    firstName: z.string(),
+    lastName: z.string(),
+    email: z.string().email(),
+    password: z
+      .string()
+      .min(8)
+      .regex(/[a-z]/, {
+        message: "Password must contain at least one lowercase letter",
+      })
+      .regex(/[A-Z]/, {
+        message: "Password must contain at least one uppercase letter",
+      })
+      .regex(/\d/, { message: "Password must contain at least one number" })
+      .regex(/[@$!%*?&]/, {
+        message:
+          "Password must contain at least one special character (@, $, !, %, *, ?, &)",
+      }),
+    confirmPassword: z
+      .string()
+      .min(8)
+      .regex(/[a-z]/, {
+        message: "Password must contain at least one lowercase letter",
+      })
+      .regex(/[A-Z]/, {
+        message: "Password must contain at least one uppercase letter",
+      })
+      .regex(/\d/, { message: "Password must contain at least one number" })
+      .regex(/[@$!%*?&]/, {
+        message:
+          "Password must contain at least one special character (@, $, !, %, *, ?, &)",
+      }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
 export const verifyEmailSchema = z.object({
   code: z.string().length(6),
 });
@@ -45,11 +102,6 @@ export const onboardingSocialInfoSchema = z.object({
   instagram: z.string(),
 });
 
-export const signInSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-});
-
 export const forgotPasswordSchema = z.object({
   email: z.string().email(),
 });
@@ -58,19 +110,6 @@ export const resetPasswordSchema = z.object({
   password: z.string().min(6),
   confirmPassword: z.string().min(6),
 });
-
-export const signUpSchema = z
-  .object({
-    firstName: z.string(),
-    lastName: z.string(),
-    email: z.string().email(),
-    password: z.string().min(6),
-    confirmPassword: z.string().min(6),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
 
 export const profileFormSchema = z.object({
   name: z
