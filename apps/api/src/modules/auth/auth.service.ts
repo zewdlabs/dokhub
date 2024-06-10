@@ -180,6 +180,9 @@ export class AuthService {
   }
 
   async updateRefreshToken(user: User, refreshToken: string) {
+    if (!user) {
+      throw new Error('User object is null or undefined');
+    }
     const hashedRefreshToken = await bcrypt.hash(refreshToken, roundsOfHashing);
     user.refreshToken = hashedRefreshToken;
     await this.usersService.updateUser({

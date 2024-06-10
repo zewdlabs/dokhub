@@ -101,9 +101,9 @@ model Membership {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  role Role
+  role OrganizationRole
 
-  @@unique([userId, organizationId])
+  @@unique([userId, organizationId], name: "unique_membership")
   @@index([userId, organizationId], name: "unique_membership")
   @@map("memberships")
 }
@@ -366,6 +366,12 @@ enum PostStatus {
   DRAFT
   PUBLISHED
   SUSPENDED
+}
+
+enum OrganizationRole {
+  ADMIN
+  MEMBER
+  OWNER
 }
 
 enum Role {
