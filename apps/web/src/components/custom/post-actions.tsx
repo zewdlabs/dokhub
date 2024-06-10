@@ -45,8 +45,9 @@ export default function PostAction({
           }),
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${session.data?.tokens.accessToken}`,
           },
-        },
+        }
       );
 
       if (!res.ok) {

@@ -28,35 +28,55 @@ export interface Post {
 }
 
 export default function PostList({ tag }: { tag?: string }) {
-  const { data: session } = useSession();
+  const session = useSession();
 
   const { data: posts, isLoading: isPostsLoading } = useQuery({
-    queryKey: ["posts", tag, session?.user.id],
+    queryKey: ["posts", tag, session.data?.user.id],
     queryFn: async () => {
       let res = null;
       if (tag === "published") {
         res = await fetch(
           // `${process.env.BACKEND_URL}/api/posts/published/${userId}`,
-          `http://localhost:4231/api/posts/published/${session?.user.id}`,
+          `http://localhost:4231/api/posts/published/${session.data?.user.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${session.data?.tokens.accessToken}`,
+            },
+          }
         );
       } else if (tag === "drafts") {
         res = await fetch(
           // `${process.env.BACKEND_URL}/api/posts/drafts/${userId}`,
-          `http://localhost:4231/api/posts/drafts/${session?.user.id}`,
+          `http://localhost:4231/api/posts/drafts/${session.data?.user.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${session.data?.tokens.accessToken}`,
+            },
+          }
         );
       } else if (tag === "following") {
         res = await fetch(
-          `http://localhost:4231/api/posts/following/${session?.user.id}`,
+          `http://localhost:4231/api/posts/following/${session.data?.user.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${session.data?.tokens.accessToken}`,
+            },
+          }
           // `${process.env.BACKEND_URL}/api/posts/following/${userId}`,
         );
       } else if (tag === "library") {
         res = await fetch(
-          `http://localhost:4231/api/posts/library/${session?.user.id}`,
+          `http://localhost:4231/api/posts/library/${session.data?.user.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${session.data?.tokens.accessToken}`,
+            },
+          }
           // `${process.env.BACKEND_URL}/api/posts/library/${userId}`,
         );
       } else {
         res = await fetch(
-          `http://localhost:4231/api/posts/foryou/${session?.user.id}`,
+          `http://localhost:4231/api/posts/foryou/${session.data?.user.id}`
           // `${process.env.BACKEND_URL}/api/posts/foryou/${userId}`,
         );
       }

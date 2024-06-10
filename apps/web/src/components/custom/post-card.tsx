@@ -38,6 +38,9 @@ export default function PostCard({ post, tag }: { post: Post; tag: string }) {
     mutationFn: async (values: z.infer<typeof deletePostSchema>) => {
       const req = await fetch(`http://localhost:4231/api/posts/${values.id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${session.data?.tokens.accessToken}`,
+        },
       });
       if (!req.ok) throw new Error("Failed to publish post");
       return await req.json();
@@ -51,6 +54,9 @@ export default function PostCard({ post, tag }: { post: Post; tag: string }) {
         `http://localhost:4231/api/posts/${values.postId}/addtolibrary/${values.userId}`,
         {
           method: "POST",
+          headers: {
+            Authorization: `Bearer ${session.data?.tokens.accessToken}`,
+          },
         },
       );
       if (!req.ok) throw new Error("Failed to publish post");
@@ -67,6 +73,9 @@ export default function PostCard({ post, tag }: { post: Post; tag: string }) {
       const req = await fetch(
         `http://localhost:4231/api/posts/${values.postId}/removefromlibrary/${values.userId}`,
         {
+          headers: {
+            Authorization: `Bearer ${session.data?.tokens.accessToken}`,
+          },
           method: "DELETE",
         },
       );
