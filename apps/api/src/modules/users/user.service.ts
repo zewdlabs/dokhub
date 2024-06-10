@@ -78,7 +78,7 @@ export class UserService {
 
   async getAllVerifications() {
     const users = await this.prisma.user.findMany({
-      where: { verificationStatus: VerificationStatus.INCOMPLETE },
+      where: { verificationStatus: VerificationStatus.PENDING },
     });
     return users;
   }
@@ -141,7 +141,6 @@ export class UserService {
     userId: string,
     partialUpdateUserDto: Partial<UpdateUserDto>,
   ): Promise<User> {
-    // Check if the user exists
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
@@ -149,11 +148,16 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    // Update the user profile with the provided data
-    console.log('0000000000000000000000000000000', partialUpdateUserDto);
     return await this.prisma.user.update({
       where: { id: userId },
-      data: { ...partialUpdateUserDto },
+      data: {
+        ...partialUpdateUserDto,
+        verificationStatus:
+          user.verificationStatus === 'INCOMPLETE' &&
+          partialUpdateUserDto.medicalLicenseNumber
+            ? 'PENDING'
+            : 'INCOMPLETE',
+      },
     });
   }
   async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<User> {
