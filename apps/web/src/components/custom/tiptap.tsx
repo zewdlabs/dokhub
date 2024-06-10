@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
+import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import Image from "@tiptap/extension-image";
@@ -13,9 +13,7 @@ import { BubbleMenu as BubbleMenuConfig } from "@tiptap/extension-bubble-menu";
 import EditorToolbar from "./editor/toolbar";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useDebounce } from "@/hooks/use-debounce";
-import { Button, buttonVariants } from "../ui/button";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Icons } from "@/components/icons";
+import { buttonVariants } from "../ui/button";
 import { useCompletion } from "ai/react";
 import { useSession } from "next-auth/react";
 
@@ -136,40 +134,6 @@ export default function Tiptap({
   return (
     <div className={cn("relative container px-0")}>
       {editor && <EditorToolbar editor={editor} complete={complete} />}
-      {editor && (
-        <BubbleMenu editor={editor}>
-          <ToggleGroup type="multiple">
-            <ToggleGroupItem
-              value="bold"
-              aria-label="Toggle bold"
-              onClick={() => editor.chain().focus().toggleBold().run()}
-              disabled={!editor.can().chain().focus().toggleBold().run()}
-            >
-              <Icons.bold className="h-5 w-5" />
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              value="italic"
-              aria-label="Toggle italic"
-              onClick={() => editor.chain().focus().toggleItalic().run()}
-              disabled={!editor.can().chain().focus().toggleItalic().run()}
-            >
-              <Icons.italic className="h-5 w-5" />
-            </ToggleGroupItem>
-            <ToggleGroupItem
-              value="underline"
-              aria-label="Toggle underline"
-              onClick={() => editor.chain().focus().toggleUnderline().run()}
-              disabled={!editor.can().chain().focus().toggleStrike().run()}
-            >
-              <Icons.underline className="h-5 w-5" />
-            </ToggleGroupItem>
-          </ToggleGroup>
-          <Button
-            variant="link"
-            onClick={() => editor.chain().focus().toggleUnderline().run()}
-          ></Button>
-        </BubbleMenu>
-      )}
       <EditorContent
         editor={editor}
         className="px-8 prose max-w-none md:px-24 py-12 min-h-[70vh] border border-t-0"
@@ -177,3 +141,38 @@ export default function Tiptap({
     </div>
   );
 }
+
+// {editor && (
+//   <BubbleMenu editor={editor}>
+//     <ToggleGroup type="multiple">
+//       <ToggleGroupItem
+//         value="bold"
+//         aria-label="Toggle bold"
+//         onClick={() => editor.chain().focus().toggleBold().run()}
+//         disabled={!editor.can().chain().focus().toggleBold().run()}
+//       >
+//         <Icons.bold className="h-5 w-5" />
+//       </ToggleGroupItem>
+//       <ToggleGroupItem
+//         value="italic"
+//         aria-label="Toggle italic"
+//         onClick={() => editor.chain().focus().toggleItalic().run()}
+//         disabled={!editor.can().chain().focus().toggleItalic().run()}
+//       >
+//         <Icons.italic className="h-5 w-5" />
+//       </ToggleGroupItem>
+//       <ToggleGroupItem
+//         value="underline"
+//         aria-label="Toggle underline"
+//         onClick={() => editor.chain().focus().toggleUnderline().run()}
+//         disabled={!editor.can().chain().focus().toggleStrike().run()}
+//       >
+//         <Icons.underline className="h-5 w-5" />
+//       </ToggleGroupItem>
+//     </ToggleGroup>
+//     <Button
+//       variant="link"
+//       onClick={() => editor.chain().focus().toggleUnderline().run()}
+//     ></Button>
+//   </BubbleMenu>
+// )}

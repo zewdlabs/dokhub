@@ -132,7 +132,7 @@ export class UserService {
     this.logger.log('updateUser');
     const updateUser = await this.prisma.user.update({
       where: params.where,
-      data: params.data,
+      data: { ...params.data },
     });
     return updateUser;
   }

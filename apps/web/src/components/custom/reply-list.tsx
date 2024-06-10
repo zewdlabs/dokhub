@@ -37,9 +37,9 @@ export default function ReplyList({ postId }: { postId: string }) {
   }
 
   return (
-    <div className="container flex flex-col gap-4">
+    <div className="container flex flex-col gap-4 items-center py-8">
       {replies.data.map((reply: Post) => (
-        <Link href={`/app/posts/${reply.id}`} key={reply.id}>
+        <Link href={`/app/posts/${reply.id}`} key={reply.id} className="w-fit">
           <PostCard post={reply} tag="replies" />
         </Link>
       ))}

@@ -65,7 +65,17 @@ export const middleware = auth(async (req) => {
       }
     }
 
-    if (pathname.endsWith("/c")) {
+    if (
+      pathname.startsWith("/app/new") &&
+      req.auth.user.verificationStatus !== "VERIFIED"
+    ) {
+      return Response.redirect(new URL("/app", req.url));
+    }
+
+    if (
+      pathname.endsWith("/app/c") &&
+      req.auth.user.verificationStatus === "VERIFIED"
+    ) {
       const res = await fetch(
         `http://localhost:4231/api/chat/user/${req.auth.user.id}`,
         {
@@ -88,6 +98,8 @@ export const middleware = auth(async (req) => {
       };
 
       return Response.redirect(new URL(`/app/c/${chat.id}`, req.url));
+    } else if (pathname.endsWith("/app/c")) {
+      return Response.redirect(new URL("/app", req.url));
     }
 
     if (pathname.startsWith("/admin") && req.auth.user.role !== "SUADMIN") {

@@ -89,10 +89,10 @@ export const deleteOrgSchema = z.object({
 });
 
 export const onboardingPersonalInfoSchema = z.object({
-  occupation: z.string(),
-  speciality: z.string(),
-  medicalLicense: z.string(),
-  yearsOfExperience: z.number(),
+  occupation: z.string().optional(),
+  speciality: z.string().optional(),
+  medicalLicense: z.string().optional(),
+  yearsOfExperience: z.number().optional(),
 });
 
 export const onboardingSocialInfoSchema = z.object({

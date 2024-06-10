@@ -32,6 +32,7 @@ import { toast } from "sonner";
 
 export default function PostCard({ post, tag }: { post: Post; tag: string }) {
   const session = useSession();
+
   const removePost = useMutation({
     mutationKey: ["post", post.id, "remove"],
     mutationFn: async (values: z.infer<typeof deletePostSchema>) => {
@@ -103,7 +104,6 @@ export default function PostCard({ post, tag }: { post: Post; tag: string }) {
             <Image
               src={post.postImage ?? "/placeholder.png"}
               fill={true}
-              objectFit="cover"
               className="object-cover w-60 h-full"
               alt={post.title}
             />
@@ -167,8 +167,6 @@ export default function PostCard({ post, tag }: { post: Post; tag: string }) {
             <DropdownMenuContent align="end">
               <DropdownMenuGroup>
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                {/*<DropdownMenuItem>Add to library</DropdownMenuItem>*/}
-
                 {post.authorId === session.data?.user.id ? (
                   <>
                     <DropdownMenuItem>

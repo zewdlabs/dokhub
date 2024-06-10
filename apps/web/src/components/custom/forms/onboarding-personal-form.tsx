@@ -175,7 +175,6 @@ export default function OnboardingPersonalInfoForm() {
                         <Input
                           id="medicallicense"
                           type="text"
-                          required
                           {...field}
                         />
                       </FormControl>
