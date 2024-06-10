@@ -27,7 +27,7 @@ import {
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Switch } from "@/components/ui/switch";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
@@ -36,6 +36,8 @@ import { usePathname } from "next/navigation";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { publishFormSchema } from "@/types/schema";
+import { User } from "./users-table-list";
+import { PostImage } from "./post-image";
 
 export function EditorHeader({ id }: { id: string }) {
   const { data: session, status } = useSession();
@@ -49,9 +51,28 @@ export function EditorHeader({ id }: { id: string }) {
     },
   });
 
+  const user = useQuery({
+    queryKey: ["user", session?.user.id],
+    queryFn: async () => {
+      const res = await fetch(
+        `http://localhost:4231/api/user/${session?.user.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${session?.tokens.accessToken}`,
+          },
+        },
+      );
+
+      if (!res.ok) return null;
+
+      return (await res.json()) as User;
+    },
+  });
+
   const client = useQueryClient();
 
   const publishPost = useMutation({
+    mutationKey: ["publish", id],
     mutationFn: async (values: z.infer<typeof publishFormSchema>) => {
       const req = await fetch(`http://localhost:4231/api/posts/${id}`, {
         method: "PATCH",
@@ -114,6 +135,7 @@ export function EditorHeader({ id }: { id: string }) {
                   Edit post information and choose where to publish it.
                 </DialogDescription>
               </DialogHeader>
+              <PostImage id={id} />
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(onSubmit)}
@@ -183,7 +205,9 @@ export function EditorHeader({ id }: { id: string }) {
               </Form>
             </DialogContent>
           </Dialog>
-          {status === "authenticated" && <AccountButton session={session} />}
+          {status === "authenticated" && (
+            <AccountButton session={session} user={user.data!} />
+          )}
         </div>
       </div>
     </header>
@@ -193,6 +217,24 @@ export function EditorHeader({ id }: { id: string }) {
 export function AppHeader() {
   const { data: session, status } = useSession();
   const pathname = usePathname();
+
+  const user = useQuery({
+    queryKey: ["user", session?.user.id],
+    queryFn: async () => {
+      const res = await fetch(
+        `http://localhost:4231/api/user/${session?.user.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${session?.tokens.accessToken}`,
+          },
+        },
+      );
+
+      if (!res.ok) return null;
+
+      return (await res.json()) as User;
+    },
+  });
 
   return (
     <header className="sticky top-0 left-0 backdrop-blur-3xl gap-4 px-4 md:px-6 border-b-[1px] border-border z-50 items-center">
@@ -229,7 +271,9 @@ export function AppHeader() {
           >
             Write
           </Link>
-          {status === "authenticated" && <AccountButton session={session!} />}
+          {status === "authenticated" && !user.isLoading && (
+            <AccountButton session={session!} user={user.data!} />
+          )}
         </div>
       </div>
     </header>

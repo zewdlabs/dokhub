@@ -17,10 +17,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Icons } from "@/components/icons";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { z } from "zod";
 import { signUpSchema } from "@/types/schema";
@@ -41,23 +39,59 @@ export default function SignupForm() {
 
   const onSubmit = form.handleSubmit(
     async (values: z.infer<typeof signUpSchema>) => {
-      const res = await fetch("http://localhost:4231/api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: `${values.firstName} ${values.lastName}`,
-          email: values.email,
-          password: values.password,
-        }),
-      });
+      try {
+        const res = await fetch("http://localhost:4231/api/auth/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: `${values.firstName} ${values.lastName}`,
+            email: values.email,
+            password: values.password,
+          }),
+        });
 
-      if (!res.ok) {
-        alert(res.statusText);
-        return;
+        if (!res.ok) {
+          const error = await res.json();
+
+          if (error.message === "User already exists") {
+            form.setError("email", {
+              type: "server",
+              message: error.message,
+            });
+          } else {
+            form.setError("email", {
+              type: "server",
+              message: error.message,
+            });
+          }
+          return;
+        }
+
+        router.push(`/auth/verify-email?email=${values.email}`);
+      } catch (error) {
+        form.setError("lastName", {
+          type: "server",
+          message: "",
+        });
+        form.setError("firstName", {
+          type: "server",
+          message: "",
+        });
+        form.setError("email", {
+          type: "server",
+          message: "An error occurred on our side. Please try again later.",
+        });
+        form.setError("password", {
+          type: "server",
+          message: "",
+        });
+        form.setError("confirmPassword", {
+          type: "server",
+          message: "",
+        });
       }
-      router.push(`/auth/verify-email?email=${values.email}`);
     },
   );
 

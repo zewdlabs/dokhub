@@ -29,7 +29,6 @@ import { addToLibrarySchema, deletePostSchema } from "@/types/schema";
 import { z } from "zod";
 import { genFallback } from "@/lib/utils";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
 export default function PostCard({ post, tag }: { post: Post; tag: string }) {
   const session = useSession();
@@ -92,7 +91,7 @@ export default function PostCard({ post, tag }: { post: Post; tag: string }) {
   return (
     <Card className="w-full p-4 md:pt-6">
       <Link href={`/app/${tag !== "drafts" ? "posts" : "new"}/${post.id}`}>
-        <div className="grid grid-cols-4">
+        <div className="grid grid-cols-5">
           <CardHeader className="p-2 pb-3 col-span-3 w-full space-y-3">
             <CardTitle className="font-cal tracking-normal">
               {post.title}
@@ -101,12 +100,11 @@ export default function PostCard({ post, tag }: { post: Post; tag: string }) {
               {post.description || "No description available"}
             </CardDescription>
           </CardHeader>
-          <div className="relative mr-4 rounded-lg h-36 overflow-hidden">
+          <div className="relative mr-4 rounded-lg h-36 w-72 overflow-hidden">
             <Image
-              src={
-                "https://images.unsplash.com/photo-1478144592103-25e218a04891?q=80&w=2275&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-              }
+              src={post.postImage ?? ""}
               fill={true}
+              objectFit="cover"
               alt={post.title}
               style={{
                 objectFit: "cover",
@@ -118,7 +116,11 @@ export default function PostCard({ post, tag }: { post: Post; tag: string }) {
       <CardFooter className="flex justify-between items-center pt-2 pb-0 px-2 w-full">
         <div className="flex items-center">
           <Avatar>
-            <AvatarImage src={undefined} alt={post.author.name} />
+            <AvatarImage
+              src={post.author.profileUrl ?? undefined}
+              alt={post.author.name}
+              className="w-10 h-10 object-cover"
+            />
             <AvatarFallback>{genFallback(post.author.name)}</AvatarFallback>
           </Avatar>
           <Icons.dot className="w-6 h-6 text-muted-foreground/75" />

@@ -92,16 +92,35 @@ export default function UserTableList({ tag }: { tag?: string }) {
     },
   });
 
+  const reject = useMutation({
+    mutationKey: ["user"],
+    mutationFn: async (values: z.infer<typeof deleteUserSchema>) => {
+      const req = await fetch(
+        `http://localhost:4231/api/user/validate/${values.id}/REJECTED`,
+        {
+          headers: {
+            Authorization: `Bearer ${session?.tokens.accessToken}`,
+          },
+          method: "PATCH",
+        },
+      );
+      if (!req.ok) throw new Error("Failed to publish post");
+      return await req.json();
+    },
+  });
+
   const verify = useMutation({
     mutationKey: ["user"],
     mutationFn: async (values: z.infer<typeof deleteUserSchema>) => {
-      const req = await fetch(`http://localhost:4231/api/user/${values.id}`, {
-        headers: {
-          Authorization: `Bearer ${session?.tokens.accessToken}`,
+      const req = await fetch(
+        `http://localhost:4231/api/user/validate/${values.id}/VERIFIED`,
+        {
+          headers: {
+            Authorization: `Bearer ${session?.tokens.accessToken}`,
+          },
+          method: "PATCH",
         },
-        method: "PATCH",
-        body: JSON.stringify({ verificationStatus: "VERIFIED" }),
-      });
+      );
       if (!req.ok) throw new Error("Failed to publish post");
       return await req.json();
     },
@@ -189,27 +208,43 @@ export default function UserTableList({ tag }: { tag?: string }) {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <form
-                              onSubmit={() => verify.mutate({ id: user.id })}
-                            >
-                              <DropdownMenuItem
-                                disabled={
-                                  user.verificationStatus === "VERIFIED"
+                            {tag === "not-verified" ? (
+                              <>
+                                <form
+                                  onSubmit={() =>
+                                    verify.mutate({ id: user.id })
+                                  }
+                                >
+                                  <DropdownMenuItem
+                                    disabled={
+                                      user.verificationStatus === "VERIFIED"
+                                    }
+                                  >
+                                    <button type="submit">Approve</button>
+                                  </DropdownMenuItem>
+                                </form>
+
+                                <form
+                                  onSubmit={() =>
+                                    reject.mutate({ id: user.id })
+                                  }
+                                >
+                                  <DropdownMenuItem>
+                                    <button type="submit">Reject</button>
+                                  </DropdownMenuItem>
+                                </form>
+                              </>
+                            ) : (
+                              <form
+                                onSubmit={() =>
+                                  removeUser.mutate({ id: user.id })
                                 }
                               >
-                                <button type="submit">Approve</button>
-                              </DropdownMenuItem>
-                            </form>
-
-                            <form
-                              onSubmit={() =>
-                                removeUser.mutate({ id: user.id })
-                              }
-                            >
-                              <DropdownMenuItem>
-                                <button type="submit">Remove</button>
-                              </DropdownMenuItem>
-                            </form>
+                                <DropdownMenuItem>
+                                  <button type="submit">Remove</button>
+                                </DropdownMenuItem>
+                              </form>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>

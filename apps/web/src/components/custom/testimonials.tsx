@@ -64,18 +64,6 @@ export default function Testimonials() {
           to get assistance in their day to day tasks. Here are some of their
           opinions on the platform.
         </p>
-        <Link
-          href={""}
-          className={cn(
-            buttonVariants({
-              variant: "default",
-              size: "lg",
-            }),
-            "rounded-full w-fit",
-          )}
-        >
-          Read success stories
-        </Link>
       </div>
       <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-1 gap-5 col-span-6">
         {testimonials.map((testimonial) => (

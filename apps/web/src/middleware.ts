@@ -6,8 +6,6 @@ import { User } from "next-auth";
 export const middleware = auth(async (req) => {
   const pathname = req.nextUrl.pathname;
 
-  console.log(`pathname: ${pathname}`);
-
   if (
     pathname === "/" ||
     pathname === "/pricing" ||
@@ -22,14 +20,22 @@ export const middleware = auth(async (req) => {
       pathname.startsWith("/auth") &&
       !pathname.startsWith("/auth/onboarding")
     ) {
-      return Response.redirect(new URL("/app", req.url));
+      return req.auth.user.role === "SUADMIN"
+        ? Response.redirect(new URL("/admin", req.url))
+        : Response.redirect(new URL("/app", req.url));
+    }
+
+    if (
+      pathname.startsWith("/auth/onboarding") &&
+      req.auth.user.role === "SUADMIN"
+    ) {
+      return Response.redirect(new URL("/admin", req.url));
     }
 
     if (
       pathname.endsWith("/onboarding/personal") &&
       req.auth.user.onboardingStatus
     ) {
-      console.log("did it get here");
       return Response.redirect(new URL("/app", req.url));
     }
 
@@ -81,6 +87,10 @@ export const middleware = auth(async (req) => {
       };
 
       return Response.redirect(new URL(`/app/c/${chat.id}`, req.url));
+    }
+
+    if (pathname.startsWith("/admin") && req.auth.user.role !== "SUADMIN") {
+      return Response.redirect(new URL("/app", req.url));
     }
 
     if (pathname.endsWith("/admin/posts")) {

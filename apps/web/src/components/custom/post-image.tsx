@@ -20,6 +20,7 @@ import { uploadImageSchema } from "@/types/schema";
 import { useSession } from "next-auth/react";
 import { genFallback } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
+import Image from "next/image";
 
 function getImageData(event: ChangeEvent<HTMLInputElement>) {
   const dataTransfer = new DataTransfer();
@@ -32,23 +33,23 @@ function getImageData(event: ChangeEvent<HTMLInputElement>) {
   return { file, displayUrl };
 }
 
-export function ProfileImage({ url }: { url: string | null }) {
+export function PostImage({ id }: { id: string }) {
   const session = useSession();
 
-  const [preview, setPreview] = useState(url ?? "");
+  const [preview, setPreview] = useState("");
   const form = useForm<z.infer<typeof uploadImageSchema>>({
     mode: "onSubmit",
     resolver: zodResolver(uploadImageSchema),
   });
 
   const uploadProfilePictureFile = useMutation({
-    mutationKey: ["user", "upload-profile-picture"],
+    mutationKey: ["post", "upload-post-image"],
     mutationFn: async (values: z.infer<typeof uploadImageSchema>) => {
       const formData = new FormData();
       formData.append("file", values.profileImage);
 
       const res = await fetch(
-        `http://localhost:4231/api/user/upload-profile-picture/${session.data?.user.id}`,
+        `http://localhost:4231/api/posts/upload-post-image/${id}`,
         {
           method: "POST",
           headers: {
@@ -79,12 +80,7 @@ export function ProfileImage({ url }: { url: string | null }) {
             uploadProfilePictureFile.mutate(data),
           )}
         >
-          <Avatar className="w-24 h-24">
-            <AvatarImage src={preview} className="w-24 h-24 object-cover" />
-            <AvatarFallback>
-              {genFallback(session.data?.user.name!)}
-            </AvatarFallback>
-          </Avatar>
+          <Image src={preview} width={200} height={200} alt="Preview" />
           <FormField
             control={form.control}
             name="profileImage"

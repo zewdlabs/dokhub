@@ -35,24 +35,6 @@ export function MarketingHeader() {
             >
               Features
             </Button>
-            <Link
-              href="/pricing"
-              className={cn(
-                buttonVariants({ variant: "link", className: "no-underline" }),
-                "text-base text-neutral-950 hover:text-primary ease-in transition-colors",
-              )}
-            >
-              Pricing
-            </Link>
-            <Link
-              href="/pricing"
-              className={cn(
-                buttonVariants({ variant: "link", className: "no-underline" }),
-                "text-base text-neutral-950 hover:text-primary ease-in transition-colors",
-              )}
-            >
-              Blog
-            </Link>
             <Button
               variant="link"
               className={cn(
@@ -71,15 +53,27 @@ export function MarketingHeader() {
           </nav>
         )}
         {status === "authenticated" && session ? (
-          <Link
-            href="/app"
-            className={cn(
-              buttonVariants({ variant: "default" }),
-              "rounded-full bg-primary hover:bg-primary/90 hidden md:flex items-center justify-center ease-in transition-colors",
-            )}
-          >
-            Dashboard
-          </Link>
+          session.user?.role !== "SUADMIN" ? (
+            <Link
+              href="/app"
+              className={cn(
+                buttonVariants({ variant: "default" }),
+                "rounded-full bg-primary hover:bg-primary/90 hidden md:flex items-center justify-center ease-in transition-colors",
+              )}
+            >
+              Dashboard
+            </Link>
+          ) : (
+            <Link
+              href="/admin"
+              className={cn(
+                buttonVariants({ variant: "default" }),
+                "rounded-full bg-primary hover:bg-primary/90 hidden md:flex items-center justify-center ease-in transition-colors",
+              )}
+            >
+              Admin Dashboard
+            </Link>
+          )
         ) : status === "unauthenticated" ? (
           <Link
             href="/auth/signin"

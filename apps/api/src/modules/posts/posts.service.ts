@@ -16,6 +16,17 @@ export class PostsService {
     private eventEmitter: EventEmitter2,
   ) {}
 
+  async updatePostPath(postId: string, url: string) {
+    return this.prisma.post.update({
+      where: {
+        id: postId,
+      },
+      data: {
+        postImage: url,
+      },
+    });
+  }
+
   async getReplies(postId: string): Promise<Post[]> {
     return await this.prisma.post.findMany({
       where: { replyToPostId: postId },
@@ -232,6 +243,7 @@ export class PostsService {
         authorId: true,
         minToRead: true,
         author: true,
+        postImage: true,
       },
       take: 10,
     });
@@ -256,6 +268,7 @@ export class PostsService {
         authorId: true,
         minToRead: true,
         author: true,
+        postImage: true,
       },
     });
   }
@@ -286,6 +299,7 @@ export class PostsService {
         authorId: true,
         minToRead: true,
         author: true,
+        postImage: true,
       },
     });
   }

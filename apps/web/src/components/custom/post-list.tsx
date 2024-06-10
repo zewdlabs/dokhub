@@ -6,10 +6,12 @@ import PostCard from "@/components/custom/post-card";
 import { useQuery } from "@tanstack/react-query";
 
 export interface Post {
+  postImage: string | null;
   author: {
     name: string;
     email: string;
     yearsOfExperience: string;
+    profileUrl: string | null;
   };
   id: string;
   reportedAmount: number;
@@ -88,6 +90,8 @@ export default function PostList({ tag }: { tag?: string }) {
       return data as Post[];
     },
   });
+
+  console.log("PPPPPPPPPPPPPPPPPPPPPPPPPP", posts);
 
   return (
     <TabsContent

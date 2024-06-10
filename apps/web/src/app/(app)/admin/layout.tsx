@@ -1,6 +1,7 @@
 "use client";
 
 import AccountButton from "@/components/custom/account";
+import { User } from "@/components/custom/users-table-list";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
@@ -9,6 +10,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 import {
   Package2,
   Home,
@@ -29,6 +31,25 @@ import { PropsWithChildren } from "react";
 export default function AdminLayout({ children }: PropsWithChildren) {
   const session = useSession();
   const pathname = usePathname();
+
+  const { data: currentUser, isLoading: isUserLoading } = useQuery({
+    queryKey: ["user", session?.data?.user.id],
+    queryFn: async () => {
+      const res = await fetch(
+        `http://localhost:4231/api/user/${session?.data?.user.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${session?.data?.tokens.accessToken}`,
+          },
+        },
+      );
+
+      if (!res.ok) return null;
+
+      return (await res.json()) as User;
+    },
+  });
+
   return (
     <>
       <div className="flex min-h-screen w-full flex-col bg-muted/40">
@@ -178,8 +199,8 @@ export default function AdminLayout({ children }: PropsWithChildren) {
               </SheetContent>
             </Sheet>
             <div className="w-full"></div>
-            {session.status === "authenticated" && (
-              <AccountButton session={session.data} />
+            {session.status === "authenticated" && !isUserLoading && (
+              <AccountButton session={session.data} user={currentUser!} />
             )}
           </header>
           {children}

@@ -880,6 +880,11 @@
         },
         "tags": [
           "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       },
       "get": {
@@ -892,6 +897,11 @@
         },
         "tags": [
           "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -915,6 +925,11 @@
         },
         "tags": [
           "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -938,6 +953,11 @@
         },
         "tags": [
           "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -969,6 +989,11 @@
         },
         "tags": [
           "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -1000,6 +1025,11 @@
         },
         "tags": [
           "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -1023,6 +1053,11 @@
         },
         "tags": [
           "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -1046,6 +1081,11 @@
         },
         "tags": [
           "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -1069,6 +1109,11 @@
         },
         "tags": [
           "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -1092,6 +1137,11 @@
         },
         "tags": [
           "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       },
       "patch": {
@@ -1123,6 +1173,11 @@
         },
         "tags": [
           "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       },
       "delete": {
@@ -1140,6 +1195,51 @@
         "responses": {
           "200": {
             "description": ""
+          }
+        },
+        "tags": [
+          "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/posts/upload-post-image/{id}": {
+      "post": {
+        "operationId": "PostsController_uploadPostPicture",
+        "summary": "Upload post picture",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The URL of the uploaded file."
           }
         },
         "tags": [
@@ -1167,6 +1267,11 @@
         },
         "tags": [
           "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -1190,6 +1295,11 @@
         },
         "tags": [
           "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },
@@ -1223,6 +1333,11 @@
         },
         "tags": [
           "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       },
       "get": {
@@ -1244,6 +1359,11 @@
         },
         "tags": [
           "Posts"
+        ],
+        "security": [
+          {
+            "bearer": []
+          }
         ]
       }
     },

@@ -67,7 +67,10 @@ export const signUpSchema = z
     password: z.string().min(6),
     confirmPassword: z.string().min(6),
   })
-  .refine((data) => data.password === data.confirmPassword);
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 export const profileFormSchema = z.object({
   name: z

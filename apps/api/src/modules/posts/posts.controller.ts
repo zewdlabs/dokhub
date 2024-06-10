@@ -7,17 +7,31 @@ import {
   Param,
   Delete,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { AccessTokenGuard } from '../auth/guards/accessToken.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { MinioService } from '../minio/minio.service';
 
 @ApiTags('Posts')
 @Controller('posts')
 export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(
+    private readonly postsService: PostsService,
+    private readonly minioService: MinioService,
+  ) {}
 
   @Post()
   @UseGuards(AccessTokenGuard)
@@ -100,6 +114,32 @@ export class PostsController {
   @ApiBearerAuth()
   update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
     return this.postsService.update(id, updatePostDto);
+  }
+
+  @Post('upload-post-image/:id')
+  @UseInterceptors(FileInterceptor('file'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @ApiOperation({ summary: 'Upload post picture' })
+  @ApiResponse({ status: 201, description: 'The URL of the uploaded file.' })
+  async uploadPostPicture(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('id') id: string,
+  ): Promise<{ url: string }> {
+    const fileName = await this.minioService.uploadFile(file);
+    const fileUrl = await this.minioService.getFileUrl(fileName);
+    await this.postsService.updatePostPath(id, fileUrl);
+    return { url: fileUrl };
   }
 
   @Delete(':id')

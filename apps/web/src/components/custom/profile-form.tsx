@@ -1,8 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { cn } from "@/lib/utils";
@@ -57,11 +56,6 @@ export function ProfileForm() {
       bio: userData?.bio,
     },
     mode: "onChange",
-  });
-
-  const { fields, append } = useFieldArray({
-    name: "urls",
-    control: form.control,
   });
 
   const updateProfile = useMutation({
@@ -147,6 +141,7 @@ export function ProfileForm() {
               </FormItem>
             )}
           />
+          {/*
           <div>
             {fields.map((field, index) => (
               <FormField
@@ -179,6 +174,7 @@ export function ProfileForm() {
               Add URL
             </Button>
           </div>
+          */}
           <Button type="submit">Update profile</Button>
         </form>
       </Form>

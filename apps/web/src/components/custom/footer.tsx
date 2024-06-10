@@ -31,32 +31,19 @@ export function MarketingFooter() {
               <span className="font-medium">Product</span>
               <ul>
                 <li className="text-primary transition-colors">
-                  <Link href="/" className="text-primary hover:text-primary/70">
+                  <Link
+                    href="#features"
+                    className="text-primary hover:text-primary/70"
+                  >
                     Features
                   </Link>
                 </li>
                 <li className="text-primary transition-colors">
                   <Link
-                    href="/pricing"
                     className="text-primary hover:text-primary/70"
-                  >
-                    Pricing
-                  </Link>
-                </li>
-                <li className="text-primary transition-colors">
-                  <Link
-                    className="text-primary hover:text-primary/70"
-                    href="/story"
+                    href="#testimonials"
                   >
                     Story
-                  </Link>
-                </li>
-                <li className="text-primary transition-colors">
-                  <Link
-                    className="text-primary hover:text-primary/70"
-                    href="/updates"
-                  >
-                    Updates
                   </Link>
                 </li>
               </ul>

@@ -156,6 +156,7 @@ model PasswordReset {
 model Post {
   id          String    @id @default(cuid())
   title       String
+  postImage   String?
   description String?
   content     String
   publishedAt DateTime?

@@ -24,7 +24,11 @@ export default function PostInfo({
       <div className="flex items-center justify-between">
         <div className="flex items-center">
           <Avatar className="h-14 w-14">
-            <AvatarImage src={undefined} alt={postDetails.author.name} />
+            <AvatarImage
+              src={postDetails.author.profileUrl ?? undefined}
+              alt={postDetails.author.name}
+              className="object-cover"
+            />
             <AvatarFallback>
               {genFallback(postDetails.author.name)}
             </AvatarFallback>

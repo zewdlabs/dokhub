@@ -49,20 +49,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
             if (res.ok) {
               const data = await res.json();
+              console.log(data);
               return data;
             } else if (res.status === 401) {
-              // Unauthorized
               return { error: "Unauthorized: Incorrect email or password." };
             } else if (res.status === 400) {
-              // Bad Request, possibly missing parameters
               return { error: "Bad Request: Missing or invalid parameters." };
             } else if (res.status === 500) {
-              // Internal Server Error
               return {
                 error: "Internal Server Error: Please try again later.",
               };
             } else {
-              // Other error responses
               return { error: `Error: ${res.statusText}` };
             }
           } catch (error) {
@@ -96,6 +93,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   pages: {
     signIn: "/auth/signin",
+    error: "/auth/error",
   },
 });
 
@@ -120,7 +118,8 @@ declare module "next-auth" {
       email: string;
       name: string;
       onboardingStatus: boolean;
-      profileUrl: string;
+      profileUrl: string | null;
+      role: string;
     } & DefaultSession["user"];
 
     tokens: {
@@ -141,7 +140,8 @@ declare module "next-auth/jwt" {
       email: string;
       name: string;
       onboardingStatus: boolean;
-      profileUrl: string;
+      profileUrl: string | null;
+      role: string;
     } & DefaultSession["user"];
 
     tokens: {

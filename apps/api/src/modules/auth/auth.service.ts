@@ -141,10 +141,11 @@ export class AuthService {
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
       profileUrl: user.profileUrl,
+      image: user.profileUrl,
       emailVerified: user.emailVerified,
       onboardingStatus: user.onboardingStatus,
     };
-    // const { password, refreshToken, ...safeUser } = user;
+
     return { tokens, user: userDto };
   }
 

@@ -111,7 +111,7 @@ export default function Dashboard({
                   }
                 >
                   <DropdownMenuItem>
-                    <button type="submit">Trash</button>
+                    <button type="submit">Delete</button>
                   </DropdownMenuItem>
                 </form>
               </DropdownMenuContent>

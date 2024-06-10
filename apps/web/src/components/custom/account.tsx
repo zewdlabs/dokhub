@@ -14,6 +14,7 @@ import {
 import type { Session } from "next-auth";
 import { signOut } from "next-auth/react";
 import Link from "next/link";
+import { User } from "./users-table-list";
 
 function genFallback(name: string) {
   return name
@@ -22,17 +23,24 @@ function genFallback(name: string) {
     .join("");
 }
 
-export default function AccountButton({ session }: { session: Session }) {
+export default function AccountButton({
+  session,
+  user,
+}: {
+  session: Session;
+  user: User;
+}) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-10 w-10">
             <AvatarImage
-              src={session.user.profileUrl}
-              alt={session?.user?.name!}
+              src={user.profileUrl ?? undefined}
+              alt={user.name}
+              className="h-10 w-10 object-cover"
             />
-            <AvatarFallback>{genFallback(session?.user?.name!)}</AvatarFallback>
+            <AvatarFallback>{genFallback(user.name)}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>

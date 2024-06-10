@@ -32,6 +32,10 @@ export default function ProfileLayout({ children }: PropsWithChildren) {
     },
   });
 
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <>
       <AppHeader />
@@ -46,10 +50,16 @@ export default function ProfileLayout({ children }: PropsWithChildren) {
           {/* TODO: If you can make it a placeholder, it would be better */}
           {status == "authenticated" ? (
             <div className="flex flex-col gap-4">
-              <Avatar className="h-10 w-10 mb-4">
-                <AvatarImage src={undefined} alt={session?.user?.name} />
+              <Avatar className="h-28 w-28 mb-4">
+                <AvatarImage
+                  src={userData?.profileUrl ?? undefined}
+                  alt={userData?.name}
+                  width={40}
+                  height={40}
+                  className="w-28 h-28 object-cover"
+                />
                 <AvatarFallback>
-                  {genFallback(session?.user?.name)}
+                  {genFallback(userData?.name ?? "User")}
                 </AvatarFallback>
               </Avatar>
               <h1 className="text-4xl font-bold">{userData?.name}</h1>

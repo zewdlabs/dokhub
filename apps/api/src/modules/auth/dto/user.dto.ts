@@ -17,6 +17,7 @@ export class UserDto implements Omit<User, 'password' | 'refreshToken'> {
   yearsOfExperience: number | null;
   verificationStatus: VerificationStatus;
   role: Role;
+  image: string | null;
   followedByCount: number;
   followingCount: number;
   createdAt: Date;

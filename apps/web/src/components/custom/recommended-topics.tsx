@@ -1,11 +1,9 @@
 "use client";
 
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { User } from "./users-table-list";
-import { genFallback } from "@/lib/utils";
 
 export default function RecommendedTopics() {
   const session = useSession();
