@@ -66,9 +66,9 @@ model User {
   tags            Tag[]
   posts           Post[]       @relation("author")
   likes           PostLike[]
-  followedBy      Follows[]    @relation("followedBy")
+  following      Follows[]    @relation("followedBy")
   followedByCount Int          @default(0)
-  following       Follows[]    @relation("following")
+  followedBy       Follows[]    @relation("following")
   followingCount  Int          @default(0)
   profileUrl      String?
   emailVerified   DateTime?

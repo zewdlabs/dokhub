@@ -190,37 +190,26 @@ export class UserService {
       data: { profileUrl: url },
     });
   }
+
   async updateUserFollowing(
     userId: string,
     userToFollowId: string,
   ): Promise<void> {
     // Check if the user exists
-    const user = await this.prisma.user.findUnique({
+    await this.prisma.user.findUniqueOrThrow({
       where: { id: userId },
     });
-    if (!user) {
-      throw new Error('User not found');
-    }
 
-    // Check if the user to follow exists
-    const userToFollow = await this.prisma.user.findUnique({
-      where: { id: userToFollowId },
+    await this.prisma.user.findUniqueOrThrow({
+      where: {
+        id: userToFollowId,
+      },
     });
-    if (!userToFollow) {
-      throw new Error('User to follow not found');
-    }
+
     await this.prisma.follows.create({
       data: {
         followedById: userId,
         followingId: userToFollowId,
-      },
-    });
-
-    // Update the followedBy list and counts for the user being followed
-    await this.prisma.follows.create({
-      data: {
-        followedById: userToFollowId,
-        followingId: userId,
       },
     });
   }
