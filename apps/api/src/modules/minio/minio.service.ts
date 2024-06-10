@@ -36,6 +36,7 @@ export class MinioService {
     await this.makeFilePublic(fileName);
     return fileName;
   }
+
   async makeFilePublic(fileName: string): Promise<void> {
     const policy = {
       Version: '2012-10-17',

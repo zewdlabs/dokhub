@@ -179,7 +179,6 @@ export class UserService {
     userId: string,
     verificationStatus: VerificationStatus,
   ): Promise<User> {
-    console.log('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', verificationStatus);
     return this.prisma.user.update({
       where: { id: userId },
       data: { verificationStatus: verificationStatus },

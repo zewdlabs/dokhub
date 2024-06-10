@@ -45,8 +45,6 @@ export default function SigninForm() {
         redirect: false,
       });
 
-      console.log("response", res);
-
       if (!res?.error) {
         return router.push("/auth/onboarding/personal");
       }

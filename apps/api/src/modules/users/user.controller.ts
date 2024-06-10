@@ -104,7 +104,6 @@ export class UserController {
   async findAll(
     @Param('verificationStatus') verificationStatus?: VerificationStatus | null,
   ): Promise<any> {
-    console.log(verificationStatus);
     return { message: 'hello' };
     // return await this.userService.findAll(verificationStatus);
   }
@@ -125,7 +124,6 @@ export class UserController {
     @Param('id') id: string,
     @Param('verificationStatus') verificationStatus: VerificationStatus,
   ): Promise<UserModel> {
-    console.log(id, verificationStatus);
     return this.userService.validateUser(id, verificationStatus);
   }
 
@@ -158,9 +156,6 @@ export class UserController {
     @UploadedFile() file: Express.Multer.File,
     @Param('id') id: string,
   ): Promise<{ url: string }> {
-    console.log('FILLLLLLEEE', file);
-
-    console.log('000000000000000000000000000000000000000', id);
     const fileName = await this.minioService.uploadFile(file);
     const fileUrl = await this.minioService.getFileUrl(fileName);
     await this.userService.updateProfilePath(id, fileUrl);
@@ -192,15 +187,11 @@ export class UserController {
     @Param('userId') userId: string,
     @Body() partialUpdateUserDto: Partial<UpdateUserDto>,
   ) {
-    console.log('For updating user', partialUpdateUserDto);
-    console.log('userId', userId);
-
     try {
       const updatedUser = await this.userService.updateProfile(
         userId,
         partialUpdateUserDto,
       );
-      console.log('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', partialUpdateUserDto);
       return updatedUser;
     } catch (error) {
       if (error instanceof NotFoundException) {

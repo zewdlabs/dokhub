@@ -40,8 +40,6 @@ export default function OnboardingSocialInfoForm() {
   const onSubmit = form.handleSubmit(
     async (values: z.infer<typeof onboardingSocialInfoSchema>) => {
       // NOTE: You can send the form data to the server here some api call
-
-      console.log(values)
       router.push("/app");
     },
   );
