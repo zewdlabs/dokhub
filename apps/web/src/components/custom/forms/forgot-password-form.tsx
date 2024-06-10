@@ -22,6 +22,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { forgotPasswordSchema } from "@/types/schema";
 import { toast } from "sonner";
+import { useMutation } from "@tanstack/react-query";
 
 export default function ForgotPasswordForm() {
   const form = useForm<z.infer<typeof forgotPasswordSchema>>({
@@ -31,10 +32,9 @@ export default function ForgotPasswordForm() {
     },
   });
 
-  const onSubmit = form.handleSubmit(
-    async (values: z.infer<typeof forgotPasswordSchema>) => {
-      // NOTE: Do some api calls which send verification code to the email
-      // Redirect the user to the reset password page
+  const forgotPasswordSubmit = useMutation({
+    mutationKey: ["forgot-password"],
+    mutationFn: async (values: z.infer<typeof forgotPasswordSchema>) => {
       const res = await fetch(
         `http://localhost:4231/api/auth/request-password-reset`,
         {
@@ -50,13 +50,16 @@ export default function ForgotPasswordForm() {
         throw new Error("Failed to send verification code");
       }
       toast("Verification code sent to your email");
-      // router.push("reset-password");
     },
-  );
+  });
 
   return (
     <Form {...form}>
-      <form onSubmit={onSubmit}>
+      <form
+        onSubmit={form.handleSubmit((data) =>
+          forgotPasswordSubmit.mutate(data),
+        )}
+      >
         <Card className="mx-auto max-w-sm">
           <CardHeader>
             <CardTitle className="text-2xl">Forgot password</CardTitle>
@@ -87,7 +90,11 @@ export default function ForgotPasswordForm() {
                   )}
                 />
               </div>
-              <Button type="submit" className="w-full">
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={forgotPasswordSubmit.isPending}
+              >
                 Send Reset Link
               </Button>
             </div>

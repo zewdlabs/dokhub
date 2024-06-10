@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
+import { useMutation } from "@tanstack/react-query";
 
 export default function ResetPasswordForm() {
   const router = useRouter();
@@ -40,8 +41,9 @@ export default function ResetPasswordForm() {
     },
   });
 
-  const onSubmit = form.handleSubmit(
-    async (values: z.infer<typeof resetPasswordSchema>) => {
+  const resetPasswordFormSubmit = useMutation({
+    mutationKey: ["reset-password"],
+    mutationFn: async (values: z.infer<typeof resetPasswordSchema>) => {
       if (values.password !== values.confirmPassword) {
         toast.error("Password and confirm password do not match.");
         return;
@@ -69,11 +71,15 @@ export default function ResetPasswordForm() {
       toast.success("Account has been recovered successfully!");
       return router.push("/auth/signin");
     },
-  );
+  });
 
   return (
     <Form {...form}>
-      <form onSubmit={onSubmit}>
+      <form
+        onSubmit={form.handleSubmit((data) =>
+          resetPasswordFormSubmit.mutate(data),
+        )}
+      >
         <Card className="mx-auto w-96">
           <CardHeader>
             <CardTitle className="text-2xl">Password Reset</CardTitle>
@@ -124,7 +130,11 @@ export default function ResetPasswordForm() {
                   )}
                 />
               </div>
-              <Button type="submit" className="w-full">
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={resetPasswordFormSubmit.isPending}
+              >
                 Reset Password
               </Button>
             </div>
