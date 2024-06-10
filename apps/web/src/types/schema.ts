@@ -17,6 +17,12 @@ export const deleteChatSchema = z.object({
   id: z.string(),
 });
 
+export const uploadImageSchema = z.object({
+  profileImage: z.custom<File>((v) => v instanceof File, {
+    message: "Image is required",
+  }),
+});
+
 export const deleteUserSchema = z.object({
   id: z.string(),
 });
@@ -75,14 +81,14 @@ export const profileFormSchema = z.object({
     .optional(),
   email: z.string().email().optional(),
   bio: z.string().max(160).min(4).optional(),
-  urls: z
-    .array(
-      z.object({
-        name: z.string().min(2).max(30),
-        value: z.string().url({ message: "Please enter a valid URL." }),
-      }),
-    )
-    .optional(),
+  // urls: z
+  //   .array(
+  //     z.object({
+  //       name: z.string().min(2).max(30),
+  //       value: z.string().url({ message: "Please enter a valid URL." }),
+  //     }),
+  //   )
+  //   .optional(),
   //TODO: add profile iamge
 });
 

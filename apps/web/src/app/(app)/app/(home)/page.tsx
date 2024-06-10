@@ -1,4 +1,5 @@
 import PostList from "@/components/custom/post-list";
+import ToFollowPeople from "@/components/custom/to-follow";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -52,59 +53,9 @@ export default async function HomePage() {
       </div>
       <div>
         <div className="sticky top-20 flex flex-col gap-6">
-          <div className="bg-transparent rounded-lg">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Recommended Topics</h2>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {topics.map((topic) => (
-              <Button variant={"ghost"} key={topic.title}>
-                {topic.title}
-              </Button>
-            ))}
-          </div>
+          <ToFollowPeople />
         </div>
       </div>
     </div>
   );
 }
-
-const topics: { title: string }[] = [
-  {
-    title: "Bioengineering",
-  },
-  {
-    title: "Postpartum",
-  },
-  {
-    title: "Epidemiology",
-  },
-  {
-    title: "Genetic Engineering",
-  },
-  {
-    title: "Medcare",
-  },
-  {
-    title: "Prepartum",
-  },
-  {
-    title: "Bioengineering",
-  },
-  {
-    title: "Postpartum",
-  },
-  {
-    title: "Epidemiology",
-  },
-  {
-    title: "Genetic Engineering",
-  },
-  {
-    title: "Medcare",
-  },
-  {
-    title: "Prepartum",
-  },
-];

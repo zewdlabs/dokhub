@@ -164,7 +164,6 @@ async function main() {
 
   await prisma.follows.createMany({
     data: [
-      { followedById: user1.id, followingId: user2.id },
       { followedById: user1.id, followingId: user3.id },
       { followedById: user1.id, followingId: user4.id },
       { followedById: user1.id, followingId: user5.id },
@@ -230,6 +229,7 @@ async function main() {
       { followedById: user9.id, followingId: user7.id },
       { followedById: user9.id, followingId: user8.id },
     ],
+    skipDuplicates: true,
   });
 
   // Create posts by organization members

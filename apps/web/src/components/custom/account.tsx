@@ -28,7 +28,10 @@ export default function AccountButton({ session }: { session: Session }) {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-10 w-10">
-            <AvatarImage src={undefined} alt={session?.user?.name!} />
+            <AvatarImage
+              src={session.user.profileUrl}
+              alt={session?.user?.name!}
+            />
             <AvatarFallback>{genFallback(session?.user?.name!)}</AvatarFallback>
           </Avatar>
         </Button>

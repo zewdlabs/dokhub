@@ -17,34 +17,35 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { profileFormSchema } from "@/types/schema";
-import { useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
+import { ProfileImage } from "./upload-profile";
+import { User } from "./users-table-list";
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export function ProfileForm() {
+  const session = useSession();
+
   const { data: userData } = useQuery({
-    queryKey: ["user", "profile"],
+    queryKey: ["user", "profile", session.data?.user.id],
     queryFn: async () => {
       const res = await fetch(
-        // `${process.env.BACKEND_URL}/api/user/${session.data?.user.id}`,
-        "http://localhost:4231/api/user/profile/clwyrexkq0003277mmksrrkg2",
+        `http://localhost:4231/api/user/${session.data?.user.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${session.data?.tokens.accessToken}`,
+          },
+        },
       );
 
       if (!res.ok) return null;
 
       const data = await res.json();
 
-      return data;
+      return data as User;
     },
   });
 
@@ -63,107 +64,124 @@ export function ProfileForm() {
     control: form.control,
   });
 
-  function onSubmit(data: ProfileFormValues) {
-    console.info(data);
-    toast("You submitted the following values");
+  const updateProfile = useMutation({
+    mutationKey: ["user", "update"],
+    mutationFn: async (values: ProfileFormValues) => {
+      const res = await fetch(
+        `http://localhost:4231/api/user/profile/${session.data?.user.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${session.data?.tokens.accessToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: values.name,
+            bio: values.bio,
+          }),
+        },
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to update profile");
+      }
+
+      return await res.json();
+    },
+  });
+
+  if (!userData) {
+    return null;
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input defaultValue={userData?.name} {...field} />
-              </FormControl>
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+    <>
+      <ProfileImage url={userData.profileUrl} />
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit((data) => updateProfile.mutate(data))}
+          className="space-y-8"
+        >
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
                 <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a verified email to display" />
-                  </SelectTrigger>
+                  <Input defaultValue={userData?.name} {...field} />
                 </FormControl>
-                <SelectContent>
-                  <SelectItem value="m@example.com">m@example.com</SelectItem>
-                  <SelectItem value="m@google.com">m@google.com</SelectItem>
-                  <SelectItem value="m@support.com">m@support.com</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormDescription>
-                You can manage verified email addresses in your{" "}
-                <Link href="/examples/forms">email settings</Link>.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="bio"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Bio</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Tell us a little bit about yourself"
-                  className="resize-none"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>
-                You can <span>@mention</span> other users and organizations to
-                link to them.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div>
-          {fields.map((field, index) => (
-            <FormField
-              control={form.control}
-              key={field.id}
-              name={`urls.${index}.value`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className={cn(index !== 0 && "sr-only")}>
-                    URLs
-                  </FormLabel>
-                  <FormDescription className={cn(index !== 0 && "sr-only")}>
-                    Add links to your website, blog, or social media profiles.
-                  </FormDescription>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          ))}
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="mt-2"
-            onClick={() => append({ value: "", name: "" })}
-          >
-            Add URL
-          </Button>
-        </div>
-        <Button type="submit">Update profile</Button>
-      </form>
-    </Form>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input defaultValue={userData?.email} {...field} readOnly />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="bio"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Bio</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Tell us a little bit about yourself"
+                    defaultValue={userData?.bio}
+                    className="resize-none"
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Add a short bio to tell other users about yourself.
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div>
+            {fields.map((field, index) => (
+              <FormField
+                control={form.control}
+                key={field.id}
+                name={`urls.${index}.value`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className={cn(index !== 0 && "sr-only")}>
+                      URLs
+                    </FormLabel>
+                    <FormDescription className={cn(index !== 0 && "sr-only")}>
+                      Add links to your website, blog, or social media profiles.
+                    </FormDescription>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ))}
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="mt-2"
+              onClick={() => append({ value: "", name: "" })}
+            >
+              Add URL
+            </Button>
+          </div>
+          <Button type="submit">Update profile</Button>
+        </form>
+      </Form>
+    </>
   );
 }
