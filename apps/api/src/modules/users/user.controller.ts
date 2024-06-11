@@ -174,9 +174,21 @@ export class UserController {
     await this.userService.updateUserFollowing(followerId, followId);
   }
 
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
   @Get('tofollow/:userId')
   async getToFollowUsers(@Param('userId') userId: string) {
     return this.userService.getToFollowUsers(userId);
+  }
+
+  @Get('stats/week')
+  async getStats() {
+    return this.userService.getWeekStats();
+  }
+
+  @Get('stats/year')
+  async getStatsYearly() {
+    return this.userService.getYearlyStatus();
   }
 
   @Patch('profile/:userId')

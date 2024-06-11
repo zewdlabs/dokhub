@@ -652,6 +652,33 @@
           "200": {
             "description": ""
           }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/user/stats/week": {
+      "get": {
+        "operationId": "UserController_getStats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/user/stats/year": {
+      "get": {
+        "operationId": "UserController_getStatsYearly",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
         }
       }
     },

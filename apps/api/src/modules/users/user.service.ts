@@ -7,7 +7,6 @@ import CreateUserDto from '@/modules/auth/dto/create-user.dto';
 import { UpdateUserDto } from './dto/updateuser.dto';
 import { mapUserDto } from '../../utils/mapper.utils';
 import { UserDto } from '../auth/dto/user.dto';
-// import { UserDto } from '../auth/dto/user.dto';
 
 export const roundsOfHashing = 10;
 @Injectable()
@@ -16,10 +15,63 @@ export class UserService {
 
   private logger = new Logger('User service');
 
+  async getWeekStats(): Promise<{
+    newUsersThisWeek: number;
+    increasedByPercentage: number;
+  }> {
+    const aggregate = await this.prisma.user.aggregate({
+      where: {
+        createdAt: {
+          gte: new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000),
+        },
+      },
+      _count: true,
+    });
+
+    const previousWeekAggregate = await this.prisma.user.aggregate({
+      where: {
+        createdAt: {
+          gte: new Date(new Date().getTime() - 14 * 24 * 60 * 60 * 1000),
+          lt: new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000),
+        },
+      },
+      _count: true,
+    });
+
+    const increasedByPercentage =
+      ((aggregate._count - previousWeekAggregate._count) /
+        previousWeekAggregate._count) *
+      100;
+
+    return {
+      newUsersThisWeek: aggregate._count,
+      increasedByPercentage,
+    };
+  }
+
+  async getYearlyStatus(): Promise<{ newUsersThisMonth: number }[]> {
+    const response = [];
+    for (let i = 1; i <= 12; i++) {
+      const aggregate = await this.prisma.user.aggregate({
+        where: {
+          createdAt: {
+            gte: new Date(new Date().getFullYear(), i - 1, 1),
+            lt: new Date(new Date().getFullYear(), i, 1),
+          },
+        },
+        _count: true,
+      });
+
+      response.push({ newUsersThisMonth: aggregate._count });
+    }
+
+    return response;
+  }
+
   async getToFollowUsers(userId: string): Promise<User[]> {
     const usersFollowed = await this.prisma.follows.findMany({
       where: {
-        followingId: userId,
+        followedById: userId,
       },
     });
 

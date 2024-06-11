@@ -1,5 +1,7 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis } from "recharts";
 
 const data = [
@@ -54,11 +56,44 @@ const data = [
 ];
 
 export function Overview() {
+  const session = useSession();
+
+  const { data: usersMonthly, isLoading: isUserMonthlyLoading } = useQuery({
+    queryKey: ["users", "new", "monthly"],
+    queryFn: async () => {
+      const res = await fetch(`http://localhost:4231/api/user/stats/year`, {
+        headers: {
+          Authorization: `Bearer ${session.data?.tokens.accessToken}`,
+        },
+      });
+
+      if (!res.ok) {
+        return null;
+      }
+
+      const result = await res.json();
+      console.log(result);
+
+      return result as { newUsersThisMonth: number }[];
+    },
+  });
+
+  if (isUserMonthlyLoading) {
+    return <div>Loading ...</div>;
+  }
+
+  const fullData = data.map((entry, idx) => {
+    return {
+      name: entry.name,
+      total: usersMonthly ? usersMonthly[idx].newUsersThisMonth : 0,
+    };
+  });
+
   return (
     <>
       <h2 className="text-2xl font-semibold p-2 pb-6">Overview</h2>
       <ResponsiveContainer width="100%" height={350}>
-        <BarChart data={data}>
+        <BarChart data={fullData}>
           <XAxis
             dataKey="name"
             stroke="#888888"

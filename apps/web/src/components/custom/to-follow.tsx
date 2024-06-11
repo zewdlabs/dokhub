@@ -17,7 +17,6 @@ export default function ToFollowPeople() {
       const res = await fetch(
         `http://localhost:4231/api/user/tofollow/${session.data?.user.id}`,
         {
-          method: "POST",
           headers: {
             Authorization: `Bearer ${session.data?.tokens.accessToken}`,
           },
@@ -90,7 +89,11 @@ function SingleCard({ user }: { user: User }) {
     <form onSubmit={() => handleFollow.mutate({ followId: user.id })}>
       <div className="flex items-center space-x-4 min-w-80">
         <Avatar className="flex-shrink-0">
-          <AvatarImage src={user.profileUrl ?? undefined} alt={user.name} />
+          <AvatarImage
+            src={user.profileUrl ?? undefined}
+            alt={user.name}
+            className="object-cover"
+          />
           <AvatarFallback>{genFallback(user.name)}</AvatarFallback>
         </Avatar>
         <div className="flex-1 space-y-1">
