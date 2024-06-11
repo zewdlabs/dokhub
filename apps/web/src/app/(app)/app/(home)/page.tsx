@@ -1,3 +1,5 @@
+"use client";
+import React, { useState } from "react";
 import PostList from "@/components/custom/post-list";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
@@ -5,7 +7,37 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export default async function HomePage() {
+interface Post {
+  title: string;
+}
+
+export default function HomePage() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [results, setResults] = useState<Post[]>([]);
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setSearchTerm(value);
+
+    if (value) {
+      fetch(`http://localhost:4231/api/search?name=${value}`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          setResults(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching search results:", error);
+        });
+    } else {
+      setResults([]);
+    }
+  };
+
   return (
     <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
       <div className="xl:col-span-2 space-y-4 md:space-y-6">
@@ -16,9 +48,16 @@ export default async function HomePage() {
               type="search"
               placeholder="Search for posts..."
               className="pl-8 ring-1 ring-muted-foreground/20"
+              value={searchTerm}
+              onChange={handleInputChange}
             />
           </div>
         </form>
+        <div>
+          {results.map((result, index) => (
+            <div key={index}>{result.title}</div>
+          ))}
+        </div>
         <div className="md:container w-full">
           <div className="flex gap-4">
             <Tabs
@@ -58,8 +97,8 @@ export default async function HomePage() {
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
-            {topics.map((topic) => (
-              <Button variant={"ghost"} key={topic.title}>
+            {topics.map((topic, index) => (
+              <Button variant={"ghost"} key={index}>
                 {topic.title}
               </Button>
             ))}
