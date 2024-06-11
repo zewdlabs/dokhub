@@ -40,6 +40,7 @@ import {
 import { useState } from "react";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { User } from "./users-table-list";
+import { Separator } from "../ui/separator";
 
 export default function PostCard({ post, tag }: { post: Post; tag: string }) {
   const session = useSession();
@@ -205,7 +206,30 @@ export default function PostCard({ post, tag }: { post: Post; tag: string }) {
 }
 
 function UserProfile({ user }: { user: User }) {
+  const session = useSession();
   const [profileViewModalOpen, setProfileViewModalOpen] = useState(false);
+
+  const handleFollow = useMutation({
+    mutationKey: ["follow", user.id],
+    mutationFn: async ({ followId }: { followId: string }) => {
+      const res = await fetch(
+        `http://localhost:4231/api/user/follow/${session.data?.user.id}/${followId}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${session.data?.tokens.accessToken}`,
+          },
+        },
+      );
+
+      if (!res.ok) {
+        return null;
+      }
+
+      return await res.json();
+    },
+    onSuccess: () => toast.success("user followed successfully"),
+  });
 
   return (
     <Dialog open={profileViewModalOpen} onOpenChange={setProfileViewModalOpen}>
@@ -226,20 +250,48 @@ function UserProfile({ user }: { user: User }) {
             See more information about the person.
           </DialogDescription>
         </DialogHeader>
-        <Image
-          width={80}
-          height={80}
-          className="object-cover"
-          src={user.profileUrl ?? "/placeholder.png"}
-          alt={user.name}
-        />
+        <Avatar className="h-28 w-28 mb-4">
+          <AvatarImage
+            src={user.profileUrl ?? undefined}
+            alt={user.name}
+            width={40}
+            height={40}
+            className="w-28 h-28 object-cover"
+          />
+          <AvatarFallback>{genFallback(user.name ?? "User")}</AvatarFallback>
+        </Avatar>
+        <h1 className="text-4xl font-bold">{user?.name}</h1>
+        <div className="flex gap-4">
+          <p className="text-lg">Following: {user?.followingCount}</p>
+          <p className="text-lg">Followers: {user?.followedByCount}</p>
+        </div>
+        <Separator orientation="horizontal" />
+        <p className="text-lg">{user?.email}</p>
+        <p>{user?.bio}</p>
+        <Separator orientation="horizontal" />
+        <p className="text-lg">{user?.yearsOfExperience} years of experience</p>
+        <p className="text-lg font-semibold">
+          Occupation:{" "}
+          <span className="text-base font-normal">{user?.occupation}</span>
+        </p>
+        {user?.verificationStatus === "VERIFIED" && (
+          <p className="text-lg font-semibold">
+            Medical License Number:{" "}
+            <span className="text-base font-normal">
+              {user?.medicalLicenseNumber}
+            </span>
+          </p>
+        )}
         <DialogFooter>
           <Button
+            onClick={() => {
+              handleFollow.mutate({ followId: user.id });
+            }}
             variant="default"
             className="hidden md:flex md:gap-2 md:items-center md:justify-center rounded-full"
             type="submit"
           >
-            Publish Now
+            Follow
           </Button>
         </DialogFooter>
       </DialogContent>

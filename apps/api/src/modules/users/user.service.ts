@@ -212,7 +212,26 @@ export class UserService {
         followingId: userToFollowId,
       },
     });
+
+    await this.prisma.user.update({
+      where: { id: userToFollowId },
+      data: {
+        followedByCount: {
+          increment: 1,
+        },
+      },
+    });
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        followingCount: {
+          increment: 1,
+        },
+      },
+    });
   }
+
   async searchUsersByName(name: string): Promise<UserDto[] | UserDto> {
     const users = await this.prisma.user.findMany({
       where: {

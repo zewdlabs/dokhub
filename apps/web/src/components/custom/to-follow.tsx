@@ -6,6 +6,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSession } from "next-auth/react";
 import { User } from "./users-table-list";
 import { genFallback } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function ToFollowPeople() {
   const session = useSession();
@@ -16,6 +17,7 @@ export default function ToFollowPeople() {
       const res = await fetch(
         `http://localhost:4231/api/user/tofollow/${session.data?.user.id}`,
         {
+          method: "POST",
           headers: {
             Authorization: `Bearer ${session.data?.tokens.accessToken}`,
           },
@@ -63,32 +65,30 @@ function SingleCard({ user }: { user: User }) {
   const session = useSession();
 
   const handleFollow = useMutation({
-    mutationKey: ["follow", user.id],
-    mutationFn: async () => {
-      const res = await fetch(`http://localhost:4231/api/user/follow`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.data?.tokens.accessToken}`,
+    mutationKey: ["follow", session.data?.user.id],
+    mutationFn: async ({ followId }: { followId: string }) => {
+      const res = await fetch(
+        `http://localhost:4231/api/user/follow/${session.data?.user.id}/${followId}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${session.data?.tokens.accessToken}`,
+          },
         },
-        body: JSON.stringify({
-          userId: session.data?.user.id,
-          userToFollowId: user.id,
-        }),
-      });
+      );
+
       if (!res.ok) {
-        throw new Error("An error occurred while following user");
+        return null;
       }
 
-      return (await res.json()) as User;
+      return await res.json();
     },
+    onSuccess: () => toast.success("user followed successfully"),
   });
+
   return (
-    <form onSubmit={() => handleFollow.mutate()}>
-      <div
-        onClick={() => handleFollow.mutate()}
-        className="flex items-center space-x-4 min-w-80"
-      >
+    <form onSubmit={() => handleFollow.mutate({ followId: user.id })}>
+      <div className="flex items-center space-x-4 min-w-80">
         <Avatar className="flex-shrink-0">
           <AvatarImage src={user.profileUrl ?? undefined} alt={user.name} />
           <AvatarFallback>{genFallback(user.name)}</AvatarFallback>
