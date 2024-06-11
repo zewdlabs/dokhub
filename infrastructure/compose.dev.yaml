@@ -45,6 +45,18 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+  log:
+    container_name: log
+    image: datalust/seq
+    restart: unless-stopped
+    ports:
+      - 5342:80
+      - 5341:5341
+    volumes:
+      - logdata:/var/lib/seq/data
+    environment:
+      ACCEPT_EULA: "Y"
 volumes:
   dbdata:
   vectordata:
+  logdata:

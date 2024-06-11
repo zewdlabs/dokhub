@@ -82,7 +82,7 @@ export class UserService {
       where: {
         NOT: {
           id: {
-            in: usersFollowed.map((user) => user.followedById) && [userId],
+            in: usersFollowed.map((user) => user.followingId) && [userId],
           },
         },
       },

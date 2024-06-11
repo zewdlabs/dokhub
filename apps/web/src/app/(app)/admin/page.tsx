@@ -118,20 +118,6 @@ export default function Dashboard() {
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardDescription>New Organizations</CardDescription>
-              <CardTitle className="text-4xl">2</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-xs text-muted-foreground">
-                +100% from last month
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Progress value={100} aria-label="100% increase" />
-            </CardFooter>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
               <CardDescription>New Messages</CardDescription>
               <CardTitle className="text-4xl">2</CardTitle>
             </CardHeader>

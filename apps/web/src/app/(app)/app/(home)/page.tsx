@@ -1,8 +1,8 @@
 import PostList from "@/components/custom/post-list";
+import SearchForm from "@/components/custom/search-form";
 import ToFollowPeople from "@/components/custom/to-follow";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -10,16 +10,7 @@ export default async function HomePage() {
   return (
     <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
       <div className="xl:col-span-2 space-y-4 md:space-y-6">
-        <form className="max-w-5xl px-2 mx-auto z-50">
-          <div className="relative">
-            <Icons.search className="absolute left-2.5 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search for posts..."
-              className="pl-8 ring-1 ring-muted-foreground/20"
-            />
-          </div>
-        </form>
+        <SearchForm />
         <div className="md:container w-full">
           <div className="flex gap-4">
             <Tabs
@@ -46,6 +37,7 @@ export default async function HomePage() {
                 </TabsTrigger>
               </TabsList>
               <PostList tag="foryou" />
+              <PostList tag="following" />
               <PostList tag="following" />
             </Tabs>
           </div>

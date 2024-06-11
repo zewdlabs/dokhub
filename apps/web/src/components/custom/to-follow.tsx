@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import { User } from "./users-table-list";
 import { genFallback } from "@/lib/utils";
 import { toast } from "sonner";
+import { useState } from "react";
 
 export default function ToFollowPeople() {
   const session = useSession();
@@ -63,6 +64,8 @@ export default function ToFollowPeople() {
 function SingleCard({ user }: { user: User }) {
   const session = useSession();
 
+  const [followState, setFollowState] = useState(false);
+
   const handleFollow = useMutation({
     mutationKey: ["follow", session.data?.user.id],
     mutationFn: async ({ followId }: { followId: string }) => {
@@ -82,32 +85,37 @@ function SingleCard({ user }: { user: User }) {
 
       return await res.json();
     },
-    onSuccess: () => toast.success("user followed successfully"),
+    onSuccess: () => {
+      toast.success("user followed successfully");
+      setFollowState(true);
+    },
   });
 
   return (
-    <form onSubmit={() => handleFollow.mutate({ followId: user.id })}>
-      <div className="flex items-center space-x-4 min-w-80">
-        <Avatar className="flex-shrink-0">
-          <AvatarImage
-            src={user.profileUrl ?? undefined}
-            alt={user.name}
-            className="object-cover"
-          />
-          <AvatarFallback>{genFallback(user.name)}</AvatarFallback>
-        </Avatar>
-        <div className="flex-1 space-y-1">
-          <div className="font-medium text-gray-900 dark:text-gray-100">
-            {user.name}
-          </div>
-          <div className="text-sm text-gray-500 dark:text-gray-400">
-            {user.occupation}
-          </div>
+    <div className="flex items-center space-x-4 min-w-80">
+      <Avatar className="flex-shrink-0">
+        <AvatarImage
+          src={user.profileUrl ?? undefined}
+          alt={user.name}
+          className="object-cover"
+        />
+        <AvatarFallback>{genFallback(user.name)}</AvatarFallback>
+      </Avatar>
+      <div className="flex-1 space-y-1">
+        <div className="font-medium text-gray-900 dark:text-gray-100">
+          {user.name}
         </div>
-        <Button variant="outline" size="sm" type="submit">
-          Follow
-        </Button>
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          {user.occupation}
+        </div>
       </div>
-    </form>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => handleFollow.mutate({ followId: user.id })}
+      >
+        {followState ? "Following" : "Follow"}
+      </Button>
+    </div>
   );
 }

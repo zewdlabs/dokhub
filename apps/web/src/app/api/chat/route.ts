@@ -189,7 +189,7 @@ export async function POST(req: NextRequest) {
         url: process.env.UPSTASH_REDIS_REST_URL,
         token: process.env.UPSTASH_REDIS_REST_TOKEN,
       }),
-      limiter: Ratelimit.fixedWindow(1, "60 s"),
+      limiter: Ratelimit.fixedWindow(10, "60 s"),
     });
 
     const rateLimitingHandler = new UpstashRatelimitHandler(userId, {

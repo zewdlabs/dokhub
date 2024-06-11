@@ -660,6 +660,31 @@
         ]
       }
     },
+    "/api/user/following/{userId}": {
+      "get": {
+        "operationId": "UserController_fetchFollowing",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/user/stats/week": {
       "get": {
         "operationId": "UserController_getStats",

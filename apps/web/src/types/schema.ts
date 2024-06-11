@@ -102,6 +102,10 @@ export const onboardingSocialInfoSchema = z.object({
   instagram: z.string(),
 });
 
+export const searchSchema = z.object({
+  query: z.string(),
+});
+
 export const forgotPasswordSchema = z.object({
   email: z.string().email(),
 });
@@ -123,6 +127,7 @@ export const profileFormSchema = z.object({
     .optional(),
   email: z.string().email().optional(),
   bio: z.string().max(160).min(4).optional(),
+  medicalLicense: z.string().optional(),
   // urls: z
   //   .array(
   //     z.object({

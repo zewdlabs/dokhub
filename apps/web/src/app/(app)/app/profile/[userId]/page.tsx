@@ -1,6 +1,5 @@
 "use client";
 
-import AboutCard from "@/components/custom/about-card";
 import PostList from "@/components/custom/post-list";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";

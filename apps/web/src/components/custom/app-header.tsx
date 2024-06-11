@@ -256,6 +256,9 @@ export function AppHeader() {
         <div className="flex items-center gap-4 ">
           {status === "authenticated" && !pathname.startsWith("/app/c") && (
             <Link
+              onClick={() => 
+                user.data?.verificationStatus !== "VERIFIED" && toast.info("Chat is not available for you")
+              }            
               href="/app/c"
               className={cn(
                 buttonVariants({
@@ -268,6 +271,9 @@ export function AppHeader() {
             </Link>
           )}
           <Link
+            onClick={() => 
+              user.data?.verificationStatus !== "VERIFIED" && toast.info("writing is not available for you")
+            }      
             href="/app/new"
             className={cn(
               buttonVariants({ variant: "default" }),

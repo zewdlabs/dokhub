@@ -181,6 +181,13 @@ export class UserController {
     return this.userService.getToFollowUsers(userId);
   }
 
+  @UseGuards(AccessTokenGuard)
+  @ApiBearerAuth()
+  @Get('following/:userId')
+  async fetchFollowing(@Param('userId') userId: string) {
+    return this.userService.checkFollowing(userId);
+  }
+
   @Get('stats/week')
   async getStats() {
     return this.userService.getWeekStats();
